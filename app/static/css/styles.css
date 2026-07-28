@@ -1,0 +1,260 @@
+:root, [data-theme="light"] {
+  --font-display: 'Cabinet Grotesk', sans-serif;
+  --font-body: 'Satoshi', sans-serif;
+  --bg: #10081e;
+  --surface: #1a1030;
+  --surface-2: #241343;
+  --surface-3: #301858;
+  --text: #f7f0ff;
+  --muted: #b8a8d1;
+  --gold: #f2b84b;
+  --gold-2: #d99a19;
+  --purple: #7f4fe0;
+  --border: rgba(242,184,75,0.18);
+  --success: #4ed29c;
+  --danger: #ff7d8d;
+}
+
+html, body {
+  background: radial-gradient(circle at top, #251243, var(--bg));
+  color: var(--text);
+  font-family: var(--font-body);
+}
+
+body { min-height: 100vh; }
+.skip-link { position:absolute; left:-9999px; }
+.skip-link:focus { left:1rem; top:1rem; background:#fff; color:#000; padding:.5rem .75rem; z-index:1000; }
+
+.app-navbar {
+  background: rgba(16,8,30,.92);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--border);
+}
+
+.navbar-brand, .navbar-brand:hover {
+  color: var(--text);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.logo-mark {
+  display:inline-flex;
+  width:2.5rem;
+  height:2.5rem;
+  border-radius:50%;
+  align-items:center;
+  justify-content:center;
+  background: linear-gradient(135deg, var(--gold), #fff0b2);
+  color:#230f06;
+  font-weight:800;
+}
+
+.theme-toggle {
+  width:2.5rem;
+  height:2.5rem;
+  border-radius:999px;
+  background:var(--surface-2);
+  color:var(--gold);
+  border:none;
+}
+
+.status-chip, .status-pill {
+  padding:.45rem .75rem;
+  border-radius:999px;
+  background:rgba(242,184,75,.1);
+  color:var(--gold);
+  border:1px solid var(--border);
+  font-size:.85rem;
+}
+
+.hero-panel, .race-summary, .card-panel, .meeting-card, .predictor-panel, .race-block, .horse-card, .podium-card {
+  background: linear-gradient(180deg, rgba(48,24,88,.75), rgba(26,16,48,.95));
+  border:1px solid var(--border);
+  border-radius:1.25rem;
+  box-shadow:0 16px 40px rgba(0,0,0,.25);
+}
+
+.hero-panel, .race-summary {
+  display:grid;
+  grid-template-columns:2fr 1fr;
+  gap:1.5rem;
+  padding:1.5rem;
+}
+
+.page-title {
+  font-family:var(--font-display);
+  font-size:clamp(2rem,4vw,3.5rem);
+  line-height:1.05;
+  margin:0 0 .75rem;
+}
+
+.eyebrow {
+  text-transform:uppercase;
+  letter-spacing:.12em;
+  color:var(--gold);
+  font-size:.8rem;
+}
+
+.hero-copy, .text-muted {
+  color:var(--muted) !important;
+}
+
+.hero-stats, .summary-grid, .detail-grid, .info-stack {
+  display:grid;
+  gap:1rem;
+}
+
+.summary-grid, .detail-grid {
+  grid-template-columns:repeat(auto-fit, minmax(180px, 1fr));
+}
+
+.stat-card {
+  background:rgba(255,255,255,.03);
+  border:1px solid rgba(255,255,255,.06);
+  border-radius:1rem;
+  padding:1rem;
+  display:flex;
+  flex-direction:column;
+  gap:.35rem;
+}
+
+.toolbar, .chip-row {
+  display:flex;
+  gap:1rem;
+  align-items:center;
+  flex-wrap:wrap;
+}
+
+.filter-input {
+  max-width:340px;
+  background:var(--surface);
+  color:var(--text);
+  border:1px solid var(--border);
+}
+
+.btn-gold {
+  background:linear-gradient(135deg, var(--gold), var(--gold-2));
+  color:#261300;
+  font-weight:700;
+  border:none;
+}
+
+.meeting-grid, .race-cards-grid, .horse-grid, .podium-grid {
+  display:grid;
+  grid-template-columns:repeat(auto-fit, minmax(280px, 1fr));
+  gap:1rem;
+}
+
+.meeting-card, .predictor-panel, .card-panel, .race-block, .horse-card, .podium-card {
+  padding:1.25rem;
+}
+
+.meeting-header, .race-block-top, .panel-heading {
+  display:flex;
+  justify-content:space-between;
+  gap:1rem;
+  align-items:start;
+  flex-wrap:wrap;
+}
+
+.variable-grid {
+  display:grid;
+  grid-template-columns:repeat(auto-fit, minmax(150px, 1fr));
+  gap:1rem;
+}
+
+.selectable-pill {
+  min-height:120px;
+  border-radius:999px;
+  background:radial-gradient(circle at top, rgba(127,79,224,.5), rgba(48,24,88,.95));
+  color:var(--text);
+  font-weight:700;
+  padding:1rem;
+  border:2px solid transparent;
+  transition:.2s ease;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  cursor:pointer;
+  position:relative;
+}
+
+.selectable-pill input {
+  position:absolute;
+  opacity:0;
+  pointer-events:none;
+}
+
+.selectable-pill.selected {
+  border-color:var(--gold);
+  box-shadow:0 0 0 3px rgba(242,184,75,.2);
+  transform:translateY(-2px);
+}
+
+.meta-list {
+  display:flex;
+  gap:.5rem;
+  flex-wrap:wrap;
+  color:var(--muted);
+  font-size:.92rem;
+}
+
+.meta-list.vertical {
+  display:grid;
+}
+
+.filter-chip {
+  border:none;
+  padding:.7rem 1rem;
+  border-radius:999px;
+  background:rgba(255,255,255,.06);
+  color:var(--text);
+}
+
+.filter-chip.active {
+  background:linear-gradient(135deg, var(--gold), var(--gold-2));
+  color:#261300;
+}
+
+.pill-live {
+  background:rgba(78,210,156,.14);
+  color:var(--success);
+  border-color:rgba(78,210,156,.3);
+}
+
+.pill-upcoming {
+  background:rgba(127,79,224,.14);
+  color:#d2b7ff;
+  border-color:rgba(127,79,224,.3);
+}
+
+.custom-tabs .nav-link {
+  color:var(--muted);
+  border:none;
+  background:transparent;
+}
+
+.custom-tabs .nav-link.active {
+  color:var(--gold);
+  background:rgba(255,255,255,.04);
+  border-radius:.85rem;
+}
+
+.back-link {
+  color:var(--gold);
+  text-decoration:none;
+  font-weight:600;
+}
+
+.podium-1 { transform:translateY(-8px); }
+.podium-2 { transform:translateY(4px); }
+.podium-3 { transform:translateY(10px); }
+.confidence { color:var(--gold); font-weight:700; }
+.podium-rank { font-size:2rem; }
+
+@media (max-width: 991px) {
+  .hero-panel, .race-summary {
+    grid-template-columns:1fr;
+  }
+}

@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% block title %}{{ venue.venue if venue else 'Venue' }}{% endblock %}
+{% block content %}
+<section class="race-summary mb-4">
+    <div>
+        <a href="/" class="back-link">&larr; Back</a>
+        <p class="eyebrow mt-3 mb-2">Page 2</p>
+        <h1 class="page-title">{{ venue.venue if venue else 'Venue unavailable' }}</h1>
+        <p class="hero-copy">Live and upcoming races at {{ venue.venue if venue else 'this race course' }}.</p>
+    </div>
+    <div class="chip-row">
+        <button class="filter-chip active" data-filter="all">All races</button>
+        <button class="filter-chip" data-filter="live">What’s live</button>
+        <button class="filter-chip" data-filter="upcoming">What’s upcoming</button>
+    </div>
+</section>
+
+<section class="race-cards-grid" id="raceCardsGrid">
+    {% for race in venue.races %}
+    <article
+        class="race-block"
+        data-state="{% if race.is_live %}live{% elif race.is_upcoming %}upcoming{% else %}all{% endif %}">
+        <div class="race-block-top">
+            <div>
+                <p class="eyebrow mb-1">
+                    Race {{ race.race_number }}{% if race.race_time %} &middot;
+                        {%- if race.race_time.strftime is defined %}
+                            {{ race.race_time.strftime('%H:%M') }}
+                        {%- else %}
+                            {{ race.race_time }}
+                        {%- endif %}
+                    {% endif %}
+                </p>
+                <h3 class="race-block-title">{{ race.title or 'Race ' ~ race.race_number }}</h3>
+            </div>
+            <span class="status-pill {% if race.is_live %}pill-live{% elif race.is_upcoming %}pill-upcoming{% endif %}">
+                {% if race.is_live %}Live{% elif race.is_upcoming %}Upcoming{% else %}Scheduled{% endif %}
+            </span>
+        </div>
+
+        {% if race.conditions %}
+        <p class="race-block-conditions mb-2">{{ race.conditions }}</p>
+        {% endif %}
+
+        <div class="meta-list">
+            {% if race.distance %}<span>{{ race.distance }}</span>{% endif %}
+            {% if race.surface %}<span>{{ race.surface }}</span>{% endif %}
+            {% if race.runners %}<span>{{ race.runners }} runners</span>{% endif %}
+        </div>
+
+        <a class="btn btn-gold mt-3" href="/races/{{ race.id }}">Open race</a>
+    </article>
+    {% endfor %}
+
+    {% if not venue or not venue.races %}
+    <p class="hero-copy">No races have been ingested for this venue yet.</p>
+    {% endif %}
+</section>
+{% endblock %}

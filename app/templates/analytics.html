@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% block title %}Choose Analytics{% endblock %}
+{% block content %}
+<section class="predictor-panel mb-4" data-race-id="{{ race.id if race else '' }}">
+    <a href="/races/{{ race.id if race else '' }}" class="back-link">&larr; Back</a>
+    <p class="eyebrow mt-3 mb-2">Page 4</p>
+    <div class="panel-heading">
+        <div>
+            <h1 class="page-title">Choose your analytics</h1>
+            <p class="hero-copy">Select exactly three of the six available factors before proceeding to prediction.</p>
+        </div>
+    </div>
+
+    <form method="post" action="/races/{{ race.id if race else '' }}/prediction" id="analyticsForm">
+        <div class="variable-grid mt-3">
+            {% for variable in variables %}
+            <label class="variable-pill selectable-pill">
+                <input type="checkbox" name="selected_variables" value="{{ variable.code }}" class="variable-checkbox">
+                <span>{{ variable.label }}</span>
+            </label>
+            {% endfor %}
+        </div>
+
+        <div class="alert alert-secondary mt-4">
+            The platform never fabricates data. Missing extracted values reduce confidence automatically.
+        </div>
+
+        <button type="submit" id="proceedPredictionBtn" class="btn btn-gold btn-lg mt-3" disabled>
+            Proceed to Prediction
+        </button>
+    </form>
+</section>
+{% endblock %}

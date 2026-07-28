@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% block title %}Choose Race Track{% endblock %}
+{% block content %}
+<section class="hero-panel mb-4">
+    <div>
+        <p class="eyebrow mb-2">Page 1</p>
+        <h1 class="page-title">Pick a race track to see what’s racing today.</h1>
+        <p class="hero-copy">
+            Search by venue and select a race track sourced from legacy.winningform.co.za.
+        </p>
+    </div>
+    <div class="hero-stats">
+        <div class="stat-card"><span>Monitoring</span><strong>{{ 'Active' if status.monitoring_active else 'Stopped' }}</strong></div>
+        <div class="stat-card"><span>Last scrape</span><strong>{{ status.last_scrape_at or 'Not yet' }}</strong></div>
+        <div class="stat-card"><span>Last prediction</span><strong>{{ status.last_prediction_at or 'Not yet' }}</strong></div>
+    </div>
+</section>
+
+<section class="toolbar mb-4">
+    <input id="venueSearch" class="form-control filter-input" type="text" placeholder="Search locations...">
+</section>
+
+<section class="meeting-grid" id="venueGrid">
+    {% for venue in venues %}
+    <article class="meeting-card venue-card" data-search="{{ venue.venue|lower }}">
+        <div class="meeting-header">
+            <div>
+                <p class="eyebrow mb-1">Race track</p>
+                <h2>{{ venue.venue }}</h2>
+            </div>
+            <span class="meeting-date">{{ venue.meeting_date or 'Date unavailable' }}</span>
+        </div>
+        <p class="text-muted mb-3">{{ venue.races|length }} race(s) loaded from source.</p>
+        <a class="btn btn-gold" href="/venues/{{ venue.id }}">View races</a>
+    </article>
+    {% endfor %}
+</section>
+{% endblock %}

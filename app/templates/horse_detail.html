@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% block title %}{{ horse.name if horse else 'Horse' }}{% endblock %}
+{% block content %}
+<section class="card-panel">
+    <a href="/races/{{ horse.race_id if horse else '' }}" class="back-link">&larr; Back</a>
+    <p class="eyebrow mt-3 mb-2">Page 3.5</p>
+    <h1 class="page-title">{{ horse.name if horse else 'Horse not found' }}</h1>
+
+    {% if horse %}
+    <div class="detail-grid">
+        <div class="stat-card"><span>Trainer</span><strong>{{ horse.trainer_name or 'Unavailable' }}</strong></div>
+        <div class="stat-card"><span>Trainer Ranking</span><strong>{{ horse.trainer_ranking or 'Unavailable' }}</strong></div>
+        <div class="stat-card"><span>Jockey</span><strong>{{ horse.jockey_name or 'Unavailable' }}</strong></div>
+        <div class="stat-card"><span>Jockey Rating</span><strong>{{ horse.jockey_rating or 'Unavailable' }}</strong></div>
+        <div class="stat-card"><span>Draw Advantage</span><strong>{{ horse.draw_number or 'Unavailable' }}</strong></div>
+        <div class="stat-card"><span>Weight</span><strong>{{ horse.weight_value or 'Unavailable' }}</strong></div>
+        <div class="stat-card"><span>Starting Price</span><strong>{{ horse.starting_price or 'Unavailable' }}</strong></div>
+        <div class="stat-card"><span>Previous Run</span><strong>{{ horse.previous_run_rating or 'Unavailable' }}</strong></div>
+        <div class="stat-card"><span>Status</span><strong>{{ 'Scratched' if horse.scratched else (horse.status or 'Open') }}</strong></div>
+    </div>
+
+    <div class="alert alert-secondary mt-4">
+        Only extracted fields from legacy.winningform.co.za are displayed. Missing values remain unavailable and lower prediction confidence.
+    </div>
+    {% endif %}
+</section>
+{% endblock %}
