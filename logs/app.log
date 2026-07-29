@@ -6639,3 +6639,215 @@ WHERE horses.external_id = ? AND horses.race_id = ?
 2026-07-29 09:06:01,231 | INFO | apscheduler.scheduler | Added job "MonitoringService.run_cycle" to job store "default"
 2026-07-29 09:06:01,232 | INFO | apscheduler.scheduler | Scheduler started
 2026-07-29 09:06:01,232 | INFO | app.services.monitoring_service | monitoring_cycle_started
+2026-07-29 09:08:26,259 | INFO | apscheduler.scheduler | Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2026-07-29 09:08:26,261 | INFO | apscheduler.scheduler | Added job "MonitoringService.run_cycle" to job store "default"
+2026-07-29 09:08:26,261 | INFO | apscheduler.scheduler | Scheduler started
+2026-07-29 09:08:26,261 | INFO | app.services.monitoring_service | monitoring_cycle_started
+2026-07-29 09:08:26,698 | INFO | httpx | HTTP Request: GET https://legacy.winningform.co.za "HTTP/1.1 200 OK"
+2026-07-29 09:08:26,751 | INFO | app.scrapers.winning_form_scraper | fetch_index_frames=['https://legacy.winningform.co.za/guide.htm', 'https://legacy.winningform.co.za/cover.htm']
+2026-07-29 09:08:26,967 | INFO | httpx | HTTP Request: GET https://legacy.winningform.co.za "HTTP/1.1 200 OK"
+2026-07-29 09:08:27,123 | INFO | httpx | HTTP Request: GET https://legacy.winningform.co.za/guide.htm "HTTP/1.1 200 OK"
+2026-07-29 09:08:27,239 | INFO | httpx | HTTP Request: GET https://legacy.winningform.co.za/cover.htm "HTTP/1.1 200 OK"
+2026-07-29 09:08:27,432 | INFO | httpx | HTTP Request: GET https://legacy.winningform.co.za "HTTP/1.1 200 OK"
+2026-07-29 09:08:27,536 | INFO | httpx | HTTP Request: GET https://legacy.winningform.co.za/guide.htm "HTTP/1.1 200 OK"
+2026-07-29 09:08:27,640 | INFO | httpx | HTTP Request: GET https://legacy.winningform.co.za/cover.htm "HTTP/1.1 200 OK"
+2026-07-29 09:08:27,671 | INFO | app.scrapers.winning_form_scraper | race_links_total=49
+2026-07-29 09:08:27,673 | INFO | app.scrapers.winning_form_scraper | meetings_seen=['ecp-f260731', 'gau-r260730', 'gau-t260801', 'kzn-s260729', 'kzn-s260802', 'zim-h260731']
+2026-07-29 09:08:27,785 | INFO | httpx | HTTP Request: GET https://legacy.winningform.co.za/KZN/2S260729_1.htm "HTTP/1.1 200 OK"
+2026-07-29 09:08:27,840 | INFO | app.scrapers.winning_form_scraper | runner_table_used columns={'number': 0, 'name': 1, 'length_behind': 2, 'speed_index': 3, 'predicted_time': 4, 'merit': 5, 'weight': 6, 'draw': 7, 'jockey': 9, 'trainer': 10} extracted=10 stated=10
+2026-07-29 09:08:27,841 | INFO | app.scrapers.winning_form_scraper | race_parsed url=https://legacy.winningform.co.za/KZN/2S260729_1.htm venue=Hollywoodbets Scottsville Outer date=2026-07-29 race=1 stated=10 parsed=10
+2026-07-29 09:08:27,841 | INFO | app.scrapers.winning_form_scraper | horse_names=['Lenoxx', 'Scots Wae Hae', 'African Ruby', 'Nautical Fire', 'Thunder Star', 'Kiartay', "Rachel's Boy", 'Bon Appetite', 'Ka Chow', 'Clean Sweep']
+2026-07-29 09:08:28,038 | INFO | httpx | HTTP Request: GET https://legacy.winningform.co.za/KZN/2S260729_2.htm "HTTP/1.1 200 OK"
+2026-07-29 09:08:28,158 | INFO | app.scrapers.winning_form_scraper | runner_table_used columns={'number': 0, 'name': 1, 'length_behind': 2, 'speed_index': 3, 'predicted_time': 4, 'merit': 5, 'weight': 6, 'draw': 7, 'jockey': 9, 'trainer': 10} extracted=17 stated=17
+2026-07-29 09:08:28,158 | INFO | app.scrapers.winning_form_scraper | race_parsed url=https://legacy.winningform.co.za/KZN/2S260729_2.htm venue=Hollywoodbets Scottsville Outer date=2026-07-29 race=2 stated=17 parsed=16
+2026-07-29 09:08:28,159 | INFO | app.scrapers.winning_form_scraper | horse_names=['Gimme A Fireball', 'Arkadin', "Trip To Maverick's", 'Scotch Again', 'Daswa', 'Majestic Limpopo', 'Cannon Bolt', 'Akihito', 'French War Lord', 'In The Red', "Pinkerton's Son", 'Red Jubilee', 'Cue Stick', 'Sebastiaan', 'Reign Man', 'Wisdom Seeker', 'A M C Roy On Fire']
+2026-07-29 09:08:28,425 | INFO | httpx | HTTP Request: GET https://legacy.winningform.co.za/KZN/2S260729_3.htm "HTTP/1.1 200 OK"
+2026-07-29 09:08:28,480 | INFO | app.scrapers.winning_form_scraper | runner_table_used columns={'number': 0, 'name': 1, 'length_behind': 2, 'speed_index': 3, 'predicted_time': 4, 'merit': 5, 'weight': 6, 'draw': 7, 'jockey': 9, 'trainer': 10} extracted=10 stated=10
+2026-07-29 09:08:28,480 | INFO | app.scrapers.winning_form_scraper | race_parsed url=https://legacy.winningform.co.za/KZN/2S260729_3.htm venue=Hollywoodbets Scottsville Inner date=2026-07-29 race=3 stated=10 parsed=10
+2026-07-29 09:08:28,481 | INFO | app.scrapers.winning_form_scraper | horse_names=['Trip To Venus', 'Sparrow Man', 'The Flat Cat', 'Captain Josh', 'Royal Sceptre', "Roy's Glorious", 'United Tides', 'A M C Voter', 'Stealth Mode', 'Judiciary']
+2026-07-29 09:08:28,719 | INFO | httpx | HTTP Request: GET https://legacy.winningform.co.za/KZN/2S260729_4.htm "HTTP/1.1 200 OK"
+2026-07-29 09:08:28,826 | INFO | app.scrapers.winning_form_scraper | runner_table_used columns={'number': 0, 'name': 1, 'length_behind': 2, 'speed_index': 3, 'predicted_time': 4, 'merit': 5, 'weight': 6, 'draw': 7, 'jockey': 9, 'trainer': 10} extracted=9 stated=9
+2026-07-29 09:08:28,826 | INFO | app.scrapers.winning_form_scraper | race_parsed url=https://legacy.winningform.co.za/KZN/2S260729_4.htm venue=Hollywoodbets Scottsville Inner date=2026-07-29 race=4 stated=9 parsed=9
+2026-07-29 09:08:28,826 | INFO | app.scrapers.winning_form_scraper | horse_names=['Blenheim Palace', 'Soho Celebrity', 'Magical Spring', 'Valli Gal', 'Hazel Green', 'Scarlet Empress', 'Lilbitofmonica', "Tomorrow's Summer", 'Summer Flirt']
+2026-07-29 09:08:28,990 | INFO | httpx | HTTP Request: GET https://legacy.winningform.co.za/KZN/2S260729_5.htm "HTTP/1.1 200 OK"
+2026-07-29 09:08:29,074 | INFO | app.scrapers.winning_form_scraper | runner_table_used columns={'number': 0, 'name': 1, 'length_behind': 2, 'speed_index': 3, 'predicted_time': 4, 'merit': 5, 'weight': 6, 'draw': 7, 'jockey': 9, 'trainer': 10} extracted=9 stated=9
+2026-07-29 09:08:29,075 | INFO | app.scrapers.winning_form_scraper | race_parsed url=https://legacy.winningform.co.za/KZN/2S260729_5.htm venue=Hollywoodbets Scottsville Outer date=2026-07-29 race=5 stated=9 parsed=9
+2026-07-29 09:08:29,075 | INFO | app.scrapers.winning_form_scraper | horse_names=['Sohot Sowhat', 'Disting', 'Lock And Key', 'Flying Fate', 'Buttercup Baby', 'Light Of Gabriel', 'Seven No Trump', 'Tara Star', 'Match That']
+2026-07-29 09:08:29,380 | INFO | httpx | HTTP Request: GET https://legacy.winningform.co.za/KZN/2S260729_6.htm "HTTP/1.1 200 OK"
+2026-07-29 09:08:29,549 | INFO | app.scrapers.winning_form_scraper | runner_table_used columns={'number': 0, 'name': 1, 'length_behind': 2, 'speed_index': 3, 'predicted_time': 4, 'merit': 5, 'weight': 6, 'draw': 7, 'jockey': 9, 'trainer': 10} extracted=9 stated=9
+2026-07-29 09:08:29,550 | INFO | app.scrapers.winning_form_scraper | race_parsed url=https://legacy.winningform.co.za/KZN/2S260729_6.htm venue=Hollywoodbets Scottsville Inner date=2026-07-29 race=6 stated=9 parsed=8
+2026-07-29 09:08:29,551 | INFO | app.scrapers.winning_form_scraper | horse_names=['Mister Nibbles', 'Phutulicious', 'Klein Karoo', 'Targaryen Knight', 'Danube', 'The Marquee', 'Red Mountain', 'Coast Of The Sun', 'Frostbite']
+2026-07-29 09:08:29,859 | INFO | httpx | HTTP Request: GET https://legacy.winningform.co.za/KZN/2S260729_7.htm "HTTP/1.1 200 OK"
+2026-07-29 09:08:29,957 | INFO | app.scrapers.winning_form_scraper | runner_table_used columns={'number': 0, 'name': 1, 'length_behind': 2, 'speed_index': 3, 'predicted_time': 4, 'merit': 5, 'weight': 6, 'draw': 7, 'jockey': 9, 'trainer': 10} extracted=9 stated=9
+2026-07-29 09:08:29,957 | INFO | app.scrapers.winning_form_scraper | race_parsed url=https://legacy.winningform.co.za/KZN/2S260729_7.htm venue=Hollywoodbets Scottsville Inner date=2026-07-29 race=7 stated=9 parsed=9
+2026-07-29 09:08:29,958 | INFO | app.scrapers.winning_form_scraper | horse_names=['Act Of Grace', 'Spirit Of Shimla', 'Treasure Island', 'Hunga Tonga', 'Prom Queen', 'Last Car To Pass', 'Pretty Kara', 'Another Dream', 'Deepest Water']
+2026-07-29 09:08:30,210 | INFO | httpx | HTTP Request: GET https://legacy.winningform.co.za/KZN/2S260729_8.htm "HTTP/1.1 200 OK"
+2026-07-29 09:08:30,431 | INFO | app.scrapers.winning_form_scraper | runner_table_used columns={'number': 0, 'name': 1, 'length_behind': 2, 'speed_index': 3, 'predicted_time': 4, 'merit': 5, 'weight': 6, 'draw': 7, 'jockey': 9, 'trainer': 10} extracted=18 stated=18
+2026-07-29 09:08:30,431 | INFO | app.scrapers.winning_form_scraper | race_parsed url=https://legacy.winningform.co.za/KZN/2S260729_8.htm venue=Hollywoodbets Scottsville Inner date=2026-07-29 race=8 stated=18 parsed=15
+2026-07-29 09:08:30,432 | INFO | app.scrapers.winning_form_scraper | horse_names=["Gardener's Pride", 'Ragnar The King', 'Double Olympic', 'Splash Of Love', 'La Maddalena', 'Global Movement', 'Irish Anthem', 'Pongola', "Kimball O'hara", 'I Am Classy', 'Gorgeous Dude', 'Christmas Rose', 'Wander Skitt', 'Fort Usher', "Ziyan's Pride", 'Run To Rio', 'Twocantango', 'National Dream']
+2026-07-29 09:08:30,918 | INFO | httpx | HTTP Request: GET https://legacy.winningform.co.za/GAU/2R260730_1.htm "HTTP/1.1 200 OK"
+2026-07-29 09:08:30,982 | INFO | app.scrapers.winning_form_scraper | runner_table_used columns={'number': 0, 'name': 1, 'length_behind': 2, 'speed_index': 3, 'predicted_time': 4, 'merit': 5, 'weight': 6, 'draw': 7, 'jockey': 9, 'trainer': 10} extracted=8 stated=8
+2026-07-29 09:08:30,983 | INFO | app.scrapers.winning_form_scraper | race_parsed url=https://legacy.winningform.co.za/GAU/2R260730_1.htm venue=Vaal Classic date=2026-07-30 race=1 stated=8 parsed=8
+2026-07-29 09:08:30,983 | INFO | app.scrapers.winning_form_scraper | horse_names=["Rafeef's Queen", 'Miss Honey Bee', 'Royal Rant', 'Miss Fire Arrow', 'San Francisco', 'Navigatrix', 'Pretty Girl', 'Volare Veloce']
+2026-07-29 09:08:31,182 | INFO | httpx | HTTP Request: GET https://legacy.winningform.co.za/GAU/2R260730_2.htm "HTTP/1.1 200 OK"
+2026-07-29 09:08:31,253 | INFO | app.scrapers.winning_form_scraper | runner_table_used columns={'number': 0, 'name': 1, 'length_behind': 2, 'speed_index': 3, 'predicted_time': 4, 'merit': 5, 'weight': 6, 'draw': 7, 'jockey': 9, 'trainer': 10} extracted=9 stated=9
+2026-07-29 09:08:31,253 | INFO | app.scrapers.winning_form_scraper | race_parsed url=https://legacy.winningform.co.za/GAU/2R260730_2.htm venue=Vaal Classic date=2026-07-30 race=2 stated=9 parsed=9
+2026-07-29 09:08:31,254 | INFO | app.scrapers.winning_form_scraper | horse_names=['Tenareef', 'Captain Cooper', 'Flotilla', 'North Star Fury', 'Chic Shack', 'Hawkeye', 'Mocha Magic', 'Reachingforthemoon', 'Red Viking']
+2026-07-29 09:08:31,435 | INFO | httpx | HTTP Request: GET https://legacy.winningform.co.za/GAU/2R260730_3.htm "HTTP/1.1 200 OK"
+2026-07-29 09:08:31,532 | INFO | app.scrapers.winning_form_scraper | runner_table_used columns={'number': 0, 'name': 1, 'length_behind': 2, 'speed_index': 3, 'predicted_time': 4, 'merit': 5, 'weight': 6, 'draw': 7, 'jockey': 9, 'trainer': 10} extracted=8 stated=8
+2026-07-29 09:08:31,533 | INFO | app.scrapers.winning_form_scraper | race_parsed url=https://legacy.winningform.co.za/GAU/2R260730_3.htm venue=Vaal Classic date=2026-07-30 race=3 stated=8 parsed=8
+2026-07-29 09:08:31,533 | INFO | app.scrapers.winning_form_scraper | horse_names=['Beautiful One', 'Two Tigers', 'Berry Lancer', 'Dreaming Of Youth', "Leanne's Love", 'Dreadnought', 'Pittar', 'Walkinginthewoods']
+2026-07-29 09:08:31,710 | INFO | httpx | HTTP Request: GET https://legacy.winningform.co.za/GAU/2R260730_4.htm "HTTP/1.1 200 OK"
+2026-07-29 09:08:31,775 | INFO | app.scrapers.winning_form_scraper | runner_table_used columns={'number': 0, 'name': 1, 'length_behind': 2, 'speed_index': 3, 'predicted_time': 4, 'merit': 5, 'weight': 6, 'draw': 7, 'jockey': 9, 'trainer': 10} extracted=9 stated=9
+2026-07-29 09:08:31,775 | INFO | app.scrapers.winning_form_scraper | race_parsed url=https://legacy.winningform.co.za/GAU/2R260730_4.htm venue=Vaal Classic date=2026-07-30 race=4 stated=9 parsed=9
+2026-07-29 09:08:31,776 | INFO | app.scrapers.winning_form_scraper | horse_names=['Duke Of Lorraine', 'Vixeninthevineyard', 'Uncle Bob', 'Angle Of Attack', 'Silver Comet', 'Crimson Ranger', 'Echo Of The Wild', 'Gus On The Bus', 'Sivaji']
+2026-07-29 09:08:31,989 | INFO | httpx | HTTP Request: GET https://legacy.winningform.co.za/GAU/2R260730_5.htm "HTTP/1.1 200 OK"
+2026-07-29 09:08:32,088 | INFO | app.scrapers.winning_form_scraper | runner_table_used columns={'number': 0, 'name': 1, 'length_behind': 2, 'speed_index': 3, 'predicted_time': 4, 'merit': 5, 'weight': 6, 'draw': 7, 'jockey': 9, 'trainer': 10} extracted=9 stated=9
+2026-07-29 09:08:32,089 | INFO | app.scrapers.winning_form_scraper | race_parsed url=https://legacy.winningform.co.za/GAU/2R260730_5.htm venue=Vaal Classic date=2026-07-30 race=5 stated=9 parsed=9
+2026-07-29 09:08:32,089 | INFO | app.scrapers.winning_form_scraper | horse_names=['Art Nouveau', 'Frangipani', 'Azaleas For All', 'Boom Boom', 'Surprise Party', 'Lady Sabrina', 'Lady Blunt', 'Juliet Tango', 'Mount Etna']
+2026-07-29 09:08:32,269 | INFO | httpx | HTTP Request: GET https://legacy.winningform.co.za/GAU/2R260730_6.htm "HTTP/1.1 200 OK"
+2026-07-29 09:08:32,348 | INFO | app.scrapers.winning_form_scraper | runner_table_used columns={'number': 0, 'name': 1, 'length_behind': 2, 'speed_index': 3, 'predicted_time': 4, 'merit': 5, 'weight': 6, 'draw': 7, 'jockey': 9, 'trainer': 10} extracted=10 stated=10
+2026-07-29 09:08:32,349 | INFO | app.scrapers.winning_form_scraper | race_parsed url=https://legacy.winningform.co.za/GAU/2R260730_6.htm venue=Vaal Classic date=2026-07-30 race=6 stated=10 parsed=10
+2026-07-29 09:08:32,349 | INFO | app.scrapers.winning_form_scraper | horse_names=['Hopscotch', 'Bold Action', 'Utsaah', 'Play With Fire', "Kylie's Angel", "Ariel's Jet", 'Be My Fate', 'Chariklo', 'Wise Counsel', 'Cocomelon']
+2026-07-29 09:08:32,883 | INFO | httpx | HTTP Request: GET https://legacy.winningform.co.za/GAU/2R260730_7.htm "HTTP/1.1 200 OK"
+2026-07-29 09:08:33,027 | INFO | app.scrapers.winning_form_scraper | runner_table_used columns={'number': 0, 'name': 1, 'length_behind': 2, 'speed_index': 3, 'predicted_time': 4, 'merit': 5, 'weight': 6, 'draw': 7, 'jockey': 9, 'trainer': 10} extracted=10 stated=10
+2026-07-29 09:08:33,028 | INFO | app.scrapers.winning_form_scraper | race_parsed url=https://legacy.winningform.co.za/GAU/2R260730_7.htm venue=Vaal Classic date=2026-07-30 race=7 stated=10 parsed=10
+2026-07-29 09:08:33,028 | INFO | app.scrapers.winning_form_scraper | horse_names=['Stop The Traffic', 'Full Go', 'Last Ginger', 'Circle Of Grace', 'Itsnowornever', 'Ghostbuster', 'Thambi', 'Gold De Grace', 'Red Sparrow', 'Cover Charge']
+2026-07-29 09:08:33,377 | INFO | httpx | HTTP Request: GET https://legacy.winningform.co.za/GAU/2R260730_8.htm "HTTP/1.1 200 OK"
+2026-07-29 09:08:33,479 | INFO | app.scrapers.winning_form_scraper | runner_table_used columns={'number': 0, 'name': 1, 'length_behind': 2, 'speed_index': 3, 'predicted_time': 4, 'merit': 5, 'weight': 6, 'draw': 7, 'jockey': 9, 'trainer': 10} extracted=8 stated=8
+2026-07-29 09:08:33,480 | INFO | app.scrapers.winning_form_scraper | race_parsed url=https://legacy.winningform.co.za/GAU/2R260730_8.htm venue=Vaal Classic date=2026-07-30 race=8 stated=8 parsed=8
+2026-07-29 09:08:33,480 | INFO | app.scrapers.winning_form_scraper | horse_names=['Time Will Tell', 'Twentytwentyvision', 'Hammer Blow', 'Arilena', 'Taking A Risk', 'Sergeant Soqrat', 'Champagne Problems', 'Raining Rubies']
+2026-07-29 09:08:33,795 | INFO | httpx | HTTP Request: GET https://legacy.winningform.co.za/GAU/2R260730_9.htm "HTTP/1.1 200 OK"
+2026-07-29 09:08:33,997 | INFO | app.scrapers.winning_form_scraper | runner_table_used columns={'number': 0, 'name': 1, 'length_behind': 2, 'speed_index': 3, 'predicted_time': 4, 'merit': 5, 'weight': 6, 'draw': 7, 'jockey': 9, 'trainer': 10} extracted=17 stated=17
+2026-07-29 09:08:33,997 | INFO | app.scrapers.winning_form_scraper | race_parsed url=https://legacy.winningform.co.za/GAU/2R260730_9.htm venue=Vaal Classic date=2026-07-30 race=9 stated=17 parsed=17
+2026-07-29 09:08:33,998 | INFO | app.scrapers.winning_form_scraper | horse_names=['Golden Warrior', 'Satyagraha', 'Elusive Red', 'Dear Doc', "Can't Catch Me", 'Snow Moon', 'Pearl In Her Crown', 'Eiffel Tower', 'Pretty Analia', 'Shoreybomba', 'Shori Kai', 'Jabari Thimba', 'Lady Elliot', 'Prized Platinum', 'On A Jet Plane', 'Space Mission', 'Baby Red']
+2026-07-29 09:08:34,239 | INFO | httpx | HTTP Request: GET https://legacy.winningform.co.za/ECP/2F260731_1.htm "HTTP/1.1 200 OK"
+2026-07-29 09:08:34,316 | INFO | app.scrapers.winning_form_scraper | runner_table_used columns={'number': 0, 'name': 1, 'length_behind': 2, 'speed_index': 3, 'predicted_time': 4, 'merit': 5, 'weight': 6, 'draw': 7, 'jockey': 9, 'trainer': 10} extracted=8 stated=8
+2026-07-29 09:08:34,316 | INFO | app.scrapers.winning_form_scraper | race_parsed url=https://legacy.winningform.co.za/ECP/2F260731_1.htm venue=Fairview date=2026-07-31 race=1 stated=8 parsed=8
+2026-07-29 09:08:34,317 | INFO | app.scrapers.winning_form_scraper | horse_names=['Eternal Spirit', "Nobody's Perfect", 'Seattle Glow', 'Camden Square', "Queen's Away", 'Roses For Trex', 'Bumble Bee', 'So Welcome']
+2026-07-29 09:08:34,571 | INFO | httpx | HTTP Request: GET https://legacy.winningform.co.za/ECP/2F260731_2.htm "HTTP/1.1 200 OK"
+2026-07-29 09:08:34,720 | INFO | app.scrapers.winning_form_scraper | runner_table_used columns={'number': 0, 'name': 1, 'length_behind': 2, 'speed_index': 3, 'predicted_time': 4, 'merit': 5, 'weight': 6, 'draw': 7, 'jockey': 9, 'trainer': 10} extracted=12 stated=12
+2026-07-29 09:08:34,720 | INFO | app.scrapers.winning_form_scraper | race_parsed url=https://legacy.winningform.co.za/ECP/2F260731_2.htm venue=Fairview date=2026-07-31 race=2 stated=12 parsed=12
+2026-07-29 09:08:34,720 | INFO | app.scrapers.winning_form_scraper | horse_names=['Good Shine', 'Peekaboo', 'Mediterraneanflame', 'Made To Measure', 'Champagne Blaze', 'Witching Hour', 'Gimmethegold', 'Pretty Boy', 'Kaleesh Cyborg', 'Total Eruption', 'Matter Of Trust', 'Makajima']
+2026-07-29 09:08:34,916 | INFO | httpx | HTTP Request: GET https://legacy.winningform.co.za/ECP/2F260731_3.htm "HTTP/1.1 200 OK"
+2026-07-29 09:08:34,997 | INFO | app.scrapers.winning_form_scraper | runner_table_used columns={'number': 0, 'name': 1, 'length_behind': 2, 'speed_index': 3, 'predicted_time': 4, 'merit': 5, 'weight': 6, 'draw': 7, 'jockey': 9, 'trainer': 10} extracted=9 stated=9
+2026-07-29 09:08:34,998 | INFO | app.scrapers.winning_form_scraper | race_parsed url=https://legacy.winningform.co.za/ECP/2F260731_3.htm venue=Fairview date=2026-07-31 race=3 stated=9 parsed=9
+2026-07-29 09:08:34,998 | INFO | app.scrapers.winning_form_scraper | horse_names=['Lovely Dancer', 'J Lordi', 'Rock Up', 'Jewel Mule', 'Alesian Beau', 'Here Comes Johnny', 'American Gem', 'Chim Chim Cheree', 'Cautionary']
+2026-07-29 09:08:35,187 | INFO | httpx | HTTP Request: GET https://legacy.winningform.co.za/ECP/2F260731_4.htm "HTTP/1.1 200 OK"
+2026-07-29 09:08:35,311 | INFO | app.scrapers.winning_form_scraper | runner_table_used columns={'number': 0, 'name': 1, 'length_behind': 2, 'speed_index': 3, 'predicted_time': 4, 'merit': 5, 'weight': 6, 'draw': 7, 'jockey': 9, 'trainer': 10} extracted=7 stated=7
+2026-07-29 09:08:35,312 | INFO | app.scrapers.winning_form_scraper | race_parsed url=https://legacy.winningform.co.za/ECP/2F260731_4.htm venue=Fairview date=2026-07-31 race=4 stated=7 parsed=7
+2026-07-29 09:08:35,313 | INFO | app.scrapers.winning_form_scraper | horse_names=['Imaginable', 'Black Egret', 'Tintamarre', 'Warrior Of Royalty', 'Ravilious', 'Joker Man', 'Galileo Star']
+2026-07-29 09:08:35,628 | INFO | httpx | HTTP Request: GET https://legacy.winningform.co.za/ECP/2F260731_5.htm "HTTP/1.1 200 OK"
+2026-07-29 09:08:35,734 | INFO | app.scrapers.winning_form_scraper | runner_table_used columns={'number': 0, 'name': 1, 'length_behind': 2, 'speed_index': 3, 'predicted_time': 4, 'merit': 5, 'weight': 6, 'draw': 7, 'jockey': 9, 'trainer': 10} extracted=8 stated=8
+2026-07-29 09:08:35,734 | INFO | app.scrapers.winning_form_scraper | race_parsed url=https://legacy.winningform.co.za/ECP/2F260731_5.htm venue=Fairview date=2026-07-31 race=5 stated=8 parsed=8
+2026-07-29 09:08:35,735 | INFO | app.scrapers.winning_form_scraper | horse_names=['All Systems Go', 'Play Act', 'Clairwood Rose', 'Faraway Girl', 'Arashi', 'Can You Danse', 'Ventura Boulevard', 'Rip Wheeler']
+2026-07-29 09:08:35,941 | INFO | httpx | HTTP Request: GET https://legacy.winningform.co.za/ECP/2F260731_6.htm "HTTP/1.1 200 OK"
+2026-07-29 09:08:36,043 | INFO | app.scrapers.winning_form_scraper | runner_table_used columns={'number': 0, 'name': 1, 'length_behind': 2, 'speed_index': 3, 'predicted_time': 4, 'merit': 5, 'weight': 6, 'draw': 7, 'jockey': 9, 'trainer': 10} extracted=12 stated=12
+2026-07-29 09:08:36,044 | INFO | app.scrapers.winning_form_scraper | race_parsed url=https://legacy.winningform.co.za/ECP/2F260731_6.htm venue=Fairview date=2026-07-31 race=6 stated=12 parsed=12
+2026-07-29 09:08:36,044 | INFO | app.scrapers.winning_form_scraper | horse_names=['Winteronthegreen', 'Whirlybird', 'Moscow Miss', 'Thread Of Life', 'Greenlight Dancer', 'Atlantic Pearl', 'Physiologus', 'Blowin In The Wind', 'New Day', 'Marketa', 'Timeline', 'Wild Star']
+2026-07-29 09:08:36,279 | INFO | httpx | HTTP Request: GET https://legacy.winningform.co.za/ECP/2F260731_7.htm "HTTP/1.1 200 OK"
+2026-07-29 09:08:36,427 | INFO | app.scrapers.winning_form_scraper | runner_table_used columns={'number': 0, 'name': 1, 'length_behind': 2, 'speed_index': 3, 'predicted_time': 4, 'merit': 5, 'weight': 6, 'draw': 7, 'jockey': 9, 'trainer': 10} extracted=12 stated=12
+2026-07-29 09:08:36,427 | INFO | app.scrapers.winning_form_scraper | race_parsed url=https://legacy.winningform.co.za/ECP/2F260731_7.htm venue=Fairview date=2026-07-31 race=7 stated=12 parsed=12
+2026-07-29 09:08:36,427 | INFO | app.scrapers.winning_form_scraper | horse_names=['Bel Canto Dream', 'Blame It On Me', 'Rhydian', 'El Romiachi', 'Disruptive', 'Amanatto', 'Show Off', 'Hospices De Beaune', 'Bosnay', 'Tokyo Princess', 'Royal Dawn', 'Fantine']
+2026-07-29 09:08:36,638 | INFO | httpx | HTTP Request: GET https://legacy.winningform.co.za/ECP/2F260731_8.htm "HTTP/1.1 200 OK"
+2026-07-29 09:08:36,815 | INFO | app.scrapers.winning_form_scraper | runner_table_used columns={'number': 0, 'name': 1, 'length_behind': 2, 'speed_index': 3, 'predicted_time': 4, 'merit': 5, 'weight': 6, 'draw': 7, 'jockey': 9, 'trainer': 10} extracted=10 stated=10
+2026-07-29 09:08:36,815 | INFO | app.scrapers.winning_form_scraper | race_parsed url=https://legacy.winningform.co.za/ECP/2F260731_8.htm venue=Fairview date=2026-07-31 race=8 stated=10 parsed=10
+2026-07-29 09:08:36,816 | INFO | app.scrapers.winning_form_scraper | horse_names=['Lana View', 'Qondanekukhanyeni', 'Oncidium', 'Flower Festival', 'Royal Kailani', "Captain's Jet", 'Potenza', 'Back For More', "Babette's Feast", 'Mountain High']
+2026-07-29 09:08:37,033 | INFO | httpx | HTTP Request: GET https://legacy.winningform.co.za/ECP/2F260731_9.htm "HTTP/1.1 200 OK"
+2026-07-29 09:08:37,251 | INFO | app.scrapers.winning_form_scraper | runner_table_used columns={'number': 0, 'name': 1, 'length_behind': 2, 'speed_index': 3, 'predicted_time': 4, 'merit': 5, 'weight': 6, 'draw': 7, 'jockey': 9, 'trainer': 10} extracted=18 stated=18
+2026-07-29 09:08:37,252 | INFO | app.scrapers.winning_form_scraper | race_parsed url=https://legacy.winningform.co.za/ECP/2F260731_9.htm venue=Fairview date=2026-07-31 race=9 stated=18 parsed=18
+2026-07-29 09:08:37,252 | INFO | app.scrapers.winning_form_scraper | horse_names=['San Quintin', 'Global Speak', 'Rototo', 'Drielandenpunt', 'Global Drumbeat', 'Golden Grey', "Silvano's Song", 'Preserve Forever', 'Crepuscolo', "Alado's Pride", 'Flash Lightning', 'Arividicio', 'Osmium', 'Celtique', "Tori's Girl", 'Terminal Velocity', 'Satellite World', 'Woman In Gold']
+2026-07-29 09:08:37,865 | INFO | httpx | HTTP Request: GET https://legacy.winningform.co.za/ZIM/2H260731_1.htm "HTTP/1.1 200 OK"
+2026-07-29 09:08:37,938 | INFO | app.scrapers.winning_form_scraper | runner_table_used columns={'number': 0, 'name': 1, 'length_behind': 2, 'speed_index': 3, 'predicted_time': 4, 'merit': 5, 'weight': 6, 'draw': 7, 'jockey': 9, 'trainer': 10} extracted=6 stated=6
+2026-07-29 09:08:37,939 | INFO | app.scrapers.winning_form_scraper | race_parsed url=https://legacy.winningform.co.za/ZIM/2H260731_1.htm venue=Borrowdale date=2026-07-31 race=1 stated=6 parsed=6
+2026-07-29 09:08:37,939 | INFO | app.scrapers.winning_form_scraper | horse_names=['Firefly Lane', "Lion's Share", 'Roman Law', 'Wintery Mansion', 'Endearing Peace', 'Majik Wine']
+2026-07-29 09:08:38,216 | INFO | httpx | HTTP Request: GET https://legacy.winningform.co.za/ZIM/2H260731_2.htm "HTTP/1.1 200 OK"
+2026-07-29 09:08:38,293 | INFO | app.scrapers.winning_form_scraper | runner_table_used columns={'number': 0, 'name': 1, 'length_behind': 2, 'speed_index': 3, 'predicted_time': 4, 'merit': 5, 'weight': 6, 'draw': 7, 'jockey': 9, 'trainer': 10} extracted=6 stated=6
+2026-07-29 09:08:38,294 | INFO | app.scrapers.winning_form_scraper | race_parsed url=https://legacy.winningform.co.za/ZIM/2H260731_2.htm venue=Borrowdale date=2026-07-31 race=2 stated=6 parsed=6
+2026-07-29 09:08:38,294 | INFO | app.scrapers.winning_form_scraper | horse_names=['Zafar', 'Queen Of Fire', 'Diamond Jim', 'Red Top', 'Ultimate Jewel', 'Festival Of Light']
+2026-07-29 09:08:39,014 | INFO | httpx | HTTP Request: GET https://legacy.winningform.co.za/ZIM/2H260731_3.htm "HTTP/1.1 200 OK"
+2026-07-29 09:08:39,097 | INFO | app.scrapers.winning_form_scraper | runner_table_used columns={'number': 0, 'name': 1, 'length_behind': 2, 'speed_index': 3, 'predicted_time': 4, 'merit': 5, 'weight': 6, 'draw': 7, 'jockey': 9, 'trainer': 10} extracted=6 stated=6
+2026-07-29 09:08:39,097 | INFO | app.scrapers.winning_form_scraper | race_parsed url=https://legacy.winningform.co.za/ZIM/2H260731_3.htm venue=Borrowdale date=2026-07-31 race=3 stated=6 parsed=6
+2026-07-29 09:08:39,098 | INFO | app.scrapers.winning_form_scraper | horse_names=['Aerial Display', 'Mizzen Sword', 'Prince Of Denmark', 'Queen Of Montmatre', 'House Of Lords', 'Captain Carnage']
+2026-07-29 09:08:39,279 | INFO | httpx | HTTP Request: GET https://legacy.winningform.co.za/ZIM/2H260731_4.htm "HTTP/1.1 200 OK"
+2026-07-29 09:08:39,385 | INFO | app.scrapers.winning_form_scraper | runner_table_used columns={'number': 0, 'name': 1, 'length_behind': 2, 'speed_index': 3, 'predicted_time': 4, 'merit': 5, 'weight': 6, 'draw': 7, 'jockey': 9, 'trainer': 10} extracted=5 stated=5
+2026-07-29 09:08:39,386 | INFO | app.scrapers.winning_form_scraper | race_parsed url=https://legacy.winningform.co.za/ZIM/2H260731_4.htm venue=Borrowdale date=2026-07-31 race=4 stated=5 parsed=5
+2026-07-29 09:08:39,387 | INFO | app.scrapers.winning_form_scraper | horse_names=['Empire Blue', 'Copper Fire', 'When Evening Comes', 'Battle Of Seattle', 'Shes Everything']
+2026-07-29 09:08:39,597 | INFO | httpx | HTTP Request: GET https://legacy.winningform.co.za/ZIM/2H260731_5.htm "HTTP/1.1 200 OK"
+2026-07-29 09:08:39,679 | INFO | app.scrapers.winning_form_scraper | runner_table_used columns={'number': 0, 'name': 1, 'length_behind': 2, 'speed_index': 3, 'predicted_time': 4, 'merit': 5, 'weight': 6, 'draw': 7, 'jockey': 9, 'trainer': 10} extracted=4 stated=4
+2026-07-29 09:08:39,680 | INFO | app.scrapers.winning_form_scraper | race_parsed url=https://legacy.winningform.co.za/ZIM/2H260731_5.htm venue=Borrowdale date=2026-07-31 race=5 stated=4 parsed=4
+2026-07-29 09:08:39,680 | INFO | app.scrapers.winning_form_scraper | horse_names=['Ultra Pursuit', 'Pocket Watch', 'Coppola', 'Guerra']
+2026-07-29 09:08:39,843 | INFO | httpx | HTTP Request: GET https://legacy.winningform.co.za/ZIM/2H260731_6.htm "HTTP/1.1 200 OK"
+2026-07-29 09:08:39,945 | INFO | app.scrapers.winning_form_scraper | runner_table_used columns={'number': 0, 'name': 1, 'length_behind': 2, 'speed_index': 3, 'predicted_time': 4, 'merit': 5, 'weight': 6, 'draw': 7, 'jockey': 9, 'trainer': 10} extracted=4 stated=4
+2026-07-29 09:08:39,946 | INFO | app.scrapers.winning_form_scraper | race_parsed url=https://legacy.winningform.co.za/ZIM/2H260731_6.htm venue=Borrowdale date=2026-07-31 race=6 stated=4 parsed=4
+2026-07-29 09:08:39,946 | INFO | app.scrapers.winning_form_scraper | horse_names=['Robin Of Locksley', 'Kagura', 'Magic Exists', 'Majestic Warrior']
+2026-07-29 09:08:40,113 | INFO | httpx | HTTP Request: GET https://legacy.winningform.co.za/ZIM/2H260731_7.htm "HTTP/1.1 200 OK"
+2026-07-29 09:08:40,216 | INFO | app.scrapers.winning_form_scraper | runner_table_used columns={'number': 0, 'name': 1, 'length_behind': 2, 'speed_index': 3, 'predicted_time': 4, 'merit': 5, 'weight': 6, 'draw': 7, 'jockey': 9, 'trainer': 10} extracted=5 stated=5
+2026-07-29 09:08:40,217 | INFO | app.scrapers.winning_form_scraper | race_parsed url=https://legacy.winningform.co.za/ZIM/2H260731_7.htm venue=Borrowdale date=2026-07-31 race=7 stated=5 parsed=5
+2026-07-29 09:08:40,217 | INFO | app.scrapers.winning_form_scraper | horse_names=['Sally Port', 'Princess Lucy', 'Matilda Fitzwalter', 'Tranquil Judi', 'Waiting On Charlie']
+2026-07-29 09:08:40,385 | INFO | httpx | HTTP Request: GET https://legacy.winningform.co.za/GAU/2T260801_1.htm "HTTP/1.1 200 OK"
+2026-07-29 09:08:40,462 | INFO | app.scrapers.winning_form_scraper | runner_table_used columns={'number': 0, 'name': 1, 'length_behind': 2, 'speed_index': 3, 'predicted_time': 4, 'merit': 5, 'weight': 6, 'draw': 7, 'jockey': 9, 'trainer': 10} extracted=9 stated=9
+2026-07-29 09:08:40,463 | INFO | app.scrapers.winning_form_scraper | race_parsed url=https://legacy.winningform.co.za/GAU/2T260801_1.htm venue=Turffontein date=2026-08-01 race=1 stated=9 parsed=9
+2026-07-29 09:08:40,463 | INFO | app.scrapers.winning_form_scraper | horse_names=["Jack's Legacy", 'Without Remorse', 'Purple Rain', 'Bellflower', 'Northern European', 'Raspberry Delight', 'Greenhilsofjamaica', 'Totheplaceibelong', 'Lady Aarya']
+2026-07-29 09:08:40,674 | INFO | httpx | HTTP Request: GET https://legacy.winningform.co.za/GAU/2T260801_2.htm "HTTP/1.1 200 OK"
+2026-07-29 09:08:40,768 | INFO | app.scrapers.winning_form_scraper | runner_table_used columns={'number': 0, 'name': 1, 'length_behind': 2, 'speed_index': 3, 'predicted_time': 4, 'merit': 5, 'weight': 6, 'draw': 7, 'jockey': 9, 'trainer': 10} extracted=7 stated=7
+2026-07-29 09:08:40,769 | INFO | app.scrapers.winning_form_scraper | race_parsed url=https://legacy.winningform.co.za/GAU/2T260801_2.htm venue=Turffontein date=2026-08-01 race=2 stated=7 parsed=7
+2026-07-29 09:08:40,769 | INFO | app.scrapers.winning_form_scraper | horse_names=['One Tiger', 'Sakura Hanami', 'Spy Story', 'Geostorm', 'Sherlock Holmes', "Trompe L'oeil", 'Matroosberg']
+2026-07-29 09:08:40,976 | INFO | httpx | HTTP Request: GET https://legacy.winningform.co.za/GAU/2T260801_3.htm "HTTP/1.1 200 OK"
+2026-07-29 09:08:41,063 | INFO | app.scrapers.winning_form_scraper | runner_table_used columns={'number': 0, 'name': 1, 'length_behind': 2, 'speed_index': 3, 'predicted_time': 4, 'merit': 5, 'weight': 6, 'draw': 7, 'jockey': 9, 'trainer': 10} extracted=7 stated=7
+2026-07-29 09:08:41,064 | INFO | app.scrapers.winning_form_scraper | race_parsed url=https://legacy.winningform.co.za/GAU/2T260801_3.htm venue=Turffontein date=2026-08-01 race=3 stated=7 parsed=7
+2026-07-29 09:08:41,064 | INFO | app.scrapers.winning_form_scraper | horse_names=['Lonely As A Cloud', 'Fostinovo', 'Mrs Stormiatrix', 'Ice Dragon', 'Banyan', 'Pivotal Role', 'Var Park']
+2026-07-29 09:08:41,293 | INFO | httpx | HTTP Request: GET https://legacy.winningform.co.za/GAU/2T260801_4.htm "HTTP/1.1 200 OK"
+2026-07-29 09:08:41,358 | INFO | app.scrapers.winning_form_scraper | runner_table_used columns={'number': 0, 'name': 1, 'length_behind': 2, 'speed_index': 3, 'predicted_time': 4, 'merit': 5, 'weight': 6, 'draw': 7, 'jockey': 9, 'trainer': 10} extracted=8 stated=8
+2026-07-29 09:08:41,359 | INFO | app.scrapers.winning_form_scraper | race_parsed url=https://legacy.winningform.co.za/GAU/2T260801_4.htm venue=Turffontein date=2026-08-01 race=4 stated=8 parsed=8
+2026-07-29 09:08:41,359 | INFO | app.scrapers.winning_form_scraper | horse_names=['Mount Pinatubo', 'Almond Sea', 'Karate Kid', 'Espinoza', 'African Pride', 'Whistle The Tune', 'Yamadori', 'Chieftain']
+2026-07-29 09:08:41,519 | INFO | httpx | HTTP Request: GET https://legacy.winningform.co.za/GAU/2T260801_5.htm "HTTP/1.1 200 OK"
+2026-07-29 09:08:41,611 | INFO | app.scrapers.winning_form_scraper | runner_table_used columns={'number': 0, 'name': 1, 'length_behind': 2, 'speed_index': 3, 'predicted_time': 4, 'merit': 5, 'weight': 6, 'draw': 7, 'jockey': 9, 'trainer': 10} extracted=7 stated=7
+2026-07-29 09:08:41,611 | INFO | app.scrapers.winning_form_scraper | race_parsed url=https://legacy.winningform.co.za/GAU/2T260801_5.htm venue=Turffontein date=2026-08-01 race=5 stated=7 parsed=7
+2026-07-29 09:08:41,612 | INFO | app.scrapers.winning_form_scraper | horse_names=['Dual Prophecy', 'Guerilla Warfare', "Diesel's Shadow", 'Dark Silver', 'World Order', 'Culturati', 'Unsolved Riddle']
+2026-07-29 09:08:41,791 | INFO | httpx | HTTP Request: GET https://legacy.winningform.co.za/GAU/2T260801_6.htm "HTTP/1.1 200 OK"
+2026-07-29 09:08:41,890 | INFO | app.scrapers.winning_form_scraper | runner_table_used columns={'number': 0, 'name': 1, 'length_behind': 2, 'speed_index': 3, 'predicted_time': 4, 'merit': 5, 'weight': 6, 'draw': 7, 'jockey': 9, 'trainer': 10} extracted=8 stated=8
+2026-07-29 09:08:41,890 | INFO | app.scrapers.winning_form_scraper | race_parsed url=https://legacy.winningform.co.za/GAU/2T260801_6.htm venue=Turffontein date=2026-08-01 race=6 stated=8 parsed=8
+2026-07-29 09:08:41,891 | INFO | app.scrapers.winning_form_scraper | horse_names=['Apache Son', 'The Playboy Bomber', 'Prince Of Kildare', 'Royal Edition', 'Mission To Mars', 'Flashy Apache', 'Mo Ment', 'Positive Attitude']
+2026-07-29 09:08:42,079 | INFO | httpx | HTTP Request: GET https://legacy.winningform.co.za/GAU/2T260801_7.htm "HTTP/1.1 200 OK"
+2026-07-29 09:08:42,163 | INFO | app.scrapers.winning_form_scraper | runner_table_used columns={'number': 0, 'name': 1, 'length_behind': 2, 'speed_index': 3, 'predicted_time': 4, 'merit': 5, 'weight': 6, 'draw': 7, 'jockey': 9, 'trainer': 10} extracted=9 stated=9
+2026-07-29 09:08:42,163 | INFO | app.scrapers.winning_form_scraper | race_parsed url=https://legacy.winningform.co.za/GAU/2T260801_7.htm venue=Turffontein date=2026-08-01 race=7 stated=9 parsed=9
+2026-07-29 09:08:42,164 | INFO | app.scrapers.winning_form_scraper | horse_names=['Arumugam', 'Orange County', 'Harun Al Rashid', 'Sky Pilot', 'Knowmore', 'Ideal Summer', 'After Hours', 'Gimmethespotlight', 'Winding Power']
+2026-07-29 09:08:42,349 | INFO | httpx | HTTP Request: GET https://legacy.winningform.co.za/GAU/2T260801_8.htm "HTTP/1.1 200 OK"
+2026-07-29 09:08:42,687 | INFO | app.scrapers.winning_form_scraper | runner_table_used columns={'number': 0, 'name': 1, 'length_behind': 2, 'speed_index': 3, 'predicted_time': 4, 'merit': 5, 'weight': 6, 'draw': 7, 'jockey': 9, 'trainer': 10} extracted=11 stated=11
+2026-07-29 09:08:42,688 | INFO | app.scrapers.winning_form_scraper | race_parsed url=https://legacy.winningform.co.za/GAU/2T260801_8.htm venue=Turffontein date=2026-08-01 race=8 stated=11 parsed=11
+2026-07-29 09:08:42,688 | INFO | app.scrapers.winning_form_scraper | horse_names=['Naretoi', 'Southampton', 'Longsword', 'Commander Of All', 'Sunset Warrior', 'Michael Faraday', 'Coming In Hot', 'Rock My Boat', 'Spirit Of Gabz', 'Rising Eagle', 'Circus Lights']
+2026-07-29 09:08:42,891 | INFO | httpx | HTTP Request: GET https://legacy.winningform.co.za/KZN/2S260802_1.htm "HTTP/1.1 200 OK"
+2026-07-29 09:08:42,965 | INFO | app.scrapers.winning_form_scraper | runner_table_used columns={'number': 0, 'name': 1, 'length_behind': 2, 'speed_index': 3, 'predicted_time': 4, 'merit': 5, 'weight': 6, 'draw': 7, 'jockey': 9, 'trainer': 10} extracted=13 stated=13
+2026-07-29 09:08:42,965 | INFO | app.scrapers.winning_form_scraper | race_parsed url=https://legacy.winningform.co.za/KZN/2S260802_1.htm venue=Hollywoodbets Scottsville Outer date=2026-08-02 race=1 stated=13 parsed=13
+2026-07-29 09:08:42,965 | INFO | app.scrapers.winning_form_scraper | horse_names=['Iceberg Rose', 'Forthegoodtimes', 'Tipperary', 'Pink Skies', 'Lovecomesknocking', 'Sweet Cherry', 'So Indi', 'Timeless Wonder', 'Bellanca Viking', 'Gezouten Haring', 'Linguistic', 'Princess Positano', 'Fleur Delacour']
+2026-07-29 09:08:43,137 | INFO | httpx | HTTP Request: GET https://legacy.winningform.co.za/KZN/2S260802_2.htm "HTTP/1.1 200 OK"
+2026-07-29 09:08:43,196 | INFO | app.scrapers.winning_form_scraper | runner_table_used columns={'number': 0, 'name': 1, 'length_behind': 2, 'speed_index': 3, 'predicted_time': 4, 'merit': 5, 'weight': 6, 'draw': 7, 'jockey': 9, 'trainer': 10} extracted=13 stated=13
+2026-07-29 09:08:43,197 | INFO | app.scrapers.winning_form_scraper | race_parsed url=https://legacy.winningform.co.za/KZN/2S260802_2.htm venue=Hollywoodbets Scottsville Outer date=2026-08-02 race=2 stated=13 parsed=13
+2026-07-29 09:08:43,197 | INFO | app.scrapers.winning_form_scraper | horse_names=['Gimme The Power', 'Floral Kingdom', 'Sweet Faye', "Queen's Bounty", 'Ayzal', 'Secret Ambition', 'Sherpa Queen', 'Rustige Kracht', 'Tokyo Girl', 'Vivalto', 'Mighty Minnie', 'Queen Indrani', 'Umoyawokubambelela']
+2026-07-29 09:08:43,444 | INFO | httpx | HTTP Request: GET https://legacy.winningform.co.za/KZN/2S260802_3.htm "HTTP/1.1 200 OK"
+2026-07-29 09:08:43,536 | INFO | app.scrapers.winning_form_scraper | runner_table_used columns={'number': 0, 'name': 1, 'length_behind': 2, 'speed_index': 3, 'predicted_time': 4, 'merit': 5, 'weight': 6, 'draw': 7, 'jockey': 9, 'trainer': 10} extracted=8 stated=8
+2026-07-29 09:08:43,537 | INFO | app.scrapers.winning_form_scraper | race_parsed url=https://legacy.winningform.co.za/KZN/2S260802_3.htm venue=Hollywoodbets Scottsville Inner date=2026-08-02 race=3 stated=8 parsed=8
+2026-07-29 09:08:43,537 | INFO | app.scrapers.winning_form_scraper | horse_names=['Future Prospect', 'Cali Bullet', 'Peaceful Duchess', 'After The Fire', "Chef's Kiss", 'Jenny Darling', 'Guild The Lilly', 'Anemie']
+2026-07-29 09:08:43,759 | INFO | httpx | HTTP Request: GET https://legacy.winningform.co.za/KZN/2S260802_4.htm "HTTP/1.1 200 OK"
+2026-07-29 09:08:43,836 | INFO | app.scrapers.winning_form_scraper | runner_table_used columns={'number': 0, 'name': 1, 'length_behind': 2, 'speed_index': 3, 'predicted_time': 4, 'merit': 5, 'weight': 6, 'draw': 7, 'jockey': 9, 'trainer': 10} extracted=8 stated=8
+2026-07-29 09:08:43,837 | INFO | app.scrapers.winning_form_scraper | race_parsed url=https://legacy.winningform.co.za/KZN/2S260802_4.htm venue=Hollywoodbets Scottsville Inner date=2026-08-02 race=4 stated=8 parsed=8
+2026-07-29 09:08:43,837 | INFO | app.scrapers.winning_form_scraper | horse_names=["Zena's Act", 'Golden Angel', 'Our Lady Fate', 'Stampede Ahead', 'Sesame', 'Cool Wind', 'Hurricane Flight', 'Mary Read']
+2026-07-29 09:08:44,044 | INFO | httpx | HTTP Request: GET https://legacy.winningform.co.za/KZN/2S260802_5.htm "HTTP/1.1 200 OK"
+2026-07-29 09:08:44,160 | INFO | app.scrapers.winning_form_scraper | runner_table_used columns={'number': 0, 'name': 1, 'length_behind': 2, 'speed_index': 3, 'predicted_time': 4, 'merit': 5, 'weight': 6, 'draw': 7, 'jockey': 9, 'trainer': 10} extracted=12 stated=12
+2026-07-29 09:08:44,161 | INFO | app.scrapers.winning_form_scraper | race_parsed url=https://legacy.winningform.co.za/KZN/2S260802_5.htm venue=Hollywoodbets Scottsville Inner date=2026-08-02 race=5 stated=12 parsed=12
+2026-07-29 09:08:44,161 | INFO | app.scrapers.winning_form_scraper | horse_names=['Serpentine Fire', "Sascha's Dream", 'Blizzardboy', 'Master Bomber', 'Buddy Boy', 'Trois Trois Quatre', 'Song To The Moon', 'Queue Wing', 'Red Cardinal', 'Dancing On A Cloud', 'Charlie Bucket', 'Double Causeway']
+2026-07-29 09:08:44,367 | INFO | httpx | HTTP Request: GET https://legacy.winningform.co.za/KZN/2S260802_6.htm "HTTP/1.1 200 OK"
+2026-07-29 09:08:44,483 | INFO | app.scrapers.winning_form_scraper | runner_table_used columns={'number': 0, 'name': 1, 'length_behind': 2, 'speed_index': 3, 'predicted_time': 4, 'merit': 5, 'weight': 6, 'draw': 7, 'jockey': 9, 'trainer': 10} extracted=9 stated=9
+2026-07-29 09:08:44,483 | INFO | app.scrapers.winning_form_scraper | race_parsed url=https://legacy.winningform.co.za/KZN/2S260802_6.htm venue=Hollywoodbets Scottsville Inner date=2026-08-02 race=6 stated=9 parsed=9
+2026-07-29 09:08:44,483 | INFO | app.scrapers.winning_form_scraper | horse_names=['Poursomesugaronme', "Captain's Pride", 'Izibulo', 'Sign Of Fate', 'Alltheboysiveloved', 'Shesha Ntombi', 'Blue Poppy', 'Rikkitikkitavi', 'Queen Amina']
+2026-07-29 09:08:44,670 | INFO | httpx | HTTP Request: GET https://legacy.winningform.co.za/KZN/2S260802_7.htm "HTTP/1.1 200 OK"
+2026-07-29 09:08:44,780 | INFO | app.scrapers.winning_form_scraper | runner_table_used columns={'number': 0, 'name': 1, 'length_behind': 2, 'speed_index': 3, 'predicted_time': 4, 'merit': 5, 'weight': 6, 'draw': 7, 'jockey': 9, 'trainer': 10} extracted=8 stated=8
+2026-07-29 09:08:44,780 | INFO | app.scrapers.winning_form_scraper | race_parsed url=https://legacy.winningform.co.za/KZN/2S260802_7.htm venue=Hollywoodbets Scottsville Outer date=2026-08-02 race=7 stated=8 parsed=8
+2026-07-29 09:08:44,781 | INFO | app.scrapers.winning_form_scraper | horse_names=['Trafalgar Square', 'Cappellino', 'Champagne Mac', 'Bless Me Fred', 'Futano', 'Intrepid', "Jane's Vision", "Mia's Athena"]
+2026-07-29 09:08:44,983 | INFO | httpx | HTTP Request: GET https://legacy.winningform.co.za/KZN/2S260802_8.htm "HTTP/1.1 200 OK"
+2026-07-29 09:08:45,092 | INFO | app.scrapers.winning_form_scraper | runner_table_used columns={'number': 0, 'name': 1, 'length_behind': 2, 'speed_index': 3, 'predicted_time': 4, 'merit': 5, 'weight': 6, 'draw': 7, 'jockey': 9, 'trainer': 10} extracted=11 stated=11
+2026-07-29 09:08:45,092 | INFO | app.scrapers.winning_form_scraper | race_parsed url=https://legacy.winningform.co.za/KZN/2S260802_8.htm venue=Hollywoodbets Scottsville Outer date=2026-08-02 race=8 stated=11 parsed=11
+2026-07-29 09:08:45,092 | INFO | app.scrapers.winning_form_scraper | horse_names=['Axis Power', 'Cavalry Commander', 'Blazing Fury', 'Military Command', 'Luneluck', 'Smorgasbord', 'Billy Cool', 'Call Of The Karoo', 'Rock Music', 'Caribbean Gold', 'Queen Of The Spear']
+2026-07-29 09:08:45,225 | INFO | app.services.monitoring_service | monitoring_cycle_completed
+2026-07-29 09:08:45,225 | INFO | app.main | application_started
