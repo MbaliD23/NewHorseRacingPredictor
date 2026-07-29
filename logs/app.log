@@ -6851,3 +6851,5 @@ WHERE horses.external_id = ? AND horses.race_id = ?
 2026-07-29 09:08:45,092 | INFO | app.scrapers.winning_form_scraper | horse_names=['Axis Power', 'Cavalry Commander', 'Blazing Fury', 'Military Command', 'Luneluck', 'Smorgasbord', 'Billy Cool', 'Call Of The Karoo', 'Rock Music', 'Caribbean Gold', 'Queen Of The Spear']
 2026-07-29 09:08:45,225 | INFO | app.services.monitoring_service | monitoring_cycle_completed
 2026-07-29 09:08:45,225 | INFO | app.main | application_started
+2026-07-29 09:33:43,106 | INFO | apscheduler.scheduler | Scheduler has been shut down
+2026-07-29 09:33:43,108 | INFO | app.main | application_stopped
