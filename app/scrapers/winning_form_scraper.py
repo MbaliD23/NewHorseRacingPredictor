@@ -95,12 +95,13 @@ class ScrapedRace:
 class WinningFormScraper:
     def __init__(self) -> None:
         self.client = httpx.AsyncClient(
-            timeout=settings.request_timeout_seconds,
-            follow_redirects=True,
-            headers={
-                "User-Agent": "HorseRacingPredictor/1.0 (+legacy.winningform.co.za reader)"
-            },
-        )
+    timeout=settings.request_timeout_seconds,
+    follow_redirects=True,
+    verify=False,
+    headers={
+        "User-Agent": "HorseRacingPredictor/1.0 (+legacy.winningform.co.za reader)"
+    },
+)
 
     async def close(self) -> None:
         await self.client.aclose()

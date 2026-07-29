@@ -6631,3 +6631,11 @@ WHERE horses.external_id = ? AND horses.race_id = ?
 2026-07-29 00:11:13,612 | INFO | app.main | application_started
 2026-07-29 00:16:04,070 | INFO | apscheduler.scheduler | Scheduler has been shut down
 2026-07-29 00:16:04,082 | INFO | app.main | application_stopped
+2026-07-29 09:01:39,952 | INFO | apscheduler.scheduler | Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2026-07-29 09:01:39,953 | INFO | apscheduler.scheduler | Added job "MonitoringService.run_cycle" to job store "default"
+2026-07-29 09:01:39,954 | INFO | apscheduler.scheduler | Scheduler started
+2026-07-29 09:01:39,954 | INFO | app.services.monitoring_service | monitoring_cycle_started
+2026-07-29 09:06:01,228 | INFO | apscheduler.scheduler | Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2026-07-29 09:06:01,231 | INFO | apscheduler.scheduler | Added job "MonitoringService.run_cycle" to job store "default"
+2026-07-29 09:06:01,232 | INFO | apscheduler.scheduler | Scheduler started
+2026-07-29 09:06:01,232 | INFO | app.services.monitoring_service | monitoring_cycle_started
