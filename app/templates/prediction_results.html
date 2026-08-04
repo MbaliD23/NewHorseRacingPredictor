@@ -13,7 +13,11 @@
                 {% if item.predicted_position == 1 %}🥇{% elif item.predicted_position == 2 %}🥈{% else %}🥉{% endif %}
             </div>
             <h2>{{ item.horse_name }}</h2>
-            <p class="confidence">{{ item.confidence_percent }}% confidence</p>
+            <div class="podium-score-stack">
+                <p class="confidence">{{ item.confidence_percent }}% confidence</p>
+                <p class="podium-score-label">Ranking score</p>
+                <p class="podium-score-value">{{ item.overall_score }}</p>
+            </div>
             <div class="meta-list vertical">
                 <span>Trainer: {{ item.trainer_name or 'Unavailable' }}</span>
                 <span>Jockey: {{ item.jockey_name or 'Unavailable' }}</span>
@@ -22,7 +26,6 @@
                 <span>Speed Index: {{ item.speed_index or 'Unavailable' }}</span>
                 <span>Predicted Time: {{ item.predicted_time or 'Unavailable' }}</span>
             </div>
-            <p class="mt-3"><strong>Score:</strong> {{ item.overall_score }}</p>
             <p><strong>Reason:</strong> {{ item.key_factors|join(', ') }}</p>
             <a href="/races/{{ result.race_id }}/final/{{ item.horse_id }}" class="btn btn-gold mt-3">View full horse result</a>
         </article>

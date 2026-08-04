@@ -9,6 +9,15 @@
             <h1 class="page-title">Choose your analytics</h1>
             <p class="hero-copy">Select exactly three of the six available factors before proceeding to prediction.</p>
         </div>
+        <button
+            type="button"
+            class="info-trigger"
+            data-bs-toggle="modal"
+            data-bs-target="#variableHelpModal"
+            aria-label="Learn what each prediction variable means"
+        >
+            i
+        </button>
     </div>
 
     <form method="post" action="/races/{{ race.id if race else '' }}/prediction" id="analyticsForm">
@@ -30,4 +39,64 @@
         </button>
     </form>
 </section>
+
+<div class="modal fade" id="variableHelpModal" tabindex="-1" aria-labelledby="variableHelpModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content help-modal">
+            <div class="modal-header help-modal-header">
+                <div>
+                    <p class="eyebrow mb-2">Quick Guide</p>
+                    <h2 class="modal-title h4 mb-0" id="variableHelpModalLabel">What these variables mean</h2>
+                </div>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="help-grid">
+                    <article class="help-card">
+                        <h3>Draw Advantage</h3>
+                        <p>The draw is the stall number. Some races suit inside draws, so this helps show whether a horse starts from a more helpful position.</p>
+                    </article>
+                    <article class="help-card">
+                        <h3>Weight</h3>
+                        <p>This is the weight the horse carries in the race. Lower carried weight can make the job a little easier, especially in tight finishes.</p>
+                    </article>
+                    <article class="help-card">
+                        <h3>Previous Run</h3>
+                        <p>This looks at how the horse finished last time. A lower finishing position usually means the horse came into this race in better recent form.</p>
+                    </article>
+                    <article class="help-card">
+                        <h3>Trainer/Jockey Combination Win %</h3>
+                        <p>This shows how often this trainer and jockey win when they team up. Higher numbers suggest the partnership has worked well before.</p>
+                    </article>
+                    <article class="help-card">
+                        <h3>Speed Index</h3>
+                        <p>This is a quick performance rating from the source site. Higher values usually point to stronger recent speed.</p>
+                    </article>
+                    <article class="help-card">
+                        <h3>Predicted Time</h3>
+                        <p>This is the source site’s expected finishing time. Lower times are generally better because they suggest a faster run.</p>
+                    </article>
+                </div>
+
+                <section class="combo-guide mt-4">
+                    <h3>Good beginner combinations</h3>
+                    <div class="combo-guide-list">
+                        <div class="combo-guide-item">
+                            <strong>Speed Index + Predicted Time</strong>
+                            <p>Performance-focused. Useful when you want to compare which horses look naturally quickest.</p>
+                        </div>
+                        <div class="combo-guide-item">
+                            <strong>Weight + Draw Advantage</strong>
+                            <p>Race-condition-focused. Helpful when you want to see how the setup of the race might help or hurt a horse.</p>
+                        </div>
+                        <div class="combo-guide-item">
+                            <strong>Trainer/Jockey Combination + Previous Run</strong>
+                            <p>Form-focused. Good for checking whether a horse comes in with both recent form and a proven rider-team partnership.</p>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
