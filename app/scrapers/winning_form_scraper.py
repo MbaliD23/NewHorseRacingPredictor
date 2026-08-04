@@ -30,6 +30,8 @@ HEADER_ALIASES = {
     "len beh": "length_behind",
     "speed index": "speed_index",
     "pred time": "predicted_time",
+    "pred": "predicted_time",
+    "time": "time",
     "merit rated": "merit",
     "mr": "merit",
     "mass": "weight",
@@ -39,6 +41,7 @@ HEADER_ALIASES = {
     "draw": "draw",
     "jockey": "jockey",
     "trainer": "trainer",
+    "fin": "previous_run",
 }
 
 NON_RUNNER_NAMES = {
@@ -60,13 +63,13 @@ class ScrapedHorse:
     external_id: str
     name: str
     trainer_name: str | None = None
-    trainer_ranking: float | None = None
     jockey_name: str | None = None
-    jockey_rating: float | None = None
     draw_number: int | None = None
     weight_value: float | None = None
-    starting_price: float | None = None
     previous_run_rating: float | None = None
+    trainer_jockey_win_percent: float | None = None
+    speed_index: float | None = None
+    predicted_time: float | None = None
     scratched: bool = False
     status: str | None = None
     notes: str | None = None
@@ -276,6 +279,7 @@ class WinningFormScraper:
         stated_runners: int | None,
     ) -> list[ScrapedHorse]:
         candidates: list[tuple[dict, list[ScrapedHorse]]] = []
+        combo_win_percentages = self._extract_trainer_jockey_combo_win_percentages(soup)
 
         for table in soup.find_all("table"):
             # Wrapper tables flatten every nested cell into one row. Skip them.
@@ -310,6 +314,7 @@ class WinningFormScraper:
                 col_map,
                 race_external_id,
                 stated_runners,
+                combo_win_percentages,
             )
             if horses:
                 candidates.append((col_map, horses))
@@ -340,6 +345,7 @@ class WinningFormScraper:
         col_map: dict[str, int],
         race_external_id: str,
         stated_runners: int | None = None,
+        combo_win_percentages: dict[int, float] | None = None,
     ) -> list[ScrapedHorse]:
         horses: list[ScrapedHorse] = []
         seen: set[str] = set()
@@ -368,8 +374,13 @@ class WinningFormScraper:
                 re.search(r"\bscr(?:atch(?:ed|ing)?)?\b", joined, re.IGNORECASE)
             )
 
-            rating_cell = self._cell(cells, col_map.get("merit")) or self._cell(
-                cells, col_map.get("speed_index")
+            previous_run_cell = self._cell(cells, col_map.get("previous_run"))
+            runner_number = self._as_int(self._cell(cells, col_map.get("number")), 1, 30)
+            speed_index = self._as_float(
+                self._cell(cells, col_map.get("speed_index")), 0, 200
+            )
+            predicted_time = self._as_float(
+                self._cell(cells, col_map.get("predicted_time")), 0, 300
             )
 
             horses.append(
@@ -384,19 +395,56 @@ class WinningFormScraper:
                     weight_value=self._as_float(
                         self._cell(cells, col_map.get("weight")), 40, 70
                     ),
-                    starting_price=None,
-                    previous_run_rating=self._as_float(rating_cell, 0, 140),
+                    previous_run_rating=self._as_float(previous_run_cell, 0, 30),
+                    trainer_jockey_win_percent=(
+                        combo_win_percentages.get(runner_number)
+                        if combo_win_percentages and runner_number is not None
+                        else None
+                    ),
+                    speed_index=speed_index,
+                    predicted_time=predicted_time,
                     scratched=scratched,
                     status="Scratched" if scratched else "Active",
                     notes=(
                         "Read from the legacy.winningform.co.za predicted-finish "
-                        "table. Starting price is not published pre-race, so it is "
+                        "and trainer/jockey combination tables. Missing values are "
                         "left empty rather than estimated."
                     ),
                 )
             )
 
         return horses
+
+    def _extract_trainer_jockey_combo_win_percentages(
+        self, soup: BeautifulSoup
+    ) -> dict[int, float]:
+        compact = " ".join(soup.get_text(" ", strip=True).split())
+        if "Trainer/Jockey Combinations" not in compact:
+            return {}
+
+        result: dict[int, float] = {}
+        pattern = re.compile(
+            r"(?P<number>\d{1,2})\s+"
+            r"(?P<trainer>[A-Za-z][A-Za-z' .-]{0,30})\s+"
+            r"(?P<jockey>(?:SCRATCHED|[A-Za-z][A-Za-z' .-]{0,30}))\s+"
+            r"(?P<runs>\d{1,3})\s+"
+            r"(?P<first>\d{1,3})\s+"
+            r"(?P<second>\d{1,3})\s+"
+            r"(?P<third>\d{1,3})\s+"
+            r"(?P<win>\d{1,3})\s+"
+            r"(?P<place>\d{1,3})(?=\s+\d{1,2}\s+[A-Za-z]|\s*$)",
+            re.IGNORECASE,
+        )
+
+        section = compact.split("Trainer/Jockey Combinations", 1)[1]
+        section = section.split("CUMULATIVE", 1)[0]
+        for match in pattern.finditer(section):
+            runner_number = int(match.group("number"))
+            win_percent = float(match.group("win"))
+            if 0 <= win_percent <= 100:
+                result[runner_number] = win_percent
+
+        return result
 
     def _pretty_name(self, value: str) -> str:
         text = self._clean_text(value).lower()

@@ -15,8 +15,10 @@
         <div class="stat-card"><span>Jockey</span><strong>{{ prediction.jockey_name or 'Unavailable' }}</strong></div>
         <div class="stat-card"><span>Draw</span><strong>{{ prediction.draw_number or 'Unavailable' }}</strong></div>
         <div class="stat-card"><span>Weight</span><strong>{{ prediction.weight_value or 'Unavailable' }}</strong></div>
-        <div class="stat-card"><span>Starting Price</span><strong>{{ prediction.starting_price or 'Unavailable' }}</strong></div>
         <div class="stat-card"><span>Previous Run</span><strong>{{ prediction.previous_run_rating or 'Unavailable' }}</strong></div>
+        <div class="stat-card"><span>Trainer/Jockey Win %</span><strong>{{ prediction.trainer_jockey_win_percent or 'Unavailable' }}</strong></div>
+        <div class="stat-card"><span>Speed Index</span><strong>{{ prediction.speed_index or 'Unavailable' }}</strong></div>
+        <div class="stat-card"><span>Predicted Time</span><strong>{{ prediction.predicted_time or 'Unavailable' }}</strong></div>
     </div>
 
     <div class="alert alert-secondary">

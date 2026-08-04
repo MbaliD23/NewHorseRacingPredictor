@@ -18,14 +18,14 @@ class Settings(BaseSettings):
     scrape_interval_seconds: int = Field(default=3600, alias='SCRAPE_INTERVAL_SECONDS')
     request_timeout_seconds: int = Field(default=30, alias='REQUEST_TIMEOUT_SECONDS')
     log_level: str = Field(default='INFO', alias='LOG_LEVEL')
-    default_variables: str = Field(default='trainer_ranking,jockey_rating,starting_price', alias='DEFAULT_VARIABLES')
+    default_variables: str = Field(default='draw_advantage,weight,previous_run', alias='DEFAULT_VARIABLES')
     allowed_origins_raw: str = Field(default='*', alias='ALLOWED_ORIGINS')
-    trainer_weight: float = Field(default=1.0, alias='TRAINER_WEIGHT')
-    jockey_weight: float = Field(default=1.0, alias='JOCKEY_WEIGHT')
+    trainer_jockey_weight: float = Field(default=1.0, alias='TRAINER_JOCKEY_WEIGHT')
     draw_weight: float = Field(default=1.0, alias='DRAW_WEIGHT')
     weight_weight: float = Field(default=1.0, alias='WEIGHT_WEIGHT')
-    starting_price_weight: float = Field(default=1.0, alias='STARTING_PRICE_WEIGHT')
     previous_run_weight: float = Field(default=1.0, alias='PREVIOUS_RUN_WEIGHT')
+    speed_index_weight: float = Field(default=1.0, alias='SPEED_INDEX_WEIGHT')
+    predicted_time_weight: float = Field(default=1.0, alias='PREDICTED_TIME_WEIGHT')
 
     @field_validator('scrape_interval_seconds')
     @classmethod

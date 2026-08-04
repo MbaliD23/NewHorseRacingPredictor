@@ -172,11 +172,17 @@ class PredictionService:
                     weight_value=float(row["horse"].weight_value)
                     if row["horse"].weight_value is not None
                     else None,
-                    starting_price=float(row["horse"].starting_price)
-                    if row["horse"].starting_price is not None
-                    else None,
                     previous_run_rating=float(row["horse"].previous_run_rating)
                     if row["horse"].previous_run_rating is not None
+                    else None,
+                    trainer_jockey_win_percent=float(row["horse"].trainer_jockey_win_percent)
+                    if row["horse"].trainer_jockey_win_percent is not None
+                    else None,
+                    speed_index=float(row["horse"].speed_index)
+                    if row["horse"].speed_index is not None
+                    else None,
+                    predicted_time=float(row["horse"].predicted_time)
+                    if row["horse"].predicted_time is not None
                     else None,
                     notes=row["notes"],
                 )

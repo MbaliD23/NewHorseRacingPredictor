@@ -4,18 +4,18 @@ from app.interfaces.scorer import IVariableScorer
 
 
 @dataclass
-class TrainerRankingScore(IVariableScorer):
-    code: str = 'trainer_ranking'
-    display_name: str = 'Trainer Ranking'
-    def extract_raw_value(self, horse): return float(horse.trainer.ranking) if horse.trainer and horse.trainer.ranking is not None else None
+class TrainerJockeyCombinationScore(IVariableScorer):
+    code: str = 'trainer_jockey_win_percent'
+    display_name: str = 'Trainer/Jockey Combination Win %'
+    def extract_raw_value(self, horse): return float(horse.trainer_jockey_win_percent) if horse.trainer_jockey_win_percent is not None else None
     def higher_is_better(self) -> bool: return True
 
 
 @dataclass
-class JockeyScore(IVariableScorer):
-    code: str = 'jockey_rating'
-    display_name: str = 'Jockey Rating'
-    def extract_raw_value(self, horse): return float(horse.jockey.rating) if horse.jockey and horse.jockey.rating is not None else None
+class SpeedIndexScore(IVariableScorer):
+    code: str = 'speed_index'
+    display_name: str = 'Speed Index'
+    def extract_raw_value(self, horse): return float(horse.speed_index) if horse.speed_index is not None else None
     def higher_is_better(self) -> bool: return True
 
 
@@ -36,10 +36,10 @@ class WeightScore(IVariableScorer):
 
 
 @dataclass
-class StartingPriceScore(IVariableScorer):
-    code: str = 'starting_price'
-    display_name: str = 'Starting Price'
-    def extract_raw_value(self, horse): return float(horse.starting_price) if horse.starting_price is not None else None
+class PredictedTimeScore(IVariableScorer):
+    code: str = 'predicted_time'
+    display_name: str = 'Predicted Time'
+    def extract_raw_value(self, horse): return float(horse.predicted_time) if horse.predicted_time is not None else None
     def higher_is_better(self) -> bool: return False
 
 
@@ -48,14 +48,14 @@ class PreviousRunScore(IVariableScorer):
     code: str = 'previous_run'
     display_name: str = 'Previous Run'
     def extract_raw_value(self, horse): return float(horse.previous_run_rating) if horse.previous_run_rating is not None else None
-    def higher_is_better(self) -> bool: return True
+    def higher_is_better(self) -> bool: return False
 
 
 SCORERS = {
-    'trainer_ranking': TrainerRankingScore(),
-    'jockey_rating': JockeyScore(),
     'draw_advantage': DrawScore(),
     'weight': WeightScore(),
-    'starting_price': StartingPriceScore(),
     'previous_run': PreviousRunScore(),
+    'trainer_jockey_win_percent': TrainerJockeyCombinationScore(),
+    'speed_index': SpeedIndexScore(),
+    'predicted_time': PredictedTimeScore(),
 }

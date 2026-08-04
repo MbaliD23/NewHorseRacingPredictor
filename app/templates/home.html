@@ -6,7 +6,7 @@
         <p class="eyebrow mb-2">Page 1</p>
         <h1 class="page-title">Pick a race track to see what’s racing today.</h1>
         <p class="hero-copy">
-            Search by venue and select a race track sourced from legacy.winningform.co.za.
+            Search by venue and select an upcoming race track sourced from legacy.winningform.co.za.
         </p>
     </div>
     <div class="hero-stats">
@@ -30,9 +30,12 @@
             </div>
             <span class="meeting-date">{{ venue.meeting_date or 'Date unavailable' }}</span>
         </div>
-        <p class="text-muted mb-3">{{ venue.races|length }} race(s) loaded from source.</p>
+        <p class="text-muted mb-3">{{ venue.races|length }} upcoming race(s) loaded from source.</p>
         <a class="btn btn-gold" href="/venues/{{ venue.id }}">View races</a>
     </article>
     {% endfor %}
+    {% if not venues %}
+    <div class="empty-state-panel">No upcoming races are currently loaded. Past races are available in the archive.</div>
+    {% endif %}
 </section>
 {% endblock %}

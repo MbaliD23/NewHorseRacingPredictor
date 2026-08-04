@@ -52,7 +52,7 @@ class MonitoringService:
                         try:
                             await prediction_service.run_prediction(
                                 race.id,
-                                ["trainer_ranking", "jockey_rating", "starting_price"],
+                                ["draw_advantage", "weight", "previous_run"],
                             )
                         except Exception as exc:
                             logger.exception("prediction_cycle_failed %s", exc)

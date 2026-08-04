@@ -48,6 +48,21 @@ async def venue_page(
     )
 
 
+@web_router.get("/archive", response_class=HTMLResponse)
+async def archive_page(
+    request: Request,
+    race_service: RaceService = Depends(get_race_service),
+    status_service: StatusService = Depends(get_status_service),
+):
+    venues = await race_service.list_archived_venues()
+    status = await status_service.get_status()
+    return templates.TemplateResponse(
+        request=request,
+        name="archive.html",
+        context={"request": request, "venues": venues, "status": status},
+    )
+
+
 @web_router.get("/races/{race_id}", response_class=HTMLResponse)
 async def race_page(
     race_id: int,
@@ -122,7 +137,7 @@ async def final_horse_page(
     race_service: RaceService = Depends(get_race_service),
 ):
     latest = await prediction_service.run_prediction(
-        race_id, ["trainer_ranking", "jockey_rating", "starting_price"]
+        race_id, ["draw_advantage", "weight", "previous_run"]
     )
     selected = next((item for item in latest.predictions if item.horse_id == horse_id), None)
     horse = await race_service.get_horse_view(horse_id)

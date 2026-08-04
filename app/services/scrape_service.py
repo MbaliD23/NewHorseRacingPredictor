@@ -9,12 +9,12 @@ from app.scrapers.winning_form_scraper import WinningFormScraper
 from app.utils.hash_utils import sha256_text
 
 VARIABLES = [
-    ("trainer_ranking", "Trainer Ranking"),
-    ("jockey_rating", "Jockey Rating"),
     ("draw_advantage", "Draw Advantage"),
     ("weight", "Weight"),
-    ("starting_price", "Starting Price"),
     ("previous_run", "Previous Run"),
+    ("trainer_jockey_win_percent", "Trainer/Jockey Combination Win %"),
+    ("speed_index", "Speed Index"),
+    ("predicted_time", "Predicted Time"),
 ]
 
 MAX_RACES = 120
@@ -78,13 +78,11 @@ class ScrapeService:
                     if horse.trainer_name:
                         trainer = await self.upsert_repo.get_or_create_trainer(
                             horse.trainer_name,
-                            horse.trainer_ranking,
                         )
 
                     if horse.jockey_name:
                         jockey = await self.upsert_repo.get_or_create_jockey(
                             horse.jockey_name,
-                            horse.jockey_rating,
                         )
 
                     await self.upsert_repo.upsert_horse(
@@ -95,8 +93,10 @@ class ScrapeService:
                         name=horse.name,
                         draw_number=horse.draw_number,
                         weight_value=horse.weight_value,
-                        starting_price=horse.starting_price,
                         previous_run_rating=horse.previous_run_rating,
+                        trainer_jockey_win_percent=horse.trainer_jockey_win_percent,
+                        speed_index=horse.speed_index,
+                        predicted_time=horse.predicted_time,
                         scratched=horse.scratched,
                         status=horse.status,
                         notes=horse.notes,

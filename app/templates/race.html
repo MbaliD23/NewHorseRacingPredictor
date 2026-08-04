@@ -22,18 +22,18 @@
     <div class="panel-heading">
         <div>
             <h2>Select exactly three variables</h2>
-            <p class="text-muted mb-0">Trainer Ranking, Jockey Rating, Draw Advantage, Weight, Starting Price, Previous Run.</p>
+            <p class="text-muted mb-0">Draw Advantage, Weight, Previous Run, Trainer/Jockey Combination Win %, Speed Index, Predicted Time.</p>
         </div>
         <button id="runPredictorBtn" class="btn btn-gold" disabled>Run Predictor</button>
     </div>
     <div class="variable-grid mt-3" id="variableGrid">
         {% set variables = [
-            ('trainer_ranking','Trainer Ranking'),
-            ('jockey_rating','Jockey Rating'),
             ('draw_advantage','Draw Advantage'),
             ('weight','Weight'),
-            ('starting_price','Starting Price'),
-            ('previous_run','Previous Run')
+            ('previous_run','Previous Run'),
+            ('trainer_jockey_win_percent','Trainer/Jockey Combination Win %'),
+            ('speed_index','Speed Index'),
+            ('predicted_time','Predicted Time')
         ] %}
         {% for code, label in variables %}
         <button class="variable-pill" data-variable="{{ code }}">{{ label }}</button>
@@ -56,8 +56,10 @@
                     <th>Jockey</th>
                     <th>Draw</th>
                     <th>Weight</th>
-                    <th>SP</th>
                     <th>Previous Run</th>
+                    <th>Trainer/Jockey Win %</th>
+                    <th>Speed Index</th>
+                    <th>Predicted Time</th>
                     <th>Status</th>
                 </tr>
             </thead>
@@ -69,8 +71,10 @@
                     <td>{{ horse.jockey_name or 'Unavailable' }}</td>
                     <td>{{ horse.draw_number or 'Unavailable' }}</td>
                     <td>{{ horse.weight_value or 'Unavailable' }}</td>
-                    <td>{{ horse.starting_price or 'Unavailable' }}</td>
                     <td>{{ horse.previous_run_rating or 'Unavailable' }}</td>
+                    <td>{{ horse.trainer_jockey_win_percent or 'Unavailable' }}</td>
+                    <td>{{ horse.speed_index or 'Unavailable' }}</td>
+                    <td>{{ horse.predicted_time or 'Unavailable' }}</td>
                     <td>{{ 'Scratched' if horse.scratched else (horse.status or 'Open') }}</td>
                 </tr>
                 {% endfor %}

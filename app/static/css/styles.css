@@ -204,6 +204,27 @@ body { min-height: 100vh; }
   display:grid;
 }
 
+.archive-nav, .archive-nav:hover {
+  text-decoration:none;
+}
+
+.race-list {
+  display:grid;
+  gap:.75rem;
+}
+
+.archive-race-link {
+  display:flex;
+  justify-content:space-between;
+  gap:1rem;
+  padding:.75rem;
+  border:1px solid rgba(255,255,255,.06);
+  border-radius:.75rem;
+  color:var(--text);
+  text-decoration:none;
+  background:rgba(255,255,255,.03);
+}
+
 .filter-chip {
   border:none;
   padding:.7rem 1rem;

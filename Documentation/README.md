@@ -13,4 +13,4 @@ HorseRacingPredictor is a production-style FastAPI application for scraping live
 
 ## Source integrity
 
-The scraper targets `https://legacy.winningform.co.za` and never fabricates race data. If fields such as trainer ranking, jockey rating, starting price, or previous run metrics are unavailable in the source HTML, the UI and prediction output clearly indicate reduced confidence.
+The scraper targets `https://legacy.winningform.co.za` and never fabricates race data. If fields such as trainer/jockey combination win percentage, speed index, predicted time, or previous run metrics are unavailable in the source HTML, the UI and prediction output clearly indicate reduced confidence.

@@ -4,21 +4,21 @@ from typing import Literal
 from pydantic import BaseModel, Field, field_validator
 
 ALLOWED_VARIABLES = {
-    "trainer_ranking",
-    "jockey_rating",
     "draw_advantage",
     "weight",
-    "starting_price",
     "previous_run",
+    "trainer_jockey_win_percent",
+    "speed_index",
+    "predicted_time",
 }
 
 VARIABLE_LABELS = {
-    "trainer_ranking": "Trainer Ranking",
-    "jockey_rating": "Jockey Rating",
     "draw_advantage": "Draw Advantage",
     "weight": "Weight",
-    "starting_price": "Starting Price",
     "previous_run": "Previous Run",
+    "trainer_jockey_win_percent": "Trainer/Jockey Combination Win %",
+    "speed_index": "Speed Index",
+    "predicted_time": "Predicted Time",
 }
 
 
@@ -51,8 +51,10 @@ class PredictionItem(BaseModel):
     jockey_name: str | None = None
     draw_number: int | None = None
     weight_value: float | None = None
-    starting_price: float | None = None
     previous_run_rating: float | None = None
+    trainer_jockey_win_percent: float | None = None
+    speed_index: float | None = None
+    predicted_time: float | None = None
     notes: str | None = None
 
 

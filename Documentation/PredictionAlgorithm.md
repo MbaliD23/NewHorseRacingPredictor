@@ -4,12 +4,12 @@
 
 The platform supports exactly six variables:
 
-1. Trainer Ranking
-2. Jockey Rating
-3. Draw Advantage
-4. Weight
-5. Starting Price
-6. Previous Run
+1. Draw Advantage
+2. Weight
+3. Previous Run
+4. Trainer/Jockey Combination Win %
+5. Speed Index
+6. Predicted Time
 
 Users must choose exactly three variables.
 
@@ -18,7 +18,7 @@ Users must choose exactly three variables.
 1. Retrieve active horses for the selected race.
 2. Extract raw values from the chosen scorer modules.
 3. Normalize each selected variable to a common 0-1 range.
-4. Reverse the scale for variables where lower values are better, such as draw, weight, and starting price.
+4. Reverse the scale for variables where lower values are better, such as draw, weight, previous-run finish, and predicted time.
 5. Average the three normalized values to produce the final score.
 6. Rank descending and return the top three horses.
 

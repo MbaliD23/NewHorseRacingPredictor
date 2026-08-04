@@ -8,13 +8,13 @@ class HorseView(BaseModel):
     race_id: int
     name: str
     trainer_name: str | None = None
-    trainer_ranking: float | None = None
     jockey_name: str | None = None
-    jockey_rating: float | None = None
     draw_number: int | None = None
     weight_value: float | None = None
-    starting_price: float | None = None
     previous_run_rating: float | None = None
+    trainer_jockey_win_percent: float | None = None
+    speed_index: float | None = None
+    predicted_time: float | None = None
     scratched: bool
     status: str | None = None
     notes: str | None = None
@@ -32,6 +32,7 @@ class RaceCardView(BaseModel):
     runners: int = 0
     is_live: bool = False
     is_upcoming: bool = False
+    is_past: bool = False
 
 
 class VenueView(BaseModel):

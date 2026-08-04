@@ -38,5 +38,8 @@
         <a class="btn btn-gold mt-3" href="/races/{{ race.id }}">Open race</a>
     </article>
     {% endfor %}
+    {% if venue and not venue.races %}
+    <div class="empty-state-panel">No upcoming races are currently available for this venue. Past races are available in the archive.</div>
+    {% endif %}
 </section>
 {% endblock %}
