@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% block title %}Prediction Results{% endblock %}
+{% block content %}
+<section class="card-panel">
+    <p class="eyebrow mb-2">Page 5</p>
+    <h1 class="page-title">Top 3 prediction podium</h1>
+    <p class="hero-copy">{{ result.notes }}</p>
+
+    <div class="podium-grid mt-4">
+        {% for item in result.predictions %}
+        <article class="podium-card podium-{{ item.predicted_position }}">
+            <div class="podium-rank">
+                {% if item.predicted_position == 1 %}🥇{% elif item.predicted_position == 2 %}🥈{% else %}🥉{% endif %}
+            </div>
+            <h2>{{ item.horse_name }}</h2>
+            <p class="confidence">{{ item.confidence_percent }}% confidence</p>
+            <div class="meta-list vertical">
+                <span>Trainer: {{ item.trainer_name or 'Unavailable' }}</span>
+                <span>Jockey: {{ item.jockey_name or 'Unavailable' }}</span>
+                <span>Weight: {{ item.weight_value or 'Unavailable' }}</span>
+                <span>Draw: {{ item.draw_number or 'Unavailable' }}</span>
+            </div>
+            <p class="mt-3"><strong>Score:</strong> {{ item.overall_score }}</p>
+            <p><strong>Reason:</strong> {{ item.key_factors|join(', ') }}</p>
+            <a href="/races/{{ result.race_id }}/final/{{ item.horse_id }}" class="btn btn-gold mt-3">View full horse result</a>
+        </article>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}
