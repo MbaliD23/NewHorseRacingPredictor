@@ -1,25 +1,40 @@
-# Virtual environments
-.venv/
-venv/
-
-# Environment files
-.env
-
-# Python cache
+# Python
 __pycache__/
-*.pyc
-
-# Logs
-logs/
-
-# Database
-*.db
-
-# Build artifacts
+*.py[cod]
+*$py.class
 *.egg-info/
 build/
 dist/
 
-# VS Code
-.vscode/
+# Environments
+.venv/
+venv/
+env/
+.env
 
+# Database
+*.db
+*.sqlite3
+
+# Node / Frontend
+node_modules/
+dist/
+.next/
+dist-ssr/
+*.local
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Logs
+logs/
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDEs
+.vscode/
+.idea/
+*.swp
