@@ -1,6 +1,6 @@
 # HorseRacingPredictor
 
-HorseRacingPredictor is a production-style FastAPI application for scraping live horse racing pages from the Winning Form legacy site, storing all extracted changes historically, running a modular Top 3 prediction engine, and serving a Hollywoodbets-inspired dashboard.
+HorseRacingPredictor is a production-style FastAPI application for scraping live horse racing pages from the Winning Form legacy site, storing all extracted changes historically, running a modular Top 3 prediction engine, and serving a Winning Form-inspired dashboard.
 
 ## Key capabilities
 

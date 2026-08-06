@@ -19,7 +19,7 @@ export function AppShell({ children }: PropsWithChildren) {
     <main className="min-h-screen overflow-x-hidden bg-background text-foreground">
       <div className="neon-bg" />
       <header className="app-header">
-        <div className="brand-mark" aria-label="Hollywoodbets">
+        <div className="brand-mark" aria-label="Winning Form">
           <span className="brand-star" aria-hidden="true">
             <span className="brand-star-core" />
           </span>
