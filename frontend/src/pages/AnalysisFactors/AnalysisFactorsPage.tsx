@@ -9,6 +9,7 @@ import { usePrediction } from "@/hooks/usePrediction";
 import { useRace } from "@/hooks/useRace";
 import { usePredictionStore } from "@/store/predictionStore";
 import { predictionVariableLabels, type PredictionVariable } from "@/types/prediction";
+import horseImg from "@/assets/3DHorseBlack.png";
 
 const factors: Array<{
   code: PredictionVariable;
@@ -73,7 +74,6 @@ export function AnalysisFactorsPage() {
   const { data: race, isLoading, isError } = useRace(raceId);
   const prediction = usePrediction();
   const { selectedVariables, setSelectedVariables, setCurrentRace, setPredictionResult } = usePredictionStore();
-  const [showInfo, setShowInfo] = useState(false);
   const [activeInfo, setActiveInfo] = useState<PredictionVariable | null>(null);
 
   const activeFactor = useMemo(() => factors.find((factor) => factor.code === activeInfo), [activeInfo]);
@@ -100,146 +100,121 @@ export function AnalysisFactorsPage() {
   }
 
   return (
-    <section className="page-section screen-shell analysis-page min-h-[calc(100vh-96px)]">
-      <button
-        className={`info-global info-orb ${showInfo ? "active" : ""}`}
-        type="button"
-        onClick={() => setShowInfo((value) => !value)}
-        aria-label="Toggle factor information"
-        aria-pressed={showInfo}
-      >
-        <Info className="h-5 w-5" />
-      </button>
-      <div className="page-heading page-heading-wide analysis-heading">
+    <section className="page-section screen-shell analysis-page light-theme min-h-[calc(100vh-96px)]">
+      <div className="page-heading page-heading-wide analysis-heading light-heading">
         <h1>
           Choose Your <span>Analysis Factors</span>
         </h1>
-        <p>Select up to 3 factors to weight the prediction algorithm.</p>
+        <p>Select up to 3 factors to weight the prediction algorithm</p>
       </div>
 
       <AsyncBoundary isLoading={isLoading} isError={isError} isEmpty={!race} emptyMessage="Race unavailable.">
         <div className="factor-layout">
-          <div className={`factor-wheel ${showInfo ? "help-active" : ""}`}>
-            <div className="wheel-glow" />
-            <div className="wheel-ring wheel-ring-outer" />
-            <div className="wheel-ring wheel-ring-inner" />
-            <div className="wheel-tick-ring" />
-            <svg className="factor-wheel-svg" viewBox="0 0 520 520" role="presentation" aria-hidden="true">
-              <defs>
-                <radialGradient id="inactiveSegment" cx="50%" cy="44%" r="68%">
-                  <stop offset="0%" stopColor="#421071" stopOpacity="0.92" />
-                  <stop offset="100%" stopColor="#17072c" stopOpacity="0.96" />
-                </radialGradient>
-                <radialGradient id="activeSegment" cx="38%" cy="38%" r="78%">
-                  <stop offset="0%" stopColor="#196b84" stopOpacity="0.94" />
-                  <stop offset="100%" stopColor="#092850" stopOpacity="0.98" />
-                </radialGradient>
-              </defs>
-              {wheelSegments.map((factor) => {
+          <div className="factor-left-col">
+            <div className="factor-wheel">
+              <div className="wheel-glow" />
+              <div className="wheel-ring wheel-ring-outer" />
+              <div className="wheel-ring wheel-ring-inner" />
+              <div className="wheel-tick-ring" />
+              <svg className="factor-wheel-svg" viewBox="0 0 520 520" role="presentation" aria-hidden="true">
+                <defs>
+                  <radialGradient id="inactiveSegment" cx="50%" cy="50%" r="70%">
+                    <stop offset="0%" stopColor="#ffffff" stopOpacity="1" />
+                    <stop offset="100%" stopColor="#f8f9fa" stopOpacity="1" />
+                  </radialGradient>
+                  <radialGradient id="activeSegment" cx="50%" cy="50%" r="70%">
+                    <stop offset="0%" stopColor="#fbf7ff" stopOpacity="1" />
+                    <stop offset="100%" stopColor="#f3e8ff" stopOpacity="1" />
+                  </radialGradient>
+                </defs>
+                {wheelSegments.map((factor) => {
+                  const selected = selectedVariables.includes(factor.code);
+                  return (
+                    <path
+                      key={factor.code}
+                      className={`wheel-wedge ${selected ? "selected" : ""}`}
+                      d={describeSegment(factor.startAngle, factor.endAngle)}
+                      fill={`url(#${selected ? "activeSegment" : "inactiveSegment"})`}
+                      onClick={() => toggleFactor(factor.code)}
+                    />
+                  );
+                })}
+              </svg>
+              <div className="wheel-center">
+                <strong>{selectedVariables.length}/3</strong>
+                <span>SELECTED</span>
+              </div>
+              {wheelSegments.map((factor, index) => {
                 const selected = selectedVariables.includes(factor.code);
+                const isActive = activeInfo === factor.code;
+                const Icon = factor.Icon;
                 return (
-                  <path
+                  <div
                     key={factor.code}
-                    className={`wheel-wedge ${selected ? "selected" : ""}`}
-                    d={describeSegment(factor.startAngle, factor.endAngle)}
-                    fill={`url(#${selected ? "activeSegment" : "inactiveSegment"})`}
-                    onClick={() => toggleFactor(factor.code)}
-                  />
-                );
-              })}
-            </svg>
-            <div className="wheel-center">
-              <strong>{selectedVariables.length}/3</strong>
-              <span>SELECTED</span>
-            </div>
-            {wheelSegments.map((factor, index) => {
-              const selected = selectedVariables.includes(factor.code);
-              const Icon = factor.Icon;
-              return (
-                <button
-                  key={factor.code}
-                  className={`factor-segment segment-${index} ${selected ? "selected" : ""}`}
-                  type="button"
-                  style={labelPosition(factor.centerAngle)}
-                  onClick={() => toggleFactor(factor.code)}
-                >
-                  <div className="factor-segment-core">
-                    <Icon className="h-9 w-9" />
-                    <span>
-                      {predictionVariableLabels[factor.code]}
-                      {showInfo ? (
-                        <span
-                          className="factor-info"
-                          role="button"
-                          tabIndex={0}
-                          aria-label={`Show ${predictionVariableLabels[factor.code]} information`}
-                          onClick={(event) => {
-                            event.stopPropagation();
-                            setActiveInfo(factor.code);
-                          }}
-                          onKeyDown={(event) => {
-                            if (event.key === "Enter" || event.key === " ") {
-                              event.preventDefault();
-                              event.stopPropagation();
-                              setActiveInfo(factor.code);
-                            }
-                          }}
-                        >
-                          <Info className="h-3.5 w-3.5" />
+                    className="factor-segment-container"
+                    style={labelPosition(factor.centerAngle)}
+                    onMouseEnter={() => setActiveInfo(factor.code)}
+                    onMouseLeave={() => setActiveInfo(null)}
+                  >
+                    <button
+                      className={`factor-segment segment-${index} ${selected ? "selected" : ""}`}
+                      type="button"
+                      onClick={() => toggleFactor(factor.code)}
+                    >
+                      <div className="factor-segment-core">
+                        <Icon className="h-8 w-8" />
+                        <span>
+                          {predictionVariableLabels[factor.code]}
+                          <span className="factor-info-icon"><Info className="h-3.5 w-3.5" /></span>
+                        </span>
+                      </div>
+                      {selected ? (
+                        <span className="factor-check">
+                          <Check className="h-4 w-4" />
                         </span>
                       ) : null}
-                    </span>
+                    </button>
+                    {isActive && (
+                      <div className={`factor-description-card tooltip-angle-${factor.centerAngle}`}>
+                        <div className="factor-desc-header">
+                          <Icon className="h-5 w-5" />
+                          <h3>{predictionVariableLabels[factor.code]}</h3>
+                        </div>
+                        <p className="factor-desc-text">{factor.explanation}</p>
+                        {factor.code === 'weight' && (
+                          <p className="factor-desc-example">
+                            e.g. A horse dropping 2.5kg from its last run (58kg → 55.5kg) after a narrow loss is often a strong positive.
+                          </p>
+                        )}
+                      </div>
+                    )}
                   </div>
-                  {selected ? (
-                    <span className="factor-check">
-                      <Check className="h-4 w-4" />
-                    </span>
-                  ) : null}
-                </button>
-              );
-            })}
+                );
+              })}
+            </div>
           </div>
 
-          <div className="factor-side-panel">
-            <GlassCard className="selected-panel selected-panel-side">
-              <div className="selected-panel-header">
-                <h2>Selected Factors</h2>
-                <span>{selectedVariables.length}/3</span>
-              </div>
-              <div className="selected-factor-stack">
-                {selectedVariables.length === 0 ? (
-                  <p className="text-violet-100/60">Pick any factor on the circle to build your prediction mix.</p>
-                ) : (
-                  selectedVariables.map((variable) => (
-                    <div className="selected-factor-card" key={variable}>
-                      <span className="selected-chip">{predictionVariableLabels[variable]}</span>
-                    </div>
-                  ))
-                )}
-              </div>
-            </GlassCard>
-
-            {showInfo ? (
-              <GlassCard className="factor-explain">
-                {activeFactor ? (
-                  <>
-                    <h2>{predictionVariableLabels[activeFactor.code]}</h2>
-                    <p>{activeFactor.explanation}</p>
-                  </>
-                ) : (
-                  <>
-                    <h2>Factor Guide</h2>
-                    <p>Tap any small info icon on the circle to read the description for that factor.</p>
-                  </>
-                )}
-              </GlassCard>
-            ) : null}
+          <div className="factor-right-col">
+            <img src={horseImg} alt="3D Horse" className="analysis-horse-image" />
           </div>
         </div>
 
-        <div className="page-actions">
-          <BackButton label="Back" showLabel className="analysis-back" />
-          <Button size="lg" className="prediction-cta" onClick={handleProceed} disabled={selectedVariables.length !== 3 || prediction.isPending}>
+        <div className="analysis-bottom-section">
+          <BackButton label="Back" showLabel className="analysis-back light-pill-btn" />
+          
+          <div className="bottom-selected-container light-pill-container">
+            <span className="selected-container-title">SELECTED FACTORS <span className="text-purple-600">({selectedVariables.length}/3)</span></span>
+            <div className="bottom-selected-bar">
+              {selectedVariables.map(v => (
+                <div key={v} className="selected-pill light-pill">
+                  {predictionVariableLabels[v]}
+                  <Check className="h-4 w-4" />
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <Button size="lg" className="prediction-cta solid-purple-btn" onClick={handleProceed} disabled={selectedVariables.length !== 3 || prediction.isPending}>
             <Sparkles className="h-5 w-5" /> {prediction.isPending ? "Running Prediction" : "Proceed to Predictions"}
           </Button>
         </div>
