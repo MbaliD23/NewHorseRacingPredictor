@@ -1,5 +1,6 @@
 import type { PropsWithChildren } from "react";
 import { useEffect, useState } from "react";
+import { Calendar } from "lucide-react";
 import { useStatus } from "@/hooks/useStatus";
 import { formatDate, formatTime } from "@/lib/utils";
 
@@ -19,23 +20,12 @@ export function AppShell({ children }: PropsWithChildren) {
     <main className="min-h-screen overflow-x-hidden bg-background text-foreground">
       <div className="neon-bg" />
       <header className="app-header">
-        <div className="brand-mark" aria-label="Winning Form">
-          <span className="brand-star" aria-hidden="true">
-            <span className="brand-star-core" />
-          </span>
-          <div className="brand-lockup">
-            <span className="brand-script">Hollywood</span>
-            <span className="brand-bets">bets</span>
-          </div>
-        </div>
         <div className="header-status">
-          <div className="status-meta">
+          <div className="status-meta light-theme">
+            <Calendar className="h-4 w-4" />
             <span>{formatDate(liveClock)}</span>
+            <span className="text-gray-300">|</span>
             <span>{formatTime(liveClock)}</span>
-          </div>
-          <div className="status-meta hidden sm:flex">
-            <span>Last Sync</span>
-            <span>{formatTime(data?.last_scrape_at ?? null)}</span>
           </div>
         </div>
       </header>
