@@ -9,14 +9,14 @@
 }
 
 html {
-  background: #0a0316;
+  background: hsl(var(--background));
 }
 
 body {
   margin: 0;
   min-width: 320px;
   font-family: "Outfit", ui-sans-serif, system-ui, sans-serif;
-  color: white;
+  color: hsl(var(--foreground));
 }
 
 button,
