@@ -100,6 +100,13 @@ class ScrapeService:
                         scratched=horse.scratched,
                         status=horse.status,
                         notes=horse.notes,
+                        odds=horse.odds,
+                        equipment=horse.equipment,
+                        pedigree_description=horse.pedigree_description,
+                        dob=horse.dob,
+                        silks=horse.silks,
+                        stakes=horse.stakes,
+                        sale_price=horse.sale_price,
                     )
 
                 horses_removed += await self.upsert_repo.delete_orphan_horses(

@@ -27,6 +27,15 @@ const getVenueImage = (venueName: string) => {
   return greyvilleImg;
 };
 
+const formatVenueDate = (dateStr: string | null) => {
+  let dateObj = new Date();
+  if (dateStr) {
+    const [year, month, day] = dateStr.split("-");
+    dateObj = new Date(Number(year), Number(month) - 1, Number(day));
+  }
+  return dateObj.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+};
+
 type FilterValue = "all" | "live" | "upcoming";
 
 export function LocationsPage() {
@@ -38,13 +47,28 @@ export function LocationsPage() {
   const [hoveredVenueId, setHoveredVenueId] = useState<number | null>(null);
 
   const venues = useMemo(() => {
-    return (data ?? []).filter((venue) => {
+    const filtered = (data ?? []).filter((venue) => {
       const matchesQuery = venue.venue.toLowerCase().includes(query.toLowerCase());
       const matchesFilter =
         filter === "all" ||
         (filter === "live" && venue.races.some((race) => race.is_live)) ||
         (filter === "upcoming" && venue.races.some((race) => race.is_upcoming));
       return matchesQuery && matchesFilter;
+    });
+
+    return filtered.sort((a, b) => {
+      const aHasActive = a.races.some(r => r.is_live || r.is_upcoming);
+      const bHasActive = b.races.some(r => r.is_live || r.is_upcoming);
+      
+      if (aHasActive && !bHasActive) return -1;
+      if (!aHasActive && bHasActive) return 1;
+
+      const dateA = a.meeting_date ? new Date(a.meeting_date).getTime() : 0;
+      const dateB = b.meeting_date ? new Date(b.meeting_date).getTime() : 0;
+      if (dateA !== dateB) {
+        return dateB - dateA; // newest first
+      }
+      return a.venue.localeCompare(b.venue);
     });
   }, [data, filter, query]);
 
@@ -127,20 +151,29 @@ export function LocationsPage() {
                   </div>
                 </div>
 
-                <div className={`flex flex-1 items-center justify-between p-5 transition-colors duration-300 ${isHovered ? 'bg-[#0A0413]' : 'bg-white'}`}>
-                  <div className="flex items-center gap-3">
-                    <MapPin className={`h-6 w-6 ${isHovered ? 'text-purple-500' : 'text-purple-600'}`} />
-                    <div>
-                      <h3 className={`text-[1.3rem] font-bold ${isHovered ? 'text-white' : 'text-gray-900'}`}>
-                        {venue.venue}
-                      </h3>
-                      <p className={`text-sm ${isHovered ? 'text-gray-400' : 'text-gray-500'}`}>
-                        Today's races
-                      </p>
+                <div className={`flex flex-1 flex-col justify-between p-5 transition-colors duration-300 ${isHovered ? 'bg-[#0A0413]' : 'bg-white'}`}>
+                  <div className="flex items-center gap-3 mb-5">
+                    <MapPin className={`h-6 w-6 shrink-0 ${isHovered ? 'text-purple-500' : 'text-purple-600'}`} />
+                    <h3 className={`text-[1.3rem] font-bold leading-tight ${isHovered ? 'text-white' : 'text-gray-900'}`}>
+                      {venue.venue}
+                    </h3>
+                  </div>
+
+                  <div className={`mb-6 flex flex-col space-y-3 rounded-xl p-4 transition-colors duration-300 ${isHovered ? 'bg-white/5 border border-white/10' : 'bg-gray-50/80 border border-gray-100'}`}>
+                    <div className="flex items-center justify-between">
+                      <span className={`text-[15px] font-semibold ${isHovered ? 'text-gray-300' : 'text-gray-700'}`}>Meeting Date</span>
+                      <span className={`text-[15px] font-extrabold ${isHovered ? 'text-white' : 'text-gray-900'}`}>{formatVenueDate(venue.meeting_date)}</span>
+                    </div>
+                    <div className={`h-px w-full ${isHovered ? 'bg-white/10' : 'bg-gray-200/70'}`} />
+                    <div className="flex items-center justify-between">
+                      <span className={`text-[15px] font-semibold ${isHovered ? 'text-gray-300' : 'text-gray-700'}`}>Number of Races</span>
+                      <span className={`text-[16px] font-extrabold ${isHovered ? 'text-purple-400' : 'text-purple-600'}`}>{venue.races.length}</span>
                     </div>
                   </div>
-                  <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-full transition-colors duration-300 ${isHovered ? 'bg-purple-600' : 'bg-gray-50 group-hover:bg-gray-100'}`}>
-                    <ArrowRight className={`h-5 w-5 ${isHovered ? 'text-white' : 'text-purple-600'}`} />
+                  <div className="flex justify-center mt-2">
+                    <button className={`px-12 py-2 rounded-full font-bold text-sm transition-all duration-300 ${isHovered ? 'bg-purple-600 text-white shadow-[0_4px_14px_0_rgba(147,51,234,0.39)]' : 'bg-purple-50 text-purple-700 group-hover:bg-purple-100'}`}>
+                      View
+                    </button>
                   </div>
                 </div>
               </div>

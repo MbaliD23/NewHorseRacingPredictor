@@ -73,6 +73,13 @@ class ScrapedHorse:
     scratched: bool = False
     status: str | None = None
     notes: str | None = None
+    odds: str | None = None
+    equipment: str | None = None
+    pedigree_description: str | None = None
+    dob: str | None = None
+    silks: str | None = None
+    stakes: str | None = None
+    sale_price: str | None = None
 
 
 @dataclass
@@ -280,6 +287,7 @@ class WinningFormScraper:
     ) -> list[ScrapedHorse]:
         candidates: list[tuple[dict, list[ScrapedHorse]]] = []
         combo_win_percentages = self._extract_trainer_jockey_combo_win_percentages(soup)
+        extended_data = self._extract_extended_horse_data(soup)
 
         for table in soup.find_all("table"):
             # Wrapper tables flatten every nested cell into one row. Skip them.
@@ -315,6 +323,7 @@ class WinningFormScraper:
                 race_external_id,
                 stated_runners,
                 combo_win_percentages,
+                extended_data,
             )
             if horses:
                 candidates.append((col_map, horses))
@@ -346,6 +355,7 @@ class WinningFormScraper:
         race_external_id: str,
         stated_runners: int | None = None,
         combo_win_percentages: dict[int, float] | None = None,
+        extended_data: dict[str, dict] | None = None,
     ) -> list[ScrapedHorse]:
         horses: list[ScrapedHorse] = []
         seen: set[str] = set()
@@ -383,6 +393,8 @@ class WinningFormScraper:
                 self._cell(cells, col_map.get("predicted_time")), 0, 300
             )
 
+            ext = extended_data.get(self._pretty_name(raw_name).lower(), {}) if extended_data else {}
+
             horses.append(
                 ScrapedHorse(
                     external_id=f"{race_external_id}-{len(horses) + 1}",
@@ -410,9 +422,84 @@ class WinningFormScraper:
                         "and trainer/jockey combination tables. Missing values are "
                         "left empty rather than estimated."
                     ),
+                    odds=ext.get("odds"),
+                    equipment=ext.get("equipment"),
+                    pedigree_description=ext.get("pedigree_description"),
+                    dob=ext.get("dob"),
+                    silks=ext.get("silks"),
+                    stakes=ext.get("stakes"),
+                    sale_price=ext.get("sale_price"),
                 )
             )
 
+        return horses
+
+    def _extract_extended_horse_data(self, soup: BeautifulSoup) -> dict[str, dict]:
+        horses = {}
+        for div_b4 in soup.find_all("div", class_="b4"):
+            try:
+                td_container = div_b4.parent
+                if td_container.name != "td":
+                    continue
+                div_b1_odds = td_container.find("div", class_="b1")
+                odds = div_b1_odds.get_text(strip=True) if div_b1_odds else None
+                
+                next_td = td_container.find_next_sibling("td")
+                if not next_td:
+                    continue
+                name_td = next_td.find("td", class_="b1")
+                if not name_td:
+                    continue
+                name = self._pretty_name(name_td.get_text(strip=True))
+                
+                eq_td = name_td.find_next_sibling("td")
+                equipment = eq_td.get_text(strip=True) if eq_td else None
+                
+                dob_td = next_td.find(string=re.compile(r"dob:"))
+                pedigree_desc = None
+                dob = None
+                if dob_td:
+                    dob = dob_td.strip().replace("dob:", "").strip()
+                    ped_td = dob_td.parent.find_previous_sibling("td")
+                    if ped_td:
+                        pedigree_desc = ped_td.get_text(strip=True)
+                
+                parent_tr = td_container.parent
+                next_tr = parent_tr.find_next_sibling("tr")
+                silks = None
+                if next_tr:
+                    small_td = next_tr.find("td", id="small")
+                    if small_td:
+                        text_nodes = list(small_td.stripped_strings)
+                        if text_nodes:
+                            silks = text_nodes[-1]
+                
+                stakes = None
+                sale_price = None
+                if next_tr:
+                    for bld_td in next_tr.find_all("td"):
+                        text = bld_td.get_text(strip=True)
+                        if text.startswith("Stakes:"):
+                            stakes_val_td = bld_td.find_next_sibling("td")
+                            if stakes_val_td:
+                                stakes = stakes_val_td.get_text(strip=True)
+                        elif text.startswith("SalePrc:"):
+                            sale_val_td = bld_td.find_next_sibling("td")
+                            if sale_val_td:
+                                sale_price = sale_val_td.get_text(strip=True)
+                
+                horses[name.lower()] = {
+                    "odds": odds,
+                    "equipment": equipment,
+                    "pedigree_description": pedigree_desc,
+                    "dob": dob,
+                    "silks": silks,
+                    "stakes": stakes,
+                    "sale_price": sale_price
+                }
+            except Exception as e:
+                logger.warning("Error parsing extended horse block: %s", e)
+                continue
         return horses
 
     def _extract_trainer_jockey_combo_win_percentages(

@@ -18,6 +18,13 @@ class HorseView(BaseModel):
     scratched: bool
     status: str | None = None
     notes: str | None = None
+    odds: str | None = None
+    equipment: str | None = None
+    pedigree_description: str | None = None
+    dob: str | None = None
+    silks: str | None = None
+    stakes: str | None = None
+    sale_price: str | None = None
 
 
 class RaceCardView(BaseModel):

@@ -1,24 +1,10 @@
-import { ArrowLeft, RotateCcw, Sparkles } from "lucide-react";
+import { ArrowLeft, RotateCcw } from "lucide-react";
 import { useMemo } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/components/common/Button";
-import { GlassCard } from "@/components/common/GlassCard";
+import { HorseAnalysisView } from "@/components/horse/HorseAnalysisView";
 import { AsyncBoundary } from "@/components/status/AsyncBoundary";
-import { valueOrUnavailable } from "@/lib/utils";
 import { usePredictionStore } from "@/store/predictionStore";
-import type { PredictionItem } from "@/types/prediction";
-import type { Horse } from "@/types/race";
-
-const horseFields = [
-  ["Trainer", "trainer_name"],
-  ["Trainer/Jockey Combination", "trainer_jockey_win_percent"],
-  ["Jockey", "jockey_name"],
-  ["Speed Index", "speed_index"],
-  ["Draw", "draw_number"],
-  ["Weight", "weight_value"],
-  ["Predicted Time", "predicted_time"],
-  ["Previous Run", "previous_run_rating"],
-] as const;
 
 export function SelectedHorsePage() {
   const { horseId } = useParams();
@@ -34,107 +20,34 @@ export function SelectedHorsePage() {
   }, [currentRace?.horses, horseId]);
 
   const horse = currentHorse?.id && String(currentHorse.id) === horseId ? currentHorse : raceHorse;
-  const horseName = horse?.name ?? prediction?.horse_name ?? "Selected Horse";
 
   return (
-    <section className="page-section screen-shell min-h-[calc(100vh-96px)]">
-      <div className="selected-horse-hero">
-        <div>
-          <p className="text-sm font-semibold uppercase tracking-[0.24em] text-primary">Selected Horse</p>
-          <h1>{horseName}</h1>
-          <p>
-            {currentRace?.venue ? `${currentRace.venue} Race ${currentRace.race_number}` : "Prediction-ready horse profile"}
-          </p>
-        </div>
-        {prediction?.predicted_position ? (
-          <div className="selected-horse-rank">
-            <span>Rank</span>
-            <strong>{prediction.predicted_position}</strong>
-          </div>
-        ) : null}
-      </div>
-
+    <section className="page-section screen-shell py-4">
       <AsyncBoundary isEmpty={!horse && !prediction} emptyMessage="Selected horse data is unavailable for this prediction.">
-        <div className="selected-horse-layout">
-          <GlassCard className="selected-horse-summary">
-            <div className="horse-saddle">{valueOrUnavailable(horse?.draw_number ?? prediction?.draw_number ?? horse?.id)}</div>
-            <div>
-              <h2>{horseName}</h2>
-              <p>{valueOrUnavailable(horse?.status)}</p>
-            </div>
-            <div className="selected-score-grid">
-              {typeof prediction?.overall_score === "number" ? <Metric label="Score" value={prediction.overall_score} /> : null}
-              {typeof prediction?.confidence_percent === "number" ? <Metric label="Confidence" value={`${prediction.confidence_percent}%`} /> : null}
-            </div>
-          </GlassCard>
-
-          <div className="detail-grid">
-            {horseFields.map(([label, key]) => {
-              const value = getHorseMetric(key, horse, prediction);
-              return (
-                <GlassCard className="detail-tile selected-horse-tile" key={key}>
-                  <div>
-                    <p>{label}</p>
-                    <strong>{valueOrUnavailable(value)}</strong>
-                  </div>
-                </GlassCard>
-              );
-            })}
-          </div>
-
-          {prediction?.key_factors?.length ? (
-            <GlassCard className="selected-horse-factors">
-              <h2>Key Factors</h2>
-              <div className="flex flex-wrap gap-2">
-                {prediction.key_factors.map((factor) => (
-                  <span className="selected-chip" key={factor}>
-                    {factor}
-                  </span>
-                ))}
-              </div>
-            </GlassCard>
-          ) : null}
-
-          {horse?.notes || prediction?.notes ? (
-            <GlassCard className="selected-horse-notes">
-              <Sparkles className="h-5 w-5 text-primary" />
-              <p>{horse?.notes ?? prediction?.notes}</p>
-            </GlassCard>
-          ) : null}
-        </div>
+        <HorseAnalysisView
+          horse={horse}
+          raceTitle={currentRace?.title ?? undefined}
+          raceNumber={currentRace?.race_number ?? undefined}
+          venueName={currentRace?.venue ?? undefined}
+        />
       </AsyncBoundary>
 
-      <div className="page-actions mt-auto">
-        <Button variant="outline" size="lg" onClick={() => navigate("/predictions/results")}>
-          <ArrowLeft className="h-6 w-6" />
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 max-w-4xl mx-auto pb-6 w-full px-2">
+        <Button variant="outline" size="lg" className="w-full sm:w-auto rounded-full" onClick={() => navigate("/predictions/results")}>
+          <ArrowLeft className="mr-2 h-5 w-5" />
           Back to Predictions
         </Button>
         <Button
           size="lg"
+          className="w-full sm:w-auto rounded-full bg-purple-700 hover:bg-purple-800 text-white"
           onClick={() => {
             resetFlow();
             navigate("/");
           }}
         >
-          Start Over <RotateCcw className="h-5 w-5" />
+          Start Over <RotateCcw className="ml-2 h-4 w-4" />
         </Button>
       </div>
     </section>
-  );
-}
-
-function getHorseMetric(key: (typeof horseFields)[number][1], horse: Horse | null, prediction: PredictionItem | null) {
-  switch (key) {
-    default:
-      return horse?.[key] ?? prediction?.[key] ?? null;
-  }
-}
-
-function Metric({ label, value }: { label: string; value: string | number }) {
-  return (
-    <div>
-      <p>{label}</p>
-      <strong>{value}</strong>
-    </div>
   );
 }

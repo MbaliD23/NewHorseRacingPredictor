@@ -49,4 +49,11 @@ export type Horse = {
   scratched: boolean;
   status: string | null;
   notes: string | null;
+  odds: string | null;
+  equipment: string | null;
+  pedigree_description: string | null;
+  dob: string | null;
+  silks: string | null;
+  stakes: string | null;
+  sale_price: string | null;
 };
