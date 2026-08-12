@@ -72,8 +72,7 @@ class RaceService:
             races = []
             for race in sorted(meeting.races, key=lambda item: item.race_number):
                 race_view = self._race_card_view(race)
-                if not race_view.is_past:
-                    races.append(race_view)
+                races.append(race_view)
 
             if not races:
                 continue
@@ -126,8 +125,7 @@ class RaceService:
         races = []
         for race in sorted(meeting.races, key=lambda item: item.race_number):
             race_view = self._race_card_view(race)
-            if not race_view.is_past:
-                races.append(race_view)
+            races.append(race_view)
 
         return VenueView(
             id=meeting.id,
