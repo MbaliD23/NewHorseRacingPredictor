@@ -35,6 +35,13 @@ HORSE_OVERWRITE_FIELDS = {
     "scratched",
     "status",
     "notes",
+    "odds",
+    "equipment",
+    "pedigree_description",
+    "dob",
+    "silks",
+    "stakes",
+    "sale_price",
 }
 
 # Never null these out on a re-run — a missing lookup should keep the old link.

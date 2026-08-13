@@ -1,25 +1,10 @@
-import { ArrowRight, BadgeInfo, Gauge, Scale, Timer, Trophy, UserRound } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/components/common/Button";
-import { GlassCard } from "@/components/common/GlassCard";
-import { BackButton } from "@/components/navigation/BackButton";
+import { HorseAnalysisView } from "@/components/horse/HorseAnalysisView";
 import { AsyncBoundary } from "@/components/status/AsyncBoundary";
 import { useRace } from "@/hooks/useRace";
-import { valueOrUnavailable } from "@/lib/utils";
 import { usePredictionStore } from "@/store/predictionStore";
-import type { Horse } from "@/types/horse";
-
-const horseFields = [
-  ["Trainer", "trainer_name", UserRound],
-  ["Trainer/Jockey Combination", "trainer_jockey_win_percent", Trophy],
-  ["Jockey", "jockey_name", UserRound],
-  ["Speed Index", "speed_index", Gauge],
-  ["Draw Advantage", "draw_number", BadgeInfo],
-  ["Weight", "weight_value", Scale],
-  ["Predicted Time", "predicted_time", Timer],
-  ["Previous Run", "previous_run_rating", BadgeInfo],
-  ["Status", "status", BadgeInfo],
-] as const;
 
 export function HorseDetailsPage() {
   const { horseId } = useParams();
@@ -29,58 +14,31 @@ export function HorseDetailsPage() {
   const horse = currentHorse ?? raceQuery.data?.horses.find((item) => String(item.id) === horseId) ?? null;
 
   return (
-    <section className="page-section screen-shell items-stretch">
-      <div className="horse-detail-head">
-        <div>
-          <p className="text-sm uppercase tracking-[0.24em] text-primary/90">Horse Analysis</p>
-          <p className="mt-3 text-lg text-violet-100/80">
-            Race {currentRace?.race_number ? `${currentRace.race_number} - ` : ""}
-            {currentRace?.title ?? ""}
-          </p>
-          <h1>{horse?.name ?? "Horse Details"}</h1>
-        </div>
-      </div>
-
+    <section className="page-section screen-shell items-stretch py-4">
       <AsyncBoundary
         isLoading={raceQuery.isLoading && !horse}
         isError={raceQuery.isError && !horse}
         isEmpty={!horse}
         emptyMessage="Horse unavailable. The backend does not expose a standalone JSON horse detail endpoint."
       >
-        <GlassCard className="horse-detail-card">
-          <div className="horse-saddle">{horse?.scratched ? "SCR" : valueOrUnavailable(horse?.draw_number ?? horse?.id)}</div>
-          <div>
-            <h2>{horse?.name}</h2>
-            <p className="mt-2 text-primary">{valueOrUnavailable(horse?.status)}</p>
-            <p className="mt-4 max-w-2xl text-violet-100/72">
-              Existing horse data, reformatted into a cleaner presentation without changing any backend-fed values or business rules.
-            </p>
-          </div>
-        </GlassCard>
+        <HorseAnalysisView
+          horse={horse}
+          raceTitle={currentRace?.title ?? undefined}
+          raceNumber={currentRace?.race_number ?? undefined}
+          venueName={currentRace?.venue ?? undefined}
+        />
 
-        <div className="detail-grid">
-          {horseFields.map(([label, key, Icon]) => (
-            <GlassCard key={key} className="detail-tile">
-              <Icon className="h-7 w-7 text-violet-300" />
-              <div>
-                <p>{label}</p>
-                <strong>{valueOrUnavailable(horse?.[key as keyof Horse])}</strong>
-              </div>
-            </GlassCard>
-          ))}
-        </div>
-
-        <div className="page-actions">
-          <BackButton label="Back" />
+        <div className="flex items-center justify-center max-w-4xl mx-auto pb-6">
           <Button
             size="lg"
+            className="w-full sm:w-auto px-8 py-3 rounded-full bg-purple-700 hover:bg-purple-800 text-white font-bold shadow-lg shadow-purple-600/20"
             onClick={() => {
               if (horse) setCurrentHorse(horse);
               navigate(`/analysis/${horse?.race_id ?? currentRace?.id}`);
             }}
             disabled={!horse?.race_id && !currentRace?.id}
           >
-            Go To Prediction <ArrowRight className="h-6 w-6" />
+            Go To Prediction Factor Selection <ArrowRight className="ml-2 h-5 w-5" />
           </Button>
         </div>
       </AsyncBoundary>
