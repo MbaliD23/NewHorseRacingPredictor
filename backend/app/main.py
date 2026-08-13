@@ -1,11 +1,16 @@
 from contextlib import asynccontextmanager
+from pathlib import Path
+import asyncio
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from alembic import command
+from alembic.config import Config
+from sqlalchemy import create_engine, inspect, text
 
 from app.api.router import api_router
 from app.core.config import get_settings
-from app.core.database import Base, engine
+from app.core.database import engine
 from app.core.exceptions import register_exception_handlers
 from app.core.logging import configure_logging, get_logger
 from app.services.monitoring_service import MonitoringService
@@ -16,10 +21,44 @@ logger = get_logger(__name__)
 monitoring_service = MonitoringService()
 
 
+def _detect_legacy_alembic_revision() -> str | None:
+    sync_engine = create_engine(settings.sync_database_url, future=True)
+    try:
+        inspector = inspect(sync_engine)
+        table_names = set(inspector.get_table_names())
+        if 'alembic_version' in table_names:
+            with sync_engine.connect() as connection:
+                existing_revision = connection.execute(text('SELECT version_num FROM alembic_version LIMIT 1')).scalar_one_or_none()
+            if existing_revision:
+                return None
+        if not table_names:
+            return None
+
+        revision = '0001_initial'
+        horse_columns = {column['name'] for column in inspector.get_columns('horses')} if 'horses' in table_names else set()
+        if {'trainer_jockey_win_percent', 'speed_index', 'predicted_time'}.issubset(horse_columns):
+            revision = '0002_prediction_variable_replacement'
+        if {'odds', 'equipment', 'pedigree_description', 'dob', 'silks', 'stakes', 'sale_price'}.issubset(horse_columns):
+            revision = '288780da9e6d'
+        return revision
+    finally:
+        sync_engine.dispose()
+
+
+def run_startup_migrations() -> None:
+    backend_dir = Path(__file__).resolve().parents[1]
+    alembic_cfg = Config(str(backend_dir / 'alembic.ini'))
+    alembic_cfg.set_main_option('script_location', str(backend_dir / 'alembic'))
+    alembic_cfg.set_main_option('sqlalchemy.url', settings.sync_database_url)
+    legacy_revision = _detect_legacy_alembic_revision()
+    if legacy_revision is not None:
+        command.stamp(alembic_cfg, legacy_revision)
+    command.upgrade(alembic_cfg, 'head')
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
+    await asyncio.to_thread(run_startup_migrations)
     await monitoring_service.start()
     logger.info('application_started')
     try:
