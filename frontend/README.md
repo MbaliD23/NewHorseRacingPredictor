@@ -9,8 +9,10 @@ npm install
 npm run dev
 ```
 
-The API base URL defaults to `http://127.0.0.1:8000` and can be changed with `VITE_API_BASE_URL`.
-
+The frontend defaults to same-origin `/api` requests during local development.
+Vite proxies those requests to `http://127.0.0.1:8080` by default, and you can override the backend target with `VITE_API_PROXY_TARGET`.
+If you need the browser to call a different backend directly, set `VITE_API_BASE_URL` to a full URL instead.
+..\.venv\Scripts\python.exe -m uvicorn app.main:app --port 8080
 ## Backend Contract
 
 The frontend only reads business data from:
