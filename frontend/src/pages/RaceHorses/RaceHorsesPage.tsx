@@ -14,6 +14,8 @@ export function RaceHorsesPage() {
   const { data: race, isLoading, isError } = useRace(raceId);
   const [tab, setTab] = useState<"horses" | "info">("horses");
   const { setCurrentRace, setCurrentHorse } = usePredictionStore();
+  const runnerCount = race?.horses?.length ?? race?.field_size ?? 0;
+  const raceStatus = valueOrUnavailable(race?.status);
 
   const getNumberStyle = (index: number) => {
     const num = index + 1;
@@ -138,95 +140,76 @@ export function RaceHorsesPage() {
               </div>
             </AsyncBoundary>
           ) : (
-            <div className="flex flex-col gap-4 pb-2">
-              {/* Highlight Hero Card */}
-              <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-violet-600 via-indigo-600 to-purple-800 p-5 text-white shadow-md shadow-violet-500/15">
-                <div className="absolute -right-6 -top-6 h-32 w-32 rounded-full bg-white/10 blur-xl pointer-events-none" />
-                <div className="flex justify-between items-start">
-                  <div>
-                    <span className="inline-flex items-center gap-1.5 rounded-full bg-white/20 backdrop-blur-md px-3 py-1 text-xs font-bold uppercase tracking-wider text-white border border-white/10">
-                      <MapPin className="h-3.5 w-3.5" />
-                      {valueOrUnavailable(race?.venue)}
-                    </span>
-                    <h2 className="mt-3 text-2xl font-black tracking-tight text-white">
+            <div className="mx-auto flex w-full max-w-3xl flex-col gap-3 pb-2">
+              <div className="relative overflow-hidden rounded-[28px] border border-[#172033] bg-[#08111f] p-5 text-white shadow-[0_24px_60px_rgba(8,17,31,0.24)]">
+                <div className="absolute inset-x-5 top-0 h-[3px] bg-gradient-to-r from-[#c8952e] via-[#f4d27a] to-[#6A2DF1]" />
+                <div className="absolute -right-20 top-10 h-52 w-52 rounded-full border border-white/10" />
+                <div className="absolute -right-9 top-[6.2rem] h-[1px] w-44 rotate-[-18deg] bg-white/10" />
+
+                <div className="relative flex flex-wrap items-start justify-between gap-4">
+                  <div className="min-w-0">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.06] px-3 py-1 text-[11px] font-bold uppercase tracking-[0.18em] text-[#f4d27a]">
+                        <MapPin className="h-3.5 w-3.5" />
+                        {valueOrUnavailable(race?.venue)}
+                      </span>
+                      <span className="rounded-full border border-white/10 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.18em] text-white/70">
+                        {raceStatus}
+                      </span>
+                    </div>
+
+                    <p className="mt-5 text-xs font-bold uppercase tracking-[0.28em] text-white/42">
                       Race {valueOrUnavailable(race?.race_number)}
-                    </h2>
-                    <p className="mt-1 text-sm text-violet-100/90 font-medium">
+                    </p>
+                    <h2 className="mt-1 text-[30px] font-black leading-[0.95] tracking-tight text-white sm:text-4xl">
                       {valueOrUnavailable(race?.title)}
-                    </p>
+                    </h2>
                   </div>
-                  <div className="flex flex-col items-end">
-                    <span className="rounded-xl bg-white/15 backdrop-blur-md px-3 py-1.5 text-xs font-bold uppercase tracking-wide text-white border border-white/20">
-                      {valueOrUnavailable(race?.status)}
-                    </span>
+
+                  <div className="grid h-[92px] w-[92px] shrink-0 place-items-center rounded-full border border-[#f4d27a]/35 bg-[#f4d27a]/10 text-center shadow-[inset_0_1px_0_rgba(255,255,255,0.14)]">
+                    <div>
+                      <Clock className="mx-auto h-5 w-5 text-[#f4d27a]" />
+                      <strong className="mt-1 block text-xl leading-none text-white">{formatTime(race?.race_time)}</strong>
+                      <span className="mt-1 block text-[10px] font-bold uppercase tracking-[0.16em] text-white/52">post</span>
+                    </div>
                   </div>
                 </div>
               </div>
 
-              {/* Key Metrics Grid */}
               <div className="grid grid-cols-2 gap-3">
-                {/* Field Size Card */}
-                <div className="flex items-center gap-3 rounded-xl bg-white p-3.5 shadow-sm border border-slate-100 hover:border-violet-200 transition-all hover:shadow-md">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-50 text-amber-600 flex-shrink-0">
-                    <Users className="h-5 w-5" />
-                  </div>
-                  <div className="min-w-0">
-                    <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Field Size</p>
-                    <p className="text-base font-bold text-slate-900 mt-0.5 truncate">
-                      {race?.horses?.length ?? race?.field_size ?? 0} Runners
-                    </p>
-                  </div>
+                <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-[0_12px_32px_rgba(15,23,42,0.06)]">
+                  <Users className="h-5 w-5 text-[#6A2DF1]" />
+                  <p className="mt-3 text-[11px] font-bold uppercase tracking-[0.18em] text-slate-400">Field</p>
+                  <p className="mt-1 truncate text-lg font-black text-slate-950">{runnerCount} runners</p>
                 </div>
 
-                {/* Meeting Date Card */}
-                <div className="flex items-center gap-3 rounded-xl bg-white p-3.5 shadow-sm border border-slate-100 hover:border-violet-200 transition-all hover:shadow-md">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 flex-shrink-0">
-                    <Calendar className="h-5 w-5" />
-                  </div>
-                  <div className="min-w-0">
-                    <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Date</p>
-                    <p className="text-sm font-bold text-slate-900 mt-0.5 truncate">
-                      {valueOrUnavailable(race?.meeting_date)}
-                    </p>
-                  </div>
+                <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-[0_12px_32px_rgba(15,23,42,0.06)]">
+                  <Calendar className="h-5 w-5 text-[#0f8f78]" />
+                  <p className="mt-3 text-[11px] font-bold uppercase tracking-[0.18em] text-slate-400">Date</p>
+                  <p className="mt-1 truncate text-base font-black text-slate-950">{valueOrUnavailable(race?.meeting_date)}</p>
                 </div>
 
-                {/* Distance Card */}
-                <div className="flex items-center gap-3 rounded-xl bg-white p-3.5 shadow-sm border border-slate-100 hover:border-violet-200 transition-all hover:shadow-md">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-50 text-blue-600 flex-shrink-0">
-                    <Activity className="h-5 w-5" />
-                  </div>
-                  <div className="min-w-0">
-                    <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Distance</p>
-                    <p className="text-base font-bold text-slate-900 mt-0.5 truncate">
-                      {valueOrUnavailable(race?.distance)}
-                    </p>
-                  </div>
+                <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-[0_12px_32px_rgba(15,23,42,0.06)]">
+                  <Activity className="h-5 w-5 text-[#c8952e]" />
+                  <p className="mt-3 text-[11px] font-bold uppercase tracking-[0.18em] text-slate-400">Distance</p>
+                  <p className="mt-1 truncate text-lg font-black text-slate-950">{valueOrUnavailable(race?.distance)}</p>
                 </div>
 
-                {/* Surface Card */}
-                <div className="flex items-center gap-3 rounded-xl bg-white p-3.5 shadow-sm border border-slate-100 hover:border-violet-200 transition-all hover:shadow-md">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-violet-50 text-violet-600 flex-shrink-0">
-                    <Compass className="h-5 w-5" />
-                  </div>
-                  <div className="min-w-0">
-                    <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Surface</p>
-                    <p className="text-base font-bold text-slate-900 mt-0.5 capitalize truncate">
-                      {valueOrUnavailable(race?.surface)}
-                    </p>
-                  </div>
+                <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-[0_12px_32px_rgba(15,23,42,0.06)]">
+                  <Compass className="h-5 w-5 text-[#334155]" />
+                  <p className="mt-3 text-[11px] font-bold uppercase tracking-[0.18em] text-slate-400">Surface</p>
+                  <p className="mt-1 truncate text-lg font-black capitalize text-slate-950">{valueOrUnavailable(race?.surface)}</p>
                 </div>
               </div>
 
-              {/* Predictor Insights Banner */}
-              <div className="rounded-xl bg-gradient-to-r from-violet-50 via-purple-50 to-indigo-50 p-4 border border-violet-100 flex items-start gap-3">
-                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#6A2DF1] text-white flex-shrink-0 mt-0.5">
+              <div className="flex items-start gap-3 rounded-2xl border border-[#ead8a7] bg-[#fff9ea] p-4">
+                <div className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#08111f] text-[#f4d27a]">
                   <Trophy className="h-4 w-4" />
                 </div>
-                <div>
-                  <h4 className="text-sm font-bold text-slate-900">Predictor Insights</h4>
-                  <p className="text-xs text-slate-600 mt-0.5 leading-relaxed">
-                    Select custom factors in the next step to calibrate speed index, draw advantages, and trainer form.
+                <div className="min-w-0">
+                  <h4 className="text-sm font-black text-slate-950">Prediction setup</h4>
+                  <p className="mt-1 text-xs leading-relaxed text-slate-600">
+                    Next, tune the model around speed index, draw advantages, trainer form, and race conditions.
                   </p>
                 </div>
               </div>

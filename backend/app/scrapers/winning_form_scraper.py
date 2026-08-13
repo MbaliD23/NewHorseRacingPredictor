@@ -224,8 +224,15 @@ class WinningFormScraper:
     ) -> ScrapedRace | None:
         response = await self.client.get(url)
         response.raise_for_status()
+        return self.parse_race_html(response.text, url, meeting_label)
 
-        soup = BeautifulSoup(response.text, "lxml")
+    def parse_race_html(
+        self,
+        html: str,
+        url: str,
+        meeting_label: str | None = None,
+    ) -> ScrapedRace | None:
+        soup = BeautifulSoup(html, "lxml")
         compact = " ".join(soup.get_text(" ", strip=True).split())
 
         race_number = self._extract_race_number(url, compact)

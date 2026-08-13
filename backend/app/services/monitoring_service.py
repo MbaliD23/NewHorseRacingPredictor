@@ -28,7 +28,10 @@ class MonitoringService:
 
         self.scheduler.start()
         monitoring_state.active = True
-        await self.run_cycle()
+        try:
+            await self.run_cycle()
+        except Exception:
+            logger.exception("initial_monitoring_cycle_failed")
 
     async def stop(self) -> None:
         if self.scheduler.running:
@@ -37,9 +40,14 @@ class MonitoringService:
 
     async def run_cycle(self) -> None:
         logger.info("monitoring_cycle_started")
-        async with SessionLocal() as session:
-            scrape_service = ScrapeService(session)
-            result = await scrape_service.sync()
+        try:
+            async with SessionLocal() as session:
+                scrape_service = ScrapeService(session)
+                result = await scrape_service.sync()
+        except Exception:
+            logger.exception("monitoring_scrape_failed")
+            logger.info("monitoring_cycle_completed")
+            return
 
         if result["changes_detected"]:
             async with SessionLocal() as session:
