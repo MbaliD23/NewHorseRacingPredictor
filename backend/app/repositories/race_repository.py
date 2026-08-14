@@ -2,6 +2,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import selectinload
 
 from app.models.horse import Horse
+from app.models.horse_form_entry import HorseFormEntry
 from app.models.prediction import Prediction
 from app.models.prediction_run import PredictionRun
 from app.models.race import Race
@@ -28,7 +29,7 @@ class RaceRepository(BaseRepository):
             .options(
                 selectinload(RaceMeeting.races).selectinload(Race.horses)
             )
-            .order_by(RaceMeeting.meeting_date.desc(), RaceMeeting.venue.asc())
+            .order_by(RaceMeeting.meeting_date.asc(), RaceMeeting.venue.asc())
         )
         return list(result.scalars().unique().all())
 
@@ -50,6 +51,7 @@ class RaceRepository(BaseRepository):
                 selectinload(Race.meeting),
                 selectinload(Race.horses).selectinload(Horse.trainer),
                 selectinload(Race.horses).selectinload(Horse.jockey),
+                selectinload(Race.horses).selectinload(Horse.form_entries),
                 selectinload(Race.prediction_runs)
                 .selectinload(PredictionRun.predictions)
                 .selectinload(Prediction.horse),
@@ -65,6 +67,7 @@ class RaceRepository(BaseRepository):
                 selectinload(Horse.race).selectinload(Race.meeting),
                 selectinload(Horse.trainer),
                 selectinload(Horse.jockey),
+                selectinload(Horse.form_entries),
             )
         )
         return result.scalars().unique().first()

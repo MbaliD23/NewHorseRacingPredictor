@@ -1,6 +1,7 @@
 from sqlalchemy import select
 
 from app.models.horse import Horse
+from app.models.horse_form_entry import HorseFormEntry
 from app.models.jockey import Jockey
 from app.models.race import Race
 from app.models.race_meeting import RaceMeeting
@@ -26,6 +27,7 @@ RACE_OVERWRITE_FIELDS = {
 
 HORSE_OVERWRITE_FIELDS = {
     "name",
+    "runner_number",
     "draw_number",
     "weight_value",
     "previous_run_rating",
@@ -37,9 +39,18 @@ HORSE_OVERWRITE_FIELDS = {
     "notes",
     "odds",
     "equipment",
+    "merit_rating",
     "pedigree_description",
+    "pedigree_line",
     "dob",
     "silks",
+    "breeder",
+    "owner",
+    "total_runs",
+    "wet_record",
+    "course_record",
+    "distance_record",
+    "course_distance_record",
     "stakes",
     "sale_price",
 }
@@ -182,6 +193,16 @@ class UpsertRepository(BaseRepository):
         if removed:
             await self.session.flush()
         return removed
+
+    async def replace_horse_form_entries(self, horse_id: int, entries: list[dict]) -> None:
+        result = await self.session.execute(select(HorseFormEntry).where(HorseFormEntry.horse_id == horse_id))
+        for entry in result.scalars().all():
+            await self.session.delete(entry)
+
+        for entry in entries:
+            self.session.add(HorseFormEntry(horse_id=horse_id, **entry))
+
+        await self.session.flush()
 
     async def ensure_variables(self, variables: list[tuple[str, str]]) -> None:
         for code, display_name in variables:

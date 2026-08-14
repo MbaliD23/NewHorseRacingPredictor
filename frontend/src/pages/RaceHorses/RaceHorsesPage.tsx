@@ -2,6 +2,7 @@ import { useState } from "react";
 import { ArrowLeft, Clock, Sparkles, MapPin, Calendar, Users, Activity, Compass, Trophy } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/components/common/Button";
+import { SilksRenderer } from "@/components/horse/SilksRenderer";
 import { BackButton } from "@/components/navigation/BackButton";
 import { AsyncBoundary } from "@/components/status/AsyncBoundary";
 import { useRace } from "@/hooks/useRace";
@@ -17,8 +18,8 @@ export function RaceHorsesPage() {
   const runnerCount = race?.horses?.length ?? race?.field_size ?? 0;
   const raceStatus = valueOrUnavailable(race?.status);
 
-  const getNumberStyle = (index: number) => {
-    const num = index + 1;
+  const getNumberStyle = (runnerNumber: number | null | undefined) => {
+    const num = runnerNumber ?? 0;
     switch (num) {
       case 1: return "bg-[#6A2DF1] text-white";
       case 2: return "bg-white text-slate-900 border border-slate-200";
@@ -92,7 +93,7 @@ export function RaceHorsesPage() {
           {tab === "horses" ? (
             <AsyncBoundary isEmpty={(race?.horses ?? []).length === 0} emptyMessage="No horses available.">
               <div className="flex flex-col gap-3.5 pb-2">
-                {race?.horses.map((horse, index) => (
+                {race?.horses.map((horse) => (
                   <div
                     key={horse.id}
                     className="flex items-center gap-4 rounded-xl bg-white p-3.5 shadow-[0_1px_8px_-4px_rgba(0,0,0,0.08)] border border-slate-100 transition-all duration-200 hover:scale-[1.02] hover:border-[#6A2DF1]/60 hover:shadow-[0_0_22px_rgba(106,45,241,0.3)] cursor-pointer active:scale-[0.99]"
@@ -102,18 +103,14 @@ export function RaceHorsesPage() {
                       navigate(`/horses/${horse.id}`);
                     }}
                   >
-                    <div className={`flex h-11 w-9 items-center justify-center rounded-[4px] font-bold text-xl ${getNumberStyle(index)}`}>
-                      {index + 1}
+                    <div className={`flex h-11 w-9 items-center justify-center rounded-[4px] font-bold text-xl ${getNumberStyle(horse.runner_number)}`}>
+                      {valueOrUnavailable(horse.runner_number)}
                     </div>
                     
                     <div className="h-16 w-16 overflow-hidden flex-shrink-0">
-                      {horse.silks ? (
-                        <img src={horse.silks} alt={`${horse.name} silk`} className="h-full w-full object-contain" />
-                      ) : (
-                        <div className="h-full w-full bg-slate-50 rounded-lg flex items-center justify-center border border-slate-100">
-                          <span className="text-[10px] font-medium text-slate-300">Silk</span>
-                        </div>
-                      )}
+                      <div className="flex h-full w-full items-center justify-center rounded-lg border border-slate-100 bg-slate-50">
+                        <SilksRenderer description={horse.silks} className="h-14 w-14" />
+                      </div>
                     </div>
 
                     <div className="flex-1 min-w-0">

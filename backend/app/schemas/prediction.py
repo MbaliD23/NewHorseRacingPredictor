@@ -41,6 +41,7 @@ class PredictionRequest(BaseModel):
 class PredictionItem(BaseModel):
     horse_id: int
     horse_name: str
+    runner_number: int | None = None
     predicted_position: Literal[1, 2, 3]
     overall_score: float
     confidence_percent: float

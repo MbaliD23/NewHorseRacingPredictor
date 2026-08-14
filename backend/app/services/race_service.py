@@ -1,13 +1,24 @@
 from datetime import datetime
 
 from app.repositories.race_repository import RaceRepository
-from app.schemas.race import HorseView, RaceCardView, RaceView, VenueView
+from app.schemas.race import HorseFormEntryView, HorseView, RaceCardView, RaceView, VenueView
 
 
 class RaceService:
     def __init__(self, session):
         self.session = session
         self.race_repo = RaceRepository(session)
+
+    @staticmethod
+    def _sort_horses_by_runner_number(horses):
+        return sorted(
+            horses,
+            key=lambda horse: (
+                horse.runner_number is None,
+                horse.runner_number if horse.runner_number is not None else 999,
+                horse.name,
+            ),
+        )
 
     @staticmethod
     def _race_flags(race_time):
@@ -41,6 +52,7 @@ class RaceService:
             id=horse.id,
             race_id=horse.race_id,
             name=horse.name,
+            runner_number=horse.runner_number,
             trainer_name=horse.trainer.name if horse.trainer else None,
             jockey_name=horse.jockey.name if horse.jockey else None,
             draw_number=horse.draw_number,
@@ -62,6 +74,51 @@ class RaceService:
             scratched=horse.scratched,
             status=horse.status,
             notes=horse.notes,
+            odds=horse.odds,
+            equipment=horse.equipment,
+            merit_rating=horse.merit_rating,
+            pedigree_description=horse.pedigree_description,
+            pedigree_line=horse.pedigree_line,
+            dob=horse.dob,
+            silks=horse.silks,
+            breeder=horse.breeder,
+            owner=horse.owner,
+            total_runs=horse.total_runs,
+            wet_record=horse.wet_record,
+            course_record=horse.course_record,
+            distance_record=horse.distance_record,
+            course_distance_record=horse.course_distance_record,
+            stakes=horse.stakes,
+            sale_price=horse.sale_price,
+            form_entries=[
+                HorseFormEntryView(
+                    run_date=entry.run_date.isoformat() if entry.run_date else None,
+                    raw_date_text=entry.raw_date_text,
+                    track=entry.track,
+                    race_number=entry.race_number,
+                    distance=entry.distance,
+                    jockey_name=entry.jockey_name,
+                    weight=entry.weight,
+                    draw=entry.draw,
+                    finish_position=entry.finish_position,
+                    margin_behind_winner=entry.margin_behind_winner,
+                    winner_name=entry.winner_name,
+                    winner_weight=entry.winner_weight,
+                    odds=entry.odds,
+                    comment=entry.comment,
+                    speed_figure=entry.speed_figure,
+                    rating=entry.rating,
+                    form_summary=entry.form_summary,
+                )
+                for entry in sorted(
+                    horse.form_entries,
+                    key=lambda item: (
+                        item.run_date is None,
+                        item.run_date.isoformat() if item.run_date else "",
+                    ),
+                    reverse=True,
+                )
+            ],
         )
 
     async def list_venues(self) -> list[VenueView]:
@@ -157,7 +214,10 @@ class RaceService:
             field_size=race.field_size,
             status=race.status,
             title=race.title,
-            horses=[self._horse_view(horse) for horse in race.horses],
+            horses=[
+                self._horse_view(horse)
+                for horse in self._sort_horses_by_runner_number(race.horses)
+            ],
         )
 
     async def get_horse_view(self, horse_id: int) -> HorseView | None:

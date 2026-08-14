@@ -1,4 +1,5 @@
 from app.models.horse import Horse
+from app.models.horse_form_entry import HorseFormEntry
 from app.models.jockey import Jockey
 from app.models.log_entry import LogEntry
 from app.models.prediction import Prediction

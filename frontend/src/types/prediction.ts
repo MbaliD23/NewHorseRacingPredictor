@@ -14,6 +14,7 @@ export type PredictionRequest = {
 export type PredictionItem = {
   horse_id: number;
   horse_name: string;
+  runner_number?: number | null;
   predicted_position: 1 | 2 | 3;
   overall_score: number;
   confidence_percent: number;

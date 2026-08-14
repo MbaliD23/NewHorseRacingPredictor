@@ -158,6 +158,7 @@ class PredictionService:
                 PredictionItem(
                     horse_id=row["horse"].id,
                     horse_name=row["horse"].name,
+                    runner_number=row["horse"].runner_number,
                     predicted_position=position,
                     overall_score=row["score"],
                     confidence_percent=row["confidence"],

@@ -67,12 +67,13 @@ class ScrapeService:
                     horse.jockey_name,
                 )
 
-            await self.upsert_repo.upsert_horse(
+            horse_entity = await self.upsert_repo.upsert_horse(
                 external_id=horse.external_id,
                 race_id=race_entity.id,
                 trainer_id=trainer.id if trainer else None,
                 jockey_id=jockey.id if jockey else None,
                 name=horse.name,
+                runner_number=horse.runner_number,
                 draw_number=horse.draw_number,
                 weight_value=horse.weight_value,
                 previous_run_rating=horse.previous_run_rating,
@@ -84,11 +85,45 @@ class ScrapeService:
                 notes=horse.notes,
                 odds=horse.odds,
                 equipment=horse.equipment,
+                merit_rating=horse.merit_rating,
                 pedigree_description=horse.pedigree_description,
+                pedigree_line=horse.pedigree_line,
                 dob=horse.dob,
                 silks=horse.silks,
+                breeder=horse.breeder,
+                owner=horse.owner,
+                total_runs=horse.total_runs,
+                wet_record=horse.wet_record,
+                course_record=horse.course_record,
+                distance_record=horse.distance_record,
+                course_distance_record=horse.course_distance_record,
                 stakes=horse.stakes,
                 sale_price=horse.sale_price,
+            )
+            await self.upsert_repo.replace_horse_form_entries(
+                horse_entity.id,
+                [
+                    {
+                        "run_date": entry.run_date,
+                        "raw_date_text": entry.raw_date_text,
+                        "track": entry.track,
+                        "race_number": entry.race_number,
+                        "distance": entry.distance,
+                        "jockey_name": entry.jockey_name,
+                        "weight": entry.weight,
+                        "draw": entry.draw,
+                        "finish_position": entry.finish_position,
+                        "margin_behind_winner": entry.margin_behind_winner,
+                        "winner_name": entry.winner_name,
+                        "winner_weight": entry.winner_weight,
+                        "odds": entry.odds,
+                        "comment": entry.comment,
+                        "speed_figure": entry.speed_figure,
+                        "rating": entry.rating,
+                        "form_summary": entry.form_summary,
+                    }
+                    for entry in horse.form_entries
+                ],
             )
 
         horses_removed = await self.upsert_repo.delete_orphan_horses(

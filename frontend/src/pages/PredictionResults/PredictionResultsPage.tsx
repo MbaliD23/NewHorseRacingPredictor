@@ -55,6 +55,7 @@ export function PredictionResultsPage() {
                 tabIndex={0}
               >
                 {item.predicted_position ? <div className="podium-badge">{item.predicted_position}</div> : null}
+                {item.runner_number ? <div className="horse-number mt-3">{item.runner_number}</div> : null}
                 {item.horse_name ? <h2>{item.horse_name}</h2> : null}
                 <div className="mt-8 grid gap-5">
                   {typeof item.overall_score === "number" ? <Metric label="Score" value={item.overall_score} /> : null}

@@ -62,6 +62,8 @@ NON_RUNNER_NAMES = {
 class ScrapedHorse:
     external_id: str
     name: str
+    runner_number: int | None = None
+    form_entries: list["ScrapedHorseFormEntry"] = field(default_factory=list)
     trainer_name: str | None = None
     jockey_name: str | None = None
     draw_number: int | None = None
@@ -75,11 +77,41 @@ class ScrapedHorse:
     notes: str | None = None
     odds: str | None = None
     equipment: str | None = None
+    merit_rating: int | None = None
     pedigree_description: str | None = None
+    pedigree_line: str | None = None
     dob: str | None = None
     silks: str | None = None
+    breeder: str | None = None
+    owner: str | None = None
+    total_runs: str | None = None
+    wet_record: str | None = None
+    course_record: str | None = None
+    distance_record: str | None = None
+    course_distance_record: str | None = None
     stakes: str | None = None
     sale_price: str | None = None
+
+
+@dataclass
+class ScrapedHorseFormEntry:
+    run_date: date | None = None
+    raw_date_text: str | None = None
+    track: str | None = None
+    race_number: str | None = None
+    distance: str | None = None
+    jockey_name: str | None = None
+    weight: str | None = None
+    draw: str | None = None
+    finish_position: int | None = None
+    margin_behind_winner: str | None = None
+    winner_name: str | None = None
+    winner_weight: str | None = None
+    odds: str | None = None
+    comment: str | None = None
+    speed_figure: str | None = None
+    rating: str | None = None
+    form_summary: str | None = None
 
 
 @dataclass
@@ -406,6 +438,8 @@ class WinningFormScraper:
                 ScrapedHorse(
                     external_id=f"{race_external_id}-{len(horses) + 1}",
                     name=self._pretty_name(raw_name),
+                    runner_number=runner_number,
+                    form_entries=ext.get("form_entries", []),
                     trainer_name=self._cell(cells, col_map.get("trainer")),
                     jockey_name=self._cell(cells, col_map.get("jockey")),
                     draw_number=self._as_int(
@@ -431,9 +465,20 @@ class WinningFormScraper:
                     ),
                     odds=ext.get("odds"),
                     equipment=ext.get("equipment"),
+                    merit_rating=self._as_int(
+                        self._cell(cells, col_map.get("merit")), 0, 200
+                    ),
                     pedigree_description=ext.get("pedigree_description"),
+                    pedigree_line=ext.get("pedigree_line"),
                     dob=ext.get("dob"),
                     silks=ext.get("silks"),
+                    breeder=ext.get("breeder"),
+                    owner=ext.get("owner"),
+                    total_runs=ext.get("total_runs"),
+                    wet_record=ext.get("wet_record"),
+                    course_record=ext.get("course_record"),
+                    distance_record=ext.get("distance_record"),
+                    course_distance_record=ext.get("course_distance_record"),
                     stakes=ext.get("stakes"),
                     sale_price=ext.get("sale_price"),
                 )
@@ -470,8 +515,11 @@ class WinningFormScraper:
                     ped_td = dob_td.parent.find_previous_sibling("td")
                     if ped_td:
                         pedigree_desc = ped_td.get_text(strip=True)
-                
+
                 parent_tr = td_container.parent
+                pedigree_line = None
+                breeder = None
+                owner = None
                 next_tr = parent_tr.find_next_sibling("tr")
                 silks = None
                 if next_tr:
@@ -479,14 +527,44 @@ class WinningFormScraper:
                     if small_td:
                         text_nodes = list(small_td.stripped_strings)
                         if text_nodes:
+                            pedigree_line = text_nodes[0]
                             silks = text_nodes[-1]
-                
+                        for text_node in text_nodes[1:]:
+                            if text_node.startswith("Breeder:"):
+                                breeder = text_node.replace("Breeder:", "", 1).strip()
+                            elif text_node != silks and owner is None:
+                                owner = text_node
+
+                wet_record = None
+                course_record = None
+                distance_record = None
+                course_distance_record = None
+                for stats_td in parent_tr.find_all("td", rowspan="2"):
+                    for label_cell in stats_td.find_all("td"):
+                        label = label_cell.get_text(strip=True)
+                        value_cell = label_cell.find_next_sibling("td")
+                        value = value_cell.get_text(strip=True) if value_cell else None
+                        if label == "Wet:":
+                            wet_record = value
+                        elif label == "Crs:":
+                            course_record = value
+                        elif label == "Dst:":
+                            distance_record = value
+                        elif label == "C&D:":
+                            course_distance_record = value
+
+                total_runs = None
                 stakes = None
                 sale_price = None
+                form_entries: list[ScrapedHorseFormEntry] = []
                 if next_tr:
                     for bld_td in next_tr.find_all("td"):
                         text = bld_td.get_text(strip=True)
-                        if text.startswith("Stakes:"):
+                        if text.startswith("Tot Rns:"):
+                            total_runs_val_td = bld_td.find_next_sibling("td")
+                            if total_runs_val_td:
+                                total_runs = total_runs_val_td.get_text(strip=True)
+                        elif text.startswith("Stakes:"):
                             stakes_val_td = bld_td.find_next_sibling("td")
                             if stakes_val_td:
                                 stakes = stakes_val_td.get_text(strip=True)
@@ -494,20 +572,120 @@ class WinningFormScraper:
                             sale_val_td = bld_td.find_next_sibling("td")
                             if sale_val_td:
                                 sale_price = sale_val_td.get_text(strip=True)
+
+                sibling_rows = list(next_tr.find_next_siblings("tr")) if next_tr else []
+                form_entries = self._extract_form_entries(sibling_rows)
                 
                 horses[name.lower()] = {
                     "odds": odds,
                     "equipment": equipment,
                     "pedigree_description": pedigree_desc,
+                    "pedigree_line": pedigree_line,
                     "dob": dob,
                     "silks": silks,
+                    "breeder": breeder,
+                    "owner": owner,
+                    "total_runs": total_runs,
+                    "wet_record": wet_record,
+                    "course_record": course_record,
+                    "distance_record": distance_record,
+                    "course_distance_record": course_distance_record,
                     "stakes": stakes,
-                    "sale_price": sale_price
+                    "sale_price": sale_price,
+                    "form_entries": form_entries,
                 }
             except Exception as e:
                 logger.warning("Error parsing extended horse block: %s", e)
                 continue
         return horses
+
+    def _extract_form_entries(self, rows) -> list[ScrapedHorseFormEntry]:
+        nested_rows = []
+        for row in rows:
+            nested_rows.extend(row.find_all("tr"))
+
+        entries: list[ScrapedHorseFormEntry] = []
+        index = 0
+        while index < len(nested_rows):
+            performance = self._parse_form_entry_row(nested_rows[index])
+            if not performance:
+                index += 1
+                continue
+
+            summary = None
+            if index + 1 < len(nested_rows):
+                summary = self._parse_form_summary_row(nested_rows[index + 1])
+            performance.form_summary = summary
+            entries.append(performance)
+            index += 1
+
+        return entries
+
+    def _parse_form_entry_row(self, row) -> ScrapedHorseFormEntry | None:
+        cells = self._row_cells(row)
+        if len(cells) < 20 or not re.search(r"\d{2}\.\d{2}\.\d{2}", cells[0]):
+            return None
+
+        raw_date_text = cells[0]
+        run_date = self._parse_form_date(raw_date_text)
+        winner_name, winner_weight = self._split_winner_details(
+            cells[14] if len(cells) > 14 else None
+        )
+        odds = cells[17] if len(cells) > 17 and "/" in cells[17] else None
+        if not odds and len(cells) > 18 and "/" in cells[18]:
+            odds = cells[18]
+
+        return ScrapedHorseFormEntry(
+            run_date=run_date,
+            raw_date_text=raw_date_text,
+            track=cells[1] if len(cells) > 1 else None,
+            race_number=cells[2] if len(cells) > 2 else None,
+            distance=cells[6] if len(cells) > 6 else None,
+            jockey_name=cells[7] if len(cells) > 7 else None,
+            weight=cells[8] if len(cells) > 8 else None,
+            draw=cells[9] if len(cells) > 9 else None,
+            finish_position=self._as_int(cells[12] if len(cells) > 12 else None, 1, 30),
+            margin_behind_winner=cells[13] if len(cells) > 13 else None,
+            winner_name=winner_name,
+            winner_weight=winner_weight,
+            odds=odds,
+            comment=cells[20] if len(cells) > 20 else None,
+            speed_figure=cells[16] if len(cells) > 16 else None,
+            rating=cells[19] if len(cells) > 19 else None,
+        )
+
+    def _parse_form_summary_row(self, row) -> str | None:
+        text_nodes = [
+            self._clean_text(text)
+            for text in row.stripped_strings
+        ]
+        if not text_nodes:
+            return None
+
+        summary = text_nodes[0]
+        return summary if summary and not re.fullmatch(r"\d{6,}", summary) else None
+
+    def _parse_form_date(self, raw_date_text: str | None) -> date | None:
+        if not raw_date_text:
+            return None
+        match = re.search(r"(\d{2})\.(\d{2})\.(\d{2})", raw_date_text)
+        if not match:
+            return None
+        year, month, day = match.groups()
+        try:
+            return date(2000 + int(year), int(month), int(day))
+        except ValueError:
+            return None
+
+    def _split_winner_details(self, winner_name: str | None) -> tuple[str | None, str | None]:
+        if not winner_name:
+            return None, None
+
+        match = re.match(r"^(?P<name>.+?)\s+(?P<weight>\d{2}\.\d)$", winner_name.strip())
+        if not match:
+            return winner_name.strip(), None
+
+        return match.group("name").strip(), match.group("weight")
 
     def _extract_trainer_jockey_combo_win_percentages(
         self, soup: BeautifulSoup

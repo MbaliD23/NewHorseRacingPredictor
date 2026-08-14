@@ -36,6 +36,24 @@ const formatVenueDate = (dateStr: string | null) => {
   return dateObj.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
 };
 
+const TODAY = new Date("2026-08-14T00:00:00");
+
+function parseVenueMeetingDate(dateStr: string | null) {
+  if (!dateStr) {
+    return null;
+  }
+
+  const isoMatch = dateStr.match(/^(\d{4})[-/](\d{2})[-/](\d{2})$/);
+  if (isoMatch) {
+    const [, year, month, day] = isoMatch;
+    const parsed = new Date(Number(year), Number(month) - 1, Number(day));
+    return Number.isNaN(parsed.getTime()) ? null : parsed;
+  }
+
+  const parsed = new Date(dateStr);
+  return Number.isNaN(parsed.getTime()) ? null : parsed;
+}
+
 type FilterValue = "all" | "live" | "upcoming";
 
 export function LocationsPage() {
@@ -57,17 +75,23 @@ export function LocationsPage() {
     });
 
     return filtered.sort((a, b) => {
-      const aHasActive = a.races.some(r => r.is_live || r.is_upcoming);
-      const bHasActive = b.races.some(r => r.is_live || r.is_upcoming);
-      
-      if (aHasActive && !bHasActive) return -1;
-      if (!aHasActive && bHasActive) return 1;
+      const dateA = parseVenueMeetingDate(a.meeting_date);
+      const dateB = parseVenueMeetingDate(b.meeting_date);
 
-      const dateA = a.meeting_date ? new Date(a.meeting_date).getTime() : 0;
-      const dateB = b.meeting_date ? new Date(b.meeting_date).getTime() : 0;
-      if (dateA !== dateB) {
-        return dateB - dateA; // newest first
+      const isPastA = dateA ? dateA.getTime() < TODAY.getTime() : true;
+      const isPastB = dateB ? dateB.getTime() < TODAY.getTime() : true;
+
+      if (isPastA !== isPastB) {
+        return isPastA ? 1 : -1;
       }
+
+      const timeA = dateA?.getTime() ?? Number.POSITIVE_INFINITY;
+      const timeB = dateB?.getTime() ?? Number.POSITIVE_INFINITY;
+
+      if (timeA !== timeB) {
+        return timeA - timeB;
+      }
+
       return a.venue.localeCompare(b.venue);
     });
   }, [data, filter, query]);
