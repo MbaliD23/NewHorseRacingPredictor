@@ -1,22 +1,37 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { ArrowLeft, Clock, Sparkles, MapPin, Calendar, Users, Activity, Compass, Trophy } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/components/common/Button";
 import { SilksRenderer } from "@/components/horse/SilksRenderer";
+import { sortHorses } from "@/lib/horseOrdering";
 import { BackButton } from "@/components/navigation/BackButton";
 import { AsyncBoundary } from "@/components/status/AsyncBoundary";
 import { useRace } from "@/hooks/useRace";
 import { formatTime, valueOrUnavailable } from "@/lib/utils";
-import { usePredictionStore } from "@/store/predictionStore";
+import { usePredictionStore, type HorseOrderBy } from "@/store/predictionStore";
+
+const ORDER_OPTIONS: Array<{ value: HorseOrderBy; label: string }> = [
+  { value: "draw_number", label: "Draw Number (Default)" },
+  { value: "runner_number", label: "Horse Number (Winning Form)" },
+  { value: "weight", label: "Weight" },
+  { value: "merit_rating", label: "Merit Rating" },
+  { value: "predicted_finish", label: "Predicted Finish" },
+  { value: "odds", label: "Odds" },
+  { value: "horse_name", label: "Horse Name" },
+];
 
 export function RaceHorsesPage() {
   const { raceId } = useParams();
   const navigate = useNavigate();
   const { data: race, isLoading, isError } = useRace(raceId);
   const [tab, setTab] = useState<"horses" | "info">("horses");
-  const { setCurrentRace, setCurrentHorse } = usePredictionStore();
+  const { setCurrentRace, setCurrentHorse, horseOrderBy, setHorseOrderBy } = usePredictionStore();
   const runnerCount = race?.horses?.length ?? race?.field_size ?? 0;
   const raceStatus = valueOrUnavailable(race?.status);
+  const orderedHorses = useMemo(
+    () => sortHorses(race?.horses ?? [], horseOrderBy),
+    [horseOrderBy, race?.horses],
+  );
 
   const getNumberStyle = (runnerNumber: number | null | undefined) => {
     const num = runnerNumber ?? 0;
@@ -91,9 +106,34 @@ export function RaceHorsesPage() {
       <AsyncBoundary isLoading={isLoading} isError={isError} isEmpty={!race} emptyMessage="Race unavailable.">
         <div className="flex-1 overflow-y-auto px-4 py-4 scroll-smooth">
           {tab === "horses" ? (
-            <AsyncBoundary isEmpty={(race?.horses ?? []).length === 0} emptyMessage="No horses available.">
+            <AsyncBoundary isEmpty={orderedHorses.length === 0} emptyMessage="No horses available.">
               <div className="flex flex-col gap-3.5 pb-2">
-                {race?.horses.map((horse) => (
+                <div className="rounded-2xl border border-slate-200 bg-white px-4 py-3 shadow-[0_1px_8px_-4px_rgba(0,0,0,0.08)]">
+                  <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                    <div>
+                      <p className="text-xs font-bold uppercase tracking-[0.18em] text-slate-400">
+                        Order By
+                      </p>
+                      <p className="mt-1 text-sm font-medium text-slate-500">
+                        Default race-card view sorts horses by draw number.
+                      </p>
+                    </div>
+                    <select
+                      value={horseOrderBy}
+                      onChange={(event) => setHorseOrderBy(event.target.value as HorseOrderBy)}
+                      className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm font-semibold text-slate-900 outline-none transition-colors focus:border-[#6A2DF1] focus:bg-white"
+                      aria-label="Order horses by"
+                    >
+                      {ORDER_OPTIONS.map((option) => (
+                        <option key={option.value} value={option.value}>
+                          {option.label}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                {orderedHorses.map((horse) => (
                   <div
                     key={horse.id}
                     className="flex items-center gap-4 rounded-xl bg-white p-3.5 shadow-[0_1px_8px_-4px_rgba(0,0,0,0.08)] border border-slate-100 transition-all duration-200 hover:scale-[1.02] hover:border-[#6A2DF1]/60 hover:shadow-[0_0_22px_rgba(106,45,241,0.3)] cursor-pointer active:scale-[0.99]"
@@ -115,6 +155,12 @@ export function RaceHorsesPage() {
 
                     <div className="flex-1 min-w-0">
                       <h2 className="truncate text-[17px] font-bold text-slate-900 leading-tight">{horse.name}</h2>
+                      <div className="mt-1 flex flex-wrap gap-x-4 gap-y-1 text-[12px] font-semibold text-slate-500">
+                        <span>Draw: {valueOrUnavailable(horse.draw_number)}</span>
+                        <span>Horse No: {valueOrUnavailable(horse.runner_number)}</span>
+                        <span>Weight: {valueOrUnavailable(horse.weight_value)}</span>
+                        <span>MR: {valueOrUnavailable(horse.merit_rating)}</span>
+                      </div>
                       <div className="flex flex-col text-[13px] text-slate-500 mt-1 space-y-0.5">
                         <span className="truncate">J: {valueOrUnavailable(horse.jockey_name)}</span>
                         <span className="truncate">T: {valueOrUnavailable(horse.trainer_name)}</span>
