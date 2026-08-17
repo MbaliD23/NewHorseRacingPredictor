@@ -20,6 +20,25 @@ const ORDER_OPTIONS: Array<{ value: HorseOrderBy; label: string }> = [
   { value: "horse_name", label: "Horse Name" },
 ];
 
+const formatRaceDate = (dateStr: string | null | undefined) => {
+  if (!dateStr) return "Unavailable";
+
+  const [year, month, day] = dateStr.split("-");
+  const parsed =
+    year && month && day
+      ? new Date(Number(year), Number(month) - 1, Number(day))
+      : new Date(dateStr);
+
+  return Number.isNaN(parsed.getTime())
+    ? valueOrUnavailable(dateStr)
+    : parsed.toLocaleDateString("en-GB", {
+        weekday: "short",
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+      });
+};
+
 export function RaceHorsesPage() {
   const { raceId } = useParams();
   const navigate = useNavigate();
@@ -183,77 +202,91 @@ export function RaceHorsesPage() {
               </div>
             </AsyncBoundary>
           ) : (
-            <div className="mx-auto flex w-full max-w-3xl flex-col gap-3 pb-2">
-              <div className="relative overflow-hidden rounded-[28px] border border-[#172033] bg-[#08111f] p-5 text-white shadow-[0_24px_60px_rgba(8,17,31,0.24)]">
-                <div className="absolute inset-x-5 top-0 h-[3px] bg-gradient-to-r from-[#c8952e] via-[#f4d27a] to-[#6A2DF1]" />
-                <div className="absolute -right-20 top-10 h-52 w-52 rounded-full border border-white/10" />
-                <div className="absolute -right-9 top-[6.2rem] h-[1px] w-44 rotate-[-18deg] bg-white/10" />
+            <div className="mx-auto flex w-full max-w-4xl flex-col gap-4 pb-2">
+              <div className="relative overflow-hidden rounded-[30px] bg-[#050507] p-5 text-white shadow-[0_26px_70px_rgba(0,0,0,0.32)] sm:p-6">
+                <div className="absolute inset-x-5 top-0 h-[3px] bg-gradient-to-r from-[#6A2DF1] via-white to-[#8B5CF6]" />
+                <div className="absolute -right-20 -top-16 h-64 w-64 rounded-full border border-white/10" />
+                <div className="absolute -right-8 top-24 h-24 w-56 rotate-[-18deg] rounded-full border border-[#8B5CF6]/25" />
+                <div className="absolute bottom-0 left-0 h-24 w-full bg-gradient-to-t from-[#6A2DF1]/22 to-transparent" />
 
-                <div className="relative flex flex-wrap items-start justify-between gap-4">
+                <div className="relative grid gap-6 lg:grid-cols-[1fr_220px] lg:items-stretch">
                   <div className="min-w-0">
                     <div className="flex flex-wrap items-center gap-2">
-                      <span className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.06] px-3 py-1 text-[11px] font-bold uppercase tracking-[0.18em] text-[#f4d27a]">
+                      <span className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/[0.08] px-3 py-1 text-[11px] font-bold uppercase tracking-[0.18em] text-white">
                         <MapPin className="h-3.5 w-3.5" />
                         {valueOrUnavailable(race?.venue)}
                       </span>
-                      <span className="rounded-full border border-white/10 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.18em] text-white/70">
+                      <span className="rounded-full border border-[#8B5CF6]/45 bg-[#6A2DF1]/15 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.18em] text-[#C4B5FD]">
                         {raceStatus}
                       </span>
                     </div>
 
-                    <p className="mt-5 text-xs font-bold uppercase tracking-[0.28em] text-white/42">
-                      Race {valueOrUnavailable(race?.race_number)}
+                    <p className="mt-6 text-xs font-bold uppercase tracking-[0.3em] text-white/45">
+                      Race {valueOrUnavailable(race?.race_number)} dossier
                     </p>
-                    <h2 className="mt-1 text-[30px] font-black leading-[0.95] tracking-tight text-white sm:text-4xl">
+                    <h2 className="mt-2 max-w-2xl text-[32px] font-black leading-[0.98] tracking-tight text-white sm:text-5xl">
                       {valueOrUnavailable(race?.title)}
                     </h2>
+
+                    <div className="mt-6 grid gap-2 sm:grid-cols-3">
+                      <div className="rounded-2xl border border-white/12 bg-white/[0.08] p-3">
+                        <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-white/42">Post time</p>
+                        <p className="mt-1 text-xl font-black text-white">{formatTime(race?.race_time)}</p>
+                      </div>
+                      <div className="rounded-2xl border border-white/12 bg-white/[0.08] p-3">
+                        <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-white/42">Distance</p>
+                        <p className="mt-1 text-xl font-black text-white">{valueOrUnavailable(race?.distance)}</p>
+                      </div>
+                      <div className="rounded-2xl border border-white/12 bg-white/[0.08] p-3">
+                        <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-white/42">Field</p>
+                        <p className="mt-1 text-xl font-black text-white">{runnerCount} runners</p>
+                      </div>
+                    </div>
                   </div>
 
-                  <div className="grid h-[92px] w-[92px] shrink-0 place-items-center rounded-full border border-[#f4d27a]/35 bg-[#f4d27a]/10 text-center shadow-[inset_0_1px_0_rgba(255,255,255,0.14)]">
+                  <div className="flex flex-col justify-between rounded-[24px] border border-[#8B5CF6]/45 bg-white/[0.07] p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.14)]">
                     <div>
-                      <Clock className="mx-auto h-5 w-5 text-[#f4d27a]" />
-                      <strong className="mt-1 block text-xl leading-none text-white">{formatTime(race?.race_time)}</strong>
-                      <span className="mt-1 block text-[10px] font-bold uppercase tracking-[0.16em] text-white/52">post</span>
+                      <Calendar className="h-5 w-5 text-[#A78BFA]" />
+                      <p className="mt-4 text-[10px] font-bold uppercase tracking-[0.2em] text-white/45">Meeting date</p>
+                      <p className="mt-1 text-2xl font-black leading-tight text-white">{formatRaceDate(race?.meeting_date)}</p>
+                    </div>
+                    <div className="mt-6 flex items-center gap-2 rounded-full bg-[#6A2DF1]/18 px-3 py-2 text-xs font-bold text-[#C4B5FD]">
+                      <Trophy className="h-4 w-4" />
+                      Ready for prediction
                     </div>
                   </div>
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
-                <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-[0_12px_32px_rgba(15,23,42,0.06)]">
-                  <Users className="h-5 w-5 text-[#6A2DF1]" />
-                  <p className="mt-3 text-[11px] font-bold uppercase tracking-[0.18em] text-slate-400">Field</p>
-                  <p className="mt-1 truncate text-lg font-black text-slate-950">{runnerCount} runners</p>
-                </div>
-
-                <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-[0_12px_32px_rgba(15,23,42,0.06)]">
-                  <Calendar className="h-5 w-5 text-[#0f8f78]" />
-                  <p className="mt-3 text-[11px] font-bold uppercase tracking-[0.18em] text-slate-400">Date</p>
-                  <p className="mt-1 truncate text-base font-black text-slate-950">{valueOrUnavailable(race?.meeting_date)}</p>
-                </div>
-
-                <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-[0_12px_32px_rgba(15,23,42,0.06)]">
-                  <Activity className="h-5 w-5 text-[#c8952e]" />
-                  <p className="mt-3 text-[11px] font-bold uppercase tracking-[0.18em] text-slate-400">Distance</p>
-                  <p className="mt-1 truncate text-lg font-black text-slate-950">{valueOrUnavailable(race?.distance)}</p>
-                </div>
-
-                <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-[0_12px_32px_rgba(15,23,42,0.06)]">
-                  <Compass className="h-5 w-5 text-[#334155]" />
-                  <p className="mt-3 text-[11px] font-bold uppercase tracking-[0.18em] text-slate-400">Surface</p>
-                  <p className="mt-1 truncate text-lg font-black capitalize text-slate-950">{valueOrUnavailable(race?.surface)}</p>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-3 rounded-2xl border border-[#ead8a7] bg-[#fff9ea] p-4">
-                <div className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#08111f] text-[#f4d27a]">
-                  <Trophy className="h-4 w-4" />
-                </div>
-                <div className="min-w-0">
-                  <h4 className="text-sm font-black text-slate-950">Prediction setup</h4>
-                  <p className="mt-1 text-xs leading-relaxed text-slate-600">
-                    Next, tune the model around speed index, draw advantages, trainer form, and race conditions.
+              <div className="rounded-[26px] border border-slate-200 bg-white p-4 shadow-[0_16px_44px_rgba(15,23,42,0.07)] sm:p-5">
+                <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+                  <div>
+                    <p className="text-[11px] font-black uppercase tracking-[0.22em] text-[#6A2DF1]">Race conditions</p>
+                    <h3 className="mt-1 text-xl font-black tracking-tight text-slate-950">Track profile</h3>
+                  </div>
+                  <p className="max-w-sm text-sm font-medium leading-relaxed text-slate-500">
+                    Key conditions used before moving into the prediction model.
                   </p>
+                </div>
+
+                <div className="mt-5 grid gap-3 sm:grid-cols-3">
+                  <div className="rounded-2xl border border-slate-100 bg-slate-50/80 p-4">
+                    <Activity className="h-5 w-5 text-[#c8952e]" />
+                    <p className="mt-4 text-[11px] font-bold uppercase tracking-[0.18em] text-slate-400">Distance</p>
+                    <p className="mt-1 truncate text-lg font-black text-slate-950">{valueOrUnavailable(race?.distance)}</p>
+                  </div>
+
+                  <div className="rounded-2xl border border-slate-100 bg-slate-50/80 p-4">
+                    <Compass className="h-5 w-5 text-[#6A2DF1]" />
+                    <p className="mt-4 text-[11px] font-bold uppercase tracking-[0.18em] text-slate-400">Surface</p>
+                    <p className="mt-1 truncate text-lg font-black capitalize text-slate-950">{valueOrUnavailable(race?.surface)}</p>
+                  </div>
+
+                  <div className="rounded-2xl border border-slate-100 bg-slate-50/80 p-4">
+                    <Users className="h-5 w-5 text-[#0f8f78]" />
+                    <p className="mt-4 text-[11px] font-bold uppercase tracking-[0.18em] text-slate-400">Declared field</p>
+                    <p className="mt-1 truncate text-lg font-black text-slate-950">{runnerCount} runners</p>
+                  </div>
                 </div>
               </div>
             </div>

@@ -1752,3 +1752,10 @@ body:has(.light-theme) .neon-bg {
   transform: translateY(-1px);
   box-shadow: 0 6px 20px rgba(139, 92, 246, 0.5) !important;
 }
+
+/* Remove outer wheel dot ornaments in the light analysis view. */
+.light-theme .factor-wheel::before,
+.light-theme .factor-segment-container::before {
+  content: none !important;
+  display: none !important;
+}
