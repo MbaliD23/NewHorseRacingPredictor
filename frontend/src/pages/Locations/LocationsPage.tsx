@@ -36,7 +36,8 @@ const formatVenueDate = (dateStr: string | null) => {
   return dateObj.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
 };
 
-const TODAY = new Date("2026-08-14T00:00:00");
+const TODAY = new Date();
+TODAY.setHours(0, 0, 0, 0);
 
 function parseVenueMeetingDate(dateStr: string | null) {
   if (!dateStr) {
@@ -142,6 +143,8 @@ export function LocationsPage() {
           {venues.map((venue) => {
             const isHovered = hoveredVenueId === venue.id;
             const isLive = venue.races.some(r => r.is_live);
+            const meetingDate = parseVenueMeetingDate(venue.meeting_date);
+            const isToday = meetingDate?.getTime() === TODAY.getTime();
             
             return (
               <div
@@ -169,7 +172,7 @@ export function LocationsPage() {
                     ) : (
                       <div className="flex items-center gap-2 rounded-xl bg-white px-3.5 py-1.5 text-xs font-bold text-gray-700 shadow-lg">
                         <Clock className="h-3.5 w-3.5 text-purple-600" />
-                        UPCOMING
+                        {isToday ? "LIVE TODAY" : "UPCOMING"}
                       </div>
                     )}
                   </div>
