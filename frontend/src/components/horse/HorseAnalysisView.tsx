@@ -2,7 +2,6 @@ import { useMemo, useState } from "react";
 import type { ComponentType, ReactNode } from "react";
 import {
   ChevronDown,
-  ChevronLeft,
   ChevronUp,
   Glasses,
   Heart,
@@ -14,7 +13,6 @@ import {
   Trophy,
   User,
 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
 import { SilksRenderer } from "@/components/horse/SilksRenderer";
 import type { Horse, HorseFormEntry } from "@/types/race";
 
@@ -260,7 +258,6 @@ export function HorseAnalysisView({
   raceNumber,
   venueName,
 }: HorseAnalysisViewProps) {
-  const navigate = useNavigate();
   const [isFavorite, setIsFavorite] = useState(false);
   const [showFormHistory, setShowFormHistory] = useState(false);
 
@@ -335,31 +332,21 @@ export function HorseAnalysisView({
       <div className="space-y-6 rounded-3xl border border-purple-100/80 bg-white p-4 shadow-[0_10px_40px_rgba(139,92,246,0.06)] sm:p-7">
         <div className="flex items-center justify-between pb-2">
           <div className="flex items-center gap-3">
-            <button
-              onClick={() => navigate(-1)}
-              className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-50 text-gray-600 transition-colors hover:bg-purple-50 hover:text-purple-700"
-              aria-label="Go back"
-            >
-              <ChevronLeft className="h-6 w-6" />
-            </button>
-
-            <div className="flex items-center gap-3">
-              <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-purple-700 text-lg font-bold text-white shadow-md shadow-purple-600/20">
-                {saddleNo}
-              </span>
-              <div>
-                <h1 className="text-xl font-black uppercase tracking-tight text-gray-900 sm:text-2xl">
-                  {horseName}
-                </h1>
-                {raceTitle ? (
-                  <p className="text-xs font-medium text-purple-600">
-                    {venueName ? `${venueName} • ` : ""}
-                    Race {raceNumber ? `${raceNumber}: ` : ""}
-                    {raceTitle}
-                  </p>
-                ) : null}
-                <p className="mt-1 text-sm font-semibold text-gray-700">{summary}</p>
-              </div>
+            <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-purple-700 text-lg font-bold text-white shadow-md shadow-purple-600/20">
+              {saddleNo}
+            </span>
+            <div>
+              <h1 className="text-xl font-black uppercase tracking-tight text-gray-900 sm:text-2xl">
+                {horseName}
+              </h1>
+              {raceTitle ? (
+                <p className="text-xs font-medium text-purple-600">
+                  {venueName ? `${venueName} • ` : ""}
+                  Race {raceNumber ? `${raceNumber}: ` : ""}
+                  {raceTitle}
+                </p>
+              ) : null}
+              <p className="mt-1 text-sm font-semibold text-gray-700">{summary}</p>
             </div>
           </div>
 

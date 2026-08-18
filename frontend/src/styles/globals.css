@@ -24,6 +24,37 @@ input {
   font: inherit;
 }
 
+.workflow-back-button {
+  min-height: 3.25rem;
+  min-width: 3.25rem;
+  border-color: rgba(168, 85, 247, 0.22);
+  background: rgba(255, 255, 255, 0.94);
+  color: #5b21b6;
+  box-shadow:
+    0 14px 30px rgba(91, 33, 182, 0.14),
+    inset 0 1px 0 rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(16px);
+}
+
+.workflow-back-button:hover {
+  transform: translateY(-1px);
+  border-color: rgba(168, 85, 247, 0.42);
+  background: rgba(255, 255, 255, 1);
+  color: #6d28d9;
+  box-shadow:
+    0 18px 38px rgba(91, 33, 182, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.95);
+}
+
+.workflow-back-button:active {
+  transform: translateY(0) scale(0.98);
+}
+
+.workflow-back-button:focus-visible {
+  outline: 2px solid rgba(168, 85, 247, 0.55);
+  outline-offset: 3px;
+}
+
 .neon-bg {
   pointer-events: none;
   position: fixed;

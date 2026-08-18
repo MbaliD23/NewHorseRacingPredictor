@@ -1,4 +1,4 @@
-import { ArrowLeft, RotateCcw } from "lucide-react";
+import { RotateCcw } from "lucide-react";
 import { useMemo } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/components/common/Button";
@@ -32,11 +32,7 @@ export function SelectedHorsePage() {
         />
       </AsyncBoundary>
 
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 max-w-4xl mx-auto pb-6 w-full px-2">
-        <Button variant="outline" size="lg" className="w-full sm:w-auto rounded-full" onClick={() => navigate("/predictions/results")}>
-          <ArrowLeft className="mr-2 h-5 w-5" />
-          Back to Predictions
-        </Button>
+      <div className="flex flex-col sm:flex-row items-center justify-end gap-4 max-w-4xl mx-auto pb-6 w-full px-2">
         <Button
           size="lg"
           className="w-full sm:w-auto rounded-full bg-purple-700 hover:bg-purple-800 text-white"
