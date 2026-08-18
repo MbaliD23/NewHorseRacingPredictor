@@ -28,10 +28,11 @@ class MonitoringService:
 
         self.scheduler.start()
         monitoring_state.active = True
-        try:
-            await self.run_cycle()
-        except Exception:
-            logger.exception("initial_monitoring_cycle_failed")
+        self.scheduler.add_job(
+            self.run_cycle,
+            id="monitoring-startup-job",
+            replace_existing=True,
+        )
 
     async def stop(self) -> None:
         if self.scheduler.running:
