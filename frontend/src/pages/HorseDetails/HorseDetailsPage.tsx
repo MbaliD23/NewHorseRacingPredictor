@@ -1,4 +1,5 @@
 import { ArrowRight } from "lucide-react";
+import { useMemo } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/components/common/Button";
 import { HorseAnalysisView } from "@/components/horse/HorseAnalysisView";
@@ -10,8 +11,18 @@ export function HorseDetailsPage() {
   const { horseId } = useParams();
   const navigate = useNavigate();
   const { currentHorse, currentRace, setCurrentHorse } = usePredictionStore();
-  const raceQuery = useRace(currentHorse?.race_id ?? currentRace?.id);
-  const horse = currentHorse ?? raceQuery.data?.horses.find((item) => String(item.id) === horseId) ?? null;
+  const raceId = currentHorse?.race_id ?? currentRace?.id;
+  const raceQuery = useRace(raceId);
+  const horse = useMemo(() => {
+    const fetchedHorse = raceQuery.data?.horses.find((item) => String(item.id) === horseId);
+
+    if (fetchedHorse) {
+      return fetchedHorse;
+    }
+
+    return currentHorse && String(currentHorse.id) === horseId ? currentHorse : null;
+  }, [currentHorse, horseId, raceQuery.data?.horses]);
+  const race = raceQuery.data ?? currentRace;
 
   return (
     <section className="page-section screen-shell items-stretch py-4">
@@ -23,10 +34,10 @@ export function HorseDetailsPage() {
       >
         <HorseAnalysisView
           horse={horse}
-          raceTitle={currentRace?.title ?? undefined}
-          raceNumber={currentRace?.race_number ?? undefined}
-          raceDistance={raceQuery.data?.distance ?? currentRace?.distance ?? undefined}
-          venueName={currentRace?.venue ?? undefined}
+          raceTitle={race?.title ?? undefined}
+          raceNumber={race?.race_number ?? undefined}
+          raceDistance={race?.distance ?? undefined}
+          venueName={race?.venue ?? undefined}
         />
 
         <div className="flex items-center justify-center max-w-4xl mx-auto pb-6">

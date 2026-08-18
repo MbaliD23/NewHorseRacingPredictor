@@ -4,6 +4,7 @@ import {
   ArrowDown,
   ArrowUp,
   ChevronDown,
+  ChevronLeft,
   ChevronUp,
   Footprints,
   Glasses,
@@ -17,6 +18,7 @@ import {
   Trophy,
   User,
 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { SilksRenderer } from "@/components/horse/SilksRenderer";
 import type { Horse, HorseFormEntry } from "@/types/race";
 
@@ -430,6 +432,7 @@ export function HorseAnalysisView({
   raceDistance,
   venueName,
 }: HorseAnalysisViewProps) {
+  const navigate = useNavigate();
   const [isFavorite, setIsFavorite] = useState(false);
   const [showFormHistory, setShowFormHistory] = useState(false);
   const [visibleFormColumnKeys, setVisibleFormColumnKeys] = useState<FormColumnKey[]>(
