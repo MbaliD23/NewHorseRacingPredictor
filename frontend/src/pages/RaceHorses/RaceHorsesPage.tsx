@@ -9,6 +9,13 @@ import { AsyncBoundary } from "@/components/status/AsyncBoundary";
 import { useRace } from "@/hooks/useRace";
 import { formatTime, valueOrUnavailable } from "@/lib/utils";
 import { usePredictionStore, type HorseOrderBy } from "@/store/predictionStore";
+import greyvilleImg from "@/assets/greyville.png";
+import turfonteinImg from "@/assets/Turffontein.png";
+import kenilworthImg from "@/assets/Kenilworth.png";
+import scotsvilleImg from "@/assets/Scottsville.png";
+import fairviewImg from "@/assets/fairview.png";
+import vaalImg from "@/assets/Vaal.png";
+import trackConditionsImg from "@/assets/track-conditions.png";
 
 const ORDER_OPTIONS: Array<{ value: HorseOrderBy; label: string }> = [
   { value: "draw_number", label: "Draw Number (Default)" },
@@ -37,6 +44,17 @@ const formatRaceDate = (dateStr: string | null | undefined) => {
         month: "short",
         year: "numeric",
       });
+};
+
+const getVenueImage = (venueName: string | null | undefined) => {
+  const name = (venueName ?? "").toLowerCase();
+  if (name.includes("greyville")) return greyvilleImg;
+  if (name.includes("turffontein")) return turfonteinImg;
+  if (name.includes("kenilworth")) return kenilworthImg;
+  if (name.includes("scottsville")) return scotsvilleImg;
+  if (name.includes("fairview")) return fairviewImg;
+  if (name.includes("vaal")) return vaalImg;
+  return greyvilleImg;
 };
 
 export function RaceHorsesPage() {
@@ -123,6 +141,7 @@ export function RaceHorsesPage() {
       </div>
 
       <AsyncBoundary isLoading={isLoading} isError={isError} isEmpty={!race} emptyMessage="Race unavailable.">
+<<<<<<< Updated upstream
         <div className="flex-1 overflow-y-auto px-4 py-4 scroll-smooth">
           {tab === "horses" ? (
             <AsyncBoundary isEmpty={orderedHorses.length === 0} emptyMessage="No horses available.">
@@ -136,6 +155,143 @@ export function RaceHorsesPage() {
                       <p className="mt-1 text-sm font-medium text-slate-500">
                         Default race-card view sorts horses by draw number.
                       </p>
+=======
+        <div className="mx-auto flex w-full max-w-[1600px] flex-col gap-6 px-2 sm:px-4 lg:px-6">
+          <div className="rounded-[32px] border border-slate-200/80 bg-white px-4 py-4 shadow-[0_1px_8px_-4px_rgba(0,0,0,0.08)] sm:px-6 lg:px-8">
+            <div className="flex flex-wrap items-center gap-2 text-[11px] font-bold uppercase tracking-[0.18em] text-[#6A2DF1]">
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-violet-200 bg-violet-50 px-3 py-1.5">
+                <Clock className="h-3.5 w-3.5" />
+                {formatTime(race?.race_time)}
+              </span>
+              <span className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1.5 text-slate-600">
+                Race {race?.race_number ?? ""}
+              </span>
+              <span className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1.5 text-slate-600">
+                {valueOrUnavailable(race?.distance)}
+              </span>
+              <span className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1.5 text-slate-600">
+                {valueOrUnavailable(race?.surface)}
+              </span>
+              <div className="ml-auto flex items-center gap-1.5 rounded-full border border-violet-200 bg-white px-2.5 py-1 text-[11px] font-bold tracking-wider text-[#6A2DF1] uppercase">
+                <div className="h-2 w-2 rounded-full bg-[#6A2DF1] animate-pulse" />
+                Live
+              </div>
+            </div>
+
+            <div className="mt-4 flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
+              <div className="min-w-0">
+                <p className="text-xs font-bold uppercase tracking-[0.26em] text-[#6A2DF1]/80">
+                  Race {valueOrUnavailable(race?.race_number)} dossier
+                </p>
+                <h1 className="mt-2 text-[clamp(2rem,3.4vw,3.4rem)] font-black leading-[0.95] tracking-tight text-slate-950">
+                  {valueOrUnavailable(race?.title)}
+                </h1>
+                <p className="mt-3 max-w-3xl text-sm leading-relaxed text-slate-500 sm:text-base">
+                  {valueOrUnavailable(race?.venue)} · {raceStatus}
+                </p>
+              </div>
+
+              <div className="grid gap-3 sm:grid-cols-3 xl:min-w-[560px]">
+                <InfoStat label="Post time" value={formatTime(race?.race_time)} />
+                <InfoStat label="Distance" value={valueOrUnavailable(race?.distance)} />
+                <InfoStat label="Field" value={`${runnerCount} runners`} />
+              </div>
+            </div>
+          </div>
+
+          <div className="grid gap-5 xl:grid-cols-[minmax(0,1.35fr)_minmax(360px,0.65fr)]">
+            <GlassCard className="group overflow-hidden rounded-[1.2rem] border-slate-100 bg-white text-slate-900 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:ring-[3px] hover:ring-purple-600 hover:shadow-[0_12px_40px_rgb(0,0,0,0.15)]">
+              <div className="relative h-36 overflow-hidden bg-slate-100 sm:h-44">
+                <img
+                  src={getVenueImage(race?.venue)}
+                  alt=""
+                  className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/15 to-transparent" />
+                <div className="absolute bottom-4 left-5 right-5 sm:left-6 sm:right-6">
+                  <p className="text-[11px] font-black uppercase tracking-[0.22em] text-purple-200">
+                    Race Information
+                  </p>
+                  <h2 className="mt-1 text-xl font-black tracking-tight text-white">Meeting details</h2>
+                </div>
+              </div>
+              <div className="grid gap-4 bg-white p-5 sm:grid-cols-2 sm:p-6">
+                <InfoTile icon={Calendar} label="Meeting date" value={formatRaceDate(race?.meeting_date)} />
+                <InfoTile icon={Clock} label="Post time" value={formatTime(race?.race_time)} />
+                <InfoTile icon={Compass} label="Surface" value={valueOrUnavailable(race?.surface)} />
+                <InfoTile icon={Trophy} label="Declared field" value={`${runnerCount} runners`} />
+              </div>
+            </GlassCard>
+
+            <GlassCard className="group overflow-hidden rounded-[1.2rem] border-slate-100 bg-white text-slate-900 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:ring-[3px] hover:ring-purple-600 hover:shadow-[0_12px_40px_rgb(0,0,0,0.15)]">
+              <div className="relative h-36 overflow-hidden bg-slate-100 sm:h-44">
+                <img
+                  src={trackConditionsImg}
+                  alt=""
+                  className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#0A0413]/90 via-[#0A0413]/25 to-transparent" />
+                <div className="absolute bottom-4 left-5 right-5 sm:left-6 sm:right-6">
+                  <p className="text-[11px] font-black uppercase tracking-[0.22em] text-purple-200">
+                    Track Profile
+                  </p>
+                  <h2 className="mt-1 text-xl font-black tracking-tight text-white">Conditions</h2>
+                </div>
+              </div>
+              <div className="grid gap-4 bg-white p-5 sm:grid-cols-2 sm:p-6">
+                <InfoTile icon={Activity} label="Distance" value={valueOrUnavailable(race?.distance)} />
+                <InfoTile icon={Compass} label="Surface" value={valueOrUnavailable(race?.surface)} />
+                <InfoTile icon={Users} label="Field size" value={`${runnerCount} runners`} />
+                <InfoTile icon={Trophy} label="Status" value={raceStatus} />
+              </div>
+            </GlassCard>
+          </div>
+
+          <div className="rounded-[28px] border border-slate-200 bg-white px-4 py-4 shadow-[0_1px_8px_-4px_rgba(0,0,0,0.08)] sm:px-6">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <p className="text-xs font-bold uppercase tracking-[0.18em] text-slate-400">
+                  Order By
+                </p>
+                <p className="mt-1 text-sm font-medium text-slate-500">
+                  Default race-card view sorts horses by draw number.
+                </p>
+              </div>
+              <select
+                value={horseOrderBy}
+                onChange={(event) => setHorseOrderBy(event.target.value as HorseOrderBy)}
+                className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm font-semibold text-slate-900 outline-none transition-colors focus:border-[#6A2DF1] focus:bg-white sm:w-[240px]"
+                aria-label="Order horses by"
+              >
+                {ORDER_OPTIONS.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          <AsyncBoundary isEmpty={orderedHorses.length === 0} emptyMessage="No horses available.">
+            <div className="flex flex-col gap-4 pb-2">
+              {orderedHorses.map((horse) => (
+                <div
+                  key={horse.id}
+                  className="grid cursor-pointer gap-4 rounded-[26px] border border-slate-200 bg-white p-4 shadow-[0_1px_8px_-4px_rgba(0,0,0,0.08)] transition-all duration-200 hover:-translate-y-0.5 hover:border-[#6A2DF1]/60 hover:shadow-[0_0_22px_rgba(106,45,241,0.14)] sm:p-5 xl:grid-cols-[auto_auto_minmax(0,1.8fr)_repeat(4,minmax(108px,0.7fr))_minmax(128px,auto)] xl:items-center"
+                  onClick={() => {
+                    setCurrentRace(race ?? null);
+                    setCurrentHorse(horse);
+                    navigate(`/horses/${horse.id}`);
+                  }}
+                >
+                  <div className={`flex h-12 w-12 items-center justify-center rounded-xl font-bold text-xl ${getNumberStyle(horse.runner_number)}`}>
+                    {valueOrUnavailable(horse.runner_number)}
+                  </div>
+
+                  <div className="h-16 w-16 overflow-hidden rounded-2xl border border-slate-100 bg-slate-50">
+                    <div className="flex h-full w-full items-center justify-center">
+                      <SilksRenderer description={horse.silks} className="h-14 w-14" />
+>>>>>>> Stashed changes
                     </div>
                     <select
                       value={horseOrderBy}
