@@ -494,10 +494,10 @@ export function HorseAnalysisView({
                       <th className="px-4 py-3">Form Summary</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-gray-100 bg-white">
+                  <tbody className="divide-y divide-gray-100 bg-white [&_td]:h-16 [&_td]:whitespace-nowrap [&_td]:align-middle">
                     {visibleFormEntries.length > 0 ? (
                       visibleFormEntries.map((entry, index) => (
-                        <tr key={`${entry.run_date ?? "unknown"}-${index}`} className="align-top">
+                        <tr key={`${entry.run_date ?? "unknown"}-${index}`}>
                           <td className="px-4 py-3 font-semibold text-gray-900">
                             {formatDate(entry.run_date, entry.raw_date_text)}
                           </td>
@@ -511,22 +511,28 @@ export function HorseAnalysisView({
                           <td className="px-4 py-3 text-gray-700">{valueOrDash(entry.track)}</td>
                           <td className="px-4 py-3 text-gray-700">{valueOrDash(entry.race_number)}</td>
                           <td className="px-4 py-3 text-gray-700">{valueOrDash(entry.distance)}</td>
-                          <td className="px-4 py-3 text-gray-700">{valueOrDash(entry.jockey_name)}</td>
+                          <td className="px-4 py-3 text-gray-700">
+                            <span className="block max-w-28 truncate">{valueOrDash(entry.jockey_name)}</span>
+                          </td>
                           <td className="px-4 py-3 text-gray-700">{valueOrDash(entry.weight)}</td>
                           <td className="px-4 py-3 text-gray-700">{valueOrDash(entry.draw)}</td>
                           <td className="px-4 py-3 text-gray-700">
                             {valueOrDash(entry.margin_behind_winner)}
                           </td>
-                          <td className="px-4 py-3 text-gray-700">{valueOrDash(entry.winner_name)}</td>
+                          <td className="px-4 py-3 text-gray-700">
+                            <span className="block max-w-32 truncate">{valueOrDash(entry.winner_name)}</span>
+                          </td>
                           <td className="px-4 py-3 text-gray-700">
                             {valueOrDash(entry.winner_weight)}
                           </td>
                           <td className="px-4 py-3 text-gray-700">{valueOrDash(entry.speed_figure)}</td>
                           <td className="px-4 py-3 text-gray-700">{valueOrDash(entry.rating)}</td>
                           <td className="px-4 py-3 text-gray-700">{valueOrDash(entry.odds)}</td>
-                          <td className="px-4 py-3 text-gray-700">{valueOrDash(entry.comment)}</td>
                           <td className="px-4 py-3 text-gray-700">
-                            {valueOrDash(entry.form_summary)}
+                            <span className="block max-w-40 truncate">{valueOrDash(entry.comment)}</span>
+                          </td>
+                          <td className="px-4 py-3 text-gray-700">
+                            <span className="block max-w-72 truncate">{valueOrDash(entry.form_summary)}</span>
                           </td>
                         </tr>
                       ))
