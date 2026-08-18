@@ -32,7 +32,7 @@ export function SelectedHorsePage() {
         />
       </AsyncBoundary>
 
-      <div className="flex flex-col sm:flex-row items-center justify-end gap-4 max-w-4xl mx-auto pb-6 w-full px-2">
+      <div className="flex w-full max-w-7xl flex-col items-center justify-end gap-4 px-2 pb-6 sm:flex-row sm:px-4 lg:px-6">
         <Button
           size="lg"
           className="w-full sm:w-auto rounded-full bg-purple-700 hover:bg-purple-800 text-white"

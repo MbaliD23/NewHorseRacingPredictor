@@ -1,5 +1,5 @@
 import type { CSSProperties, ReactNode } from "react";
-import { ArrowRight, BarChart3, BadgeCheck, Flame, Gauge, Medal, Scale, Trophy, UserRound } from "lucide-react";
+import { ArrowRight, BarChart3, BadgeCheck, Flame, Gauge, Medal, Scale, Trophy } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/common/Button";
 import { AsyncBoundary } from "@/components/status/AsyncBoundary";
@@ -120,8 +120,6 @@ export function PredictionResultsPage() {
                   </div>
 
                   <div className="prediction-metrics-grid">
-                    <Metric label="Trainer" value={valueOrUnavailable(item.trainer_name)} icon={<UserRound className="h-4 w-4" />} />
-                    <Metric label="Jockey" value={valueOrUnavailable(item.jockey_name)} icon={<Trophy className="h-4 w-4" />} />
                     <Metric label="Weight" value={formatWeight(item.weight_value)} icon={<Scale className="h-4 w-4" />} />
                     <Metric label="Draw" value={formatDraw(item.draw_number)} icon={<BadgeCheck className="h-4 w-4" />} />
                     <Metric
@@ -145,23 +143,6 @@ export function PredictionResultsPage() {
                       icon={<BadgeCheck className="h-4 w-4" />}
                     />
                   </div>
-
-                  {hasTrainerJockeyComboStats(item) ? (
-                    <section className="prediction-combo-panel" aria-label="Trainer and jockey combination statistics">
-                      <div className="prediction-section-title">
-                        <span>Trainer/Jockey Combination</span>
-                        <strong>{formatComboPercent(item.trainer_jockey_win_percent)}</strong>
-                      </div>
-                      <div className="prediction-combo-grid">
-                        <MiniStat label="Runs" value={formatComboMetric(item.trainer_jockey_runs)} />
-                        <MiniStat label="Wins" value={formatComboMetric(item.trainer_jockey_wins)} />
-                        <MiniStat label="Seconds" value={formatComboMetric(item.trainer_jockey_seconds)} />
-                        <MiniStat label="Thirds" value={formatComboMetric(item.trainer_jockey_thirds)} />
-                        <MiniStat label="Win %" value={formatComboPercent(item.trainer_jockey_win_percent)} />
-                        <MiniStat label="Place %" value={formatComboPercent(item.trainer_jockey_place_percent)} />
-                      </div>
-                    </section>
-                  ) : null}
 
                   <div className="prediction-footer">
                     <div className="prediction-key-factors">
@@ -219,15 +200,6 @@ function Metric({
   );
 }
 
-function MiniStat({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="prediction-mini-stat">
-      <span>{label}</span>
-      <strong>{value}</strong>
-    </div>
-  );
-}
-
 function formatMetric(value: number | null | undefined) {
   if (value === null || value === undefined || Number.isNaN(value)) return "Unavailable";
   return Number.isInteger(value) ? String(value) : value.toFixed(1);
@@ -249,31 +221,4 @@ function formatWeight(value: number | null | undefined) {
 function formatDraw(value: number | null | undefined) {
   const formatted = formatMetric(value);
   return formatted === "Unavailable" ? formatted : `Gate ${formatted}`;
-}
-
-function formatComboMetric(value: number | null | undefined) {
-  return valueOrUnavailable(value);
-}
-
-function formatComboPercent(value: number | null | undefined) {
-  if (value === null || value === undefined || Number.isNaN(value)) return "Unavailable";
-  return `${formatPercent(value)}%`;
-}
-
-function hasTrainerJockeyComboStats(item: {
-  trainer_jockey_runs?: number | null;
-  trainer_jockey_wins?: number | null;
-  trainer_jockey_seconds?: number | null;
-  trainer_jockey_thirds?: number | null;
-  trainer_jockey_win_percent?: number | null;
-  trainer_jockey_place_percent?: number | null;
-}) {
-  return [
-    item.trainer_jockey_runs,
-    item.trainer_jockey_wins,
-    item.trainer_jockey_seconds,
-    item.trainer_jockey_thirds,
-    item.trainer_jockey_win_percent,
-    item.trainer_jockey_place_percent,
-  ].some((value) => value !== null && value !== undefined);
 }
