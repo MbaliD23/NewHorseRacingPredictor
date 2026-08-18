@@ -128,14 +128,22 @@ export function RaceHorsesPage() {
           </div>
 
           <div className="grid gap-5 xl:grid-cols-[minmax(0,1.35fr)_minmax(360px,0.65fr)]">
-            <GlassCard className="overflow-hidden border-slate-200 bg-white text-slate-900 shadow-[0_16px_44px_rgba(15,23,42,0.07)]">
-              <div className="border-b border-slate-100 px-5 py-4 sm:px-6">
-                <p className="text-[11px] font-black uppercase tracking-[0.22em] text-[#6A2DF1]">
-                  Race Information
-                </p>
-                <h2 className="mt-1 text-xl font-black tracking-tight text-slate-950">Meeting details</h2>
+            <GlassCard className="group overflow-hidden rounded-[1.2rem] border-slate-100 bg-white text-slate-900 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:ring-[3px] hover:ring-purple-600 hover:shadow-[0_12px_40px_rgb(0,0,0,0.15)]">
+              <div className="relative h-36 overflow-hidden bg-slate-100 sm:h-44">
+                <img
+                  src={getVenueImage(race?.venue)}
+                  alt=""
+                  className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/15 to-transparent" />
+                <div className="absolute bottom-4 left-5 right-5 sm:left-6 sm:right-6">
+                  <p className="text-[11px] font-black uppercase tracking-[0.22em] text-purple-200">
+                    Race Information
+                  </p>
+                  <h2 className="mt-1 text-xl font-black tracking-tight text-white">Meeting details</h2>
+                </div>
               </div>
-              <div className="grid gap-4 p-5 sm:grid-cols-2 sm:p-6">
+              <div className="grid gap-4 bg-white p-5 sm:grid-cols-2 sm:p-6">
                 <InfoTile icon={Calendar} label="Meeting date" value={formatRaceDate(race?.meeting_date)} />
                 <InfoTile icon={Clock} label="Post time" value={formatTime(race?.race_time)} />
                 <InfoTile icon={Compass} label="Surface" value={valueOrUnavailable(race?.surface)} />
@@ -143,14 +151,22 @@ export function RaceHorsesPage() {
               </div>
             </GlassCard>
 
-            <GlassCard className="overflow-hidden border-slate-200 bg-white text-slate-900 shadow-[0_16px_44px_rgba(15,23,42,0.07)]">
-              <div className="border-b border-slate-100 px-5 py-4 sm:px-6">
-                <p className="text-[11px] font-black uppercase tracking-[0.22em] text-[#6A2DF1]">
-                  Track Profile
-                </p>
-                <h2 className="mt-1 text-xl font-black tracking-tight text-slate-950">Conditions</h2>
+            <GlassCard className="group overflow-hidden rounded-[1.2rem] border-slate-100 bg-white text-slate-900 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:ring-[3px] hover:ring-purple-600 hover:shadow-[0_12px_40px_rgb(0,0,0,0.15)]">
+              <div className="relative h-36 overflow-hidden bg-slate-100 sm:h-44">
+                <img
+                  src={trackConditionsImg}
+                  alt=""
+                  className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#0A0413]/90 via-[#0A0413]/25 to-transparent" />
+                <div className="absolute bottom-4 left-5 right-5 sm:left-6 sm:right-6">
+                  <p className="text-[11px] font-black uppercase tracking-[0.22em] text-purple-200">
+                    Track Profile
+                  </p>
+                  <h2 className="mt-1 text-xl font-black tracking-tight text-white">Conditions</h2>
+                </div>
               </div>
-              <div className="grid gap-4 p-5 sm:grid-cols-2 sm:p-6">
+              <div className="grid gap-4 bg-white p-5 sm:grid-cols-2 sm:p-6">
                 <InfoTile icon={Activity} label="Distance" value={valueOrUnavailable(race?.distance)} />
                 <InfoTile icon={Compass} label="Surface" value={valueOrUnavailable(race?.surface)} />
                 <InfoTile icon={Users} label="Field size" value={`${runnerCount} runners`} />
