@@ -461,6 +461,324 @@ input {
   padding: 1.35rem 1.55rem;
 }
 
+.venue-races-page {
+  gap: 1.4rem;
+}
+
+.venue-races-page .races-heading p {
+  max-width: 60rem;
+}
+
+.races-hero-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1.3fr) minmax(320px, 0.9fr);
+  gap: 1.2rem;
+  align-items: stretch;
+  border: 1px solid rgba(139, 92, 246, 0.12);
+  border-radius: 30px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 244, 255, 0.96)),
+    radial-gradient(circle at top left, rgba(168, 85, 247, 0.12), transparent 34%);
+  padding: 1.2rem;
+  box-shadow:
+    0 18px 50px rgba(91, 33, 182, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+
+.races-hero-copy {
+  display: grid;
+  align-content: center;
+  gap: 0.85rem;
+  padding: 0.5rem 0.2rem 0.5rem 0.3rem;
+}
+
+.races-hero-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  width: fit-content;
+  border: 1px solid rgba(139, 92, 246, 0.12);
+  border-radius: 999px;
+  background: rgba(245, 243, 255, 0.92);
+  color: #6d28d9;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  padding: 0.45rem 0.75rem;
+  text-transform: uppercase;
+}
+
+.races-hero-copy h2 {
+  margin: 0;
+  color: #130a2b;
+  font-family: "Sora", "Outfit", sans-serif;
+  font-size: clamp(1.9rem, 3.3vw, 3rem);
+  font-weight: 800;
+  letter-spacing: -0.05em;
+  line-height: 1;
+}
+
+.races-hero-copy p {
+  max-width: 52rem;
+  color: #5d5a72;
+  line-height: 1.65;
+}
+
+.races-hero-stats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.races-hero-stat {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  border: 1px solid rgba(139, 92, 246, 0.08);
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.96);
+  padding: 0.95rem 1rem;
+}
+
+.races-hero-stat-icon {
+  display: grid;
+  flex: 0 0 auto;
+  place-items: center;
+  height: 2.55rem;
+  width: 2.55rem;
+  border-radius: 18px;
+  background: rgba(139, 92, 246, 0.12);
+  color: #7c3aed;
+}
+
+.races-hero-stat p {
+  color: #857aa6;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+}
+
+.races-hero-stat strong {
+  color: #130a2b;
+  font-size: 1rem;
+  font-weight: 800;
+}
+
+.races-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.status-strip-light {
+  border-color: rgba(139, 92, 246, 0.14);
+  background: rgba(255, 255, 255, 0.96);
+  color: #4b3c7a;
+  box-shadow: 0 10px 24px rgba(91, 33, 182, 0.06);
+}
+
+.race-list--premium {
+  gap: 1rem;
+}
+
+.race-row-light {
+  position: relative;
+  overflow: hidden;
+  align-items: stretch;
+  border: 1px solid rgba(139, 92, 246, 0.12);
+  border-radius: 28px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 244, 255, 0.96)),
+    radial-gradient(circle at top left, rgba(168, 85, 247, 0.1), transparent 30%);
+  box-shadow:
+    0 16px 42px rgba(91, 33, 182, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  cursor: pointer;
+}
+
+.race-row-light::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(135deg, transparent 0 62%, rgba(255, 255, 255, 0.48) 62.5%, transparent 64%),
+    radial-gradient(circle at top right, rgba(168, 85, 247, 0.08), transparent 26%);
+}
+
+.race-row-light:hover {
+  transform: translateY(-3px);
+  border-color: rgba(139, 92, 246, 0.28);
+  box-shadow:
+    0 22px 58px rgba(91, 33, 182, 0.12),
+    0 0 0 1px rgba(139, 92, 246, 0.08) inset;
+}
+
+.race-row-light:focus-visible {
+  outline: 2px solid rgba(139, 92, 246, 0.65);
+  outline-offset: 4px;
+}
+
+.race-row-live {
+  border-color: rgba(212, 167, 44, 0.18);
+  box-shadow:
+    0 18px 50px rgba(212, 167, 44, 0.08),
+    0 16px 42px rgba(91, 33, 182, 0.08);
+}
+
+.race-row-upcoming {
+  border-color: rgba(139, 92, 246, 0.16);
+}
+
+.race-number-light {
+  position: relative;
+  height: 66px;
+  width: 66px;
+  border: 1px solid rgba(139, 92, 246, 0.12);
+  background:
+    radial-gradient(circle at top, rgba(255, 255, 255, 0.7), transparent 42%),
+    linear-gradient(145deg, #7c3aed, #5b21b6);
+  box-shadow:
+    0 12px 28px rgba(91, 33, 182, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.18);
+  color: white;
+}
+
+.race-number-light span {
+  position: relative;
+  z-index: 1;
+}
+
+.race-row-copy {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  flex: 1 1 auto;
+  gap: 0.75rem;
+  min-width: 0;
+}
+
+.race-row-topline {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+}
+
+.race-date-chip,
+.race-status-chip,
+.race-field-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.race-date-chip {
+  border: 1px solid rgba(139, 92, 246, 0.12);
+  background: rgba(245, 243, 255, 0.92);
+  color: #6d28d9;
+  padding: 0.45rem 0.72rem;
+}
+
+.race-status-chip {
+  border: 1px solid rgba(139, 92, 246, 0.12);
+  background: rgba(255, 255, 255, 0.96);
+  color: #7c3aed;
+  padding: 0.45rem 0.72rem;
+}
+
+.race-status-chip-live {
+  border-color: rgba(212, 167, 44, 0.2);
+  background: rgba(255, 250, 233, 0.95);
+  color: #a16207;
+}
+
+.race-status-chip-upcoming {
+  border-color: rgba(99, 102, 241, 0.14);
+  background: rgba(238, 242, 255, 0.95);
+  color: #4f46e5;
+}
+
+.race-row-heading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.race-number-label {
+  color: #7c3aed;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+
+.race-row-heading h2 {
+  margin: 0.2rem 0 0;
+  color: #130a2b;
+  font-family: "Sora", "Outfit", sans-serif;
+  font-size: clamp(1.35rem, 2.2vw, 1.9rem);
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  line-height: 1.02;
+}
+
+.race-field-pill {
+  border: 1px solid rgba(139, 92, 246, 0.12);
+  background: rgba(250, 247, 255, 0.96);
+  color: #4b3c7a;
+  padding: 0.55rem 0.75rem;
+  white-space: nowrap;
+}
+
+.race-meta-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.7rem;
+}
+
+.race-meta-tile {
+  display: grid;
+  gap: 0.25rem;
+  border: 1px solid rgba(139, 92, 246, 0.08);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.96);
+  padding: 0.8rem 0.85rem;
+}
+
+.race-meta-tile p {
+  color: #857aa6;
+  font-size: 0.66rem;
+  font-weight: 800;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+}
+
+.race-meta-tile strong {
+  color: #130a2b;
+  font-size: 0.96rem;
+  font-weight: 800;
+}
+
+.race-row-action {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
 .race-row-premium,
 .horse-row-premium,
 .prediction-card-selectable {
@@ -1057,6 +1375,389 @@ input {
   background: linear-gradient(90deg, #ffd25f, #a665ff 70%, #59e6ff 100%);
 }
 
+.prediction-results-page {
+  gap: 1.8rem;
+}
+
+.prediction-results-heading p {
+  max-width: 60rem;
+}
+
+.prediction-weighted-by {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.65rem;
+  margin-top: 1rem;
+}
+
+.prediction-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  border: 1px solid rgba(139, 92, 246, 0.14);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.94);
+  color: #6d28d9;
+  font-size: 0.86rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  padding: 0.48rem 0.85rem;
+  box-shadow: 0 10px 28px rgba(91, 33, 182, 0.08);
+}
+
+.prediction-chip--soft {
+  background: #f5f3ff;
+  border-color: rgba(139, 92, 246, 0.16);
+  color: #7c3aed;
+}
+
+.prediction-grid--premium {
+  align-items: stretch;
+}
+
+.prediction-results-card {
+  position: relative;
+  overflow: hidden;
+  min-height: 100%;
+  border: 1px solid rgba(139, 92, 246, 0.12);
+  border-radius: 30px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 244, 255, 0.96)),
+    radial-gradient(circle at top left, var(--prediction-accent-soft), transparent 34%);
+  padding: 1.2rem;
+  box-shadow:
+    0 18px 50px rgba(91, 33, 182, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  cursor: pointer;
+  transition: transform 250ms ease, border-color 250ms ease, box-shadow 250ms ease;
+}
+
+.prediction-results-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at top right, rgba(168, 85, 247, 0.08), transparent 28%),
+    linear-gradient(135deg, transparent 0 60%, rgba(255, 255, 255, 0.52) 60.5%, transparent 62%);
+  pointer-events: none;
+}
+
+.prediction-results-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(139, 92, 246, 0.28);
+  box-shadow:
+    0 24px 64px rgba(91, 33, 182, 0.12),
+    0 0 0 1px rgba(139, 92, 246, 0.08) inset;
+}
+
+.prediction-results-card:focus-visible {
+  outline: 2px solid rgba(139, 92, 246, 0.65);
+  outline-offset: 4px;
+}
+
+.prediction-results-card.selected {
+  border-color: var(--prediction-accent);
+  box-shadow:
+    0 22px 60px rgba(91, 33, 182, 0.16),
+    0 0 0 1px rgba(139, 92, 246, 0.16) inset;
+}
+
+.prediction-results-card--rank-1 {
+  box-shadow:
+    0 22px 66px rgba(212, 167, 44, 0.12),
+    0 18px 50px rgba(91, 33, 182, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.92);
+}
+
+.prediction-results-card--rank-1.selected {
+  box-shadow:
+    0 26px 74px rgba(212, 167, 44, 0.18),
+    0 0 0 1px rgba(212, 167, 44, 0.2) inset;
+}
+
+.prediction-card-shell {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: 1rem;
+}
+
+.prediction-card-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.prediction-rank-stack {
+  display: grid;
+  gap: 0.6rem;
+}
+
+.prediction-rank-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  width: fit-content;
+  border: 1px solid rgba(139, 92, 246, 0.12);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.96);
+  color: #6d28d9;
+  font-size: 0.8rem;
+  font-weight: 800;
+  letter-spacing: 0.03em;
+  padding: 0.48rem 0.78rem;
+  box-shadow: 0 8px 20px rgba(91, 33, 182, 0.08);
+}
+
+.prediction-rank-badge svg {
+  color: var(--prediction-accent);
+}
+
+.prediction-position-pill {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.1rem;
+  width: fit-content;
+  border-radius: 22px;
+  background: rgba(245, 243, 255, 0.92);
+  border: 1px solid rgba(139, 92, 246, 0.1);
+  padding: 0.55rem 0.75rem;
+}
+
+.prediction-position-pill span {
+  color: #7c3aed;
+  font-size: 0.66rem;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.prediction-position-pill strong {
+  color: #1f1147;
+  font-size: 1.35rem;
+  line-height: 1;
+}
+
+.prediction-runner-number {
+  margin-left: auto;
+  box-shadow:
+    0 14px 28px rgba(212, 167, 44, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.26);
+}
+
+.prediction-card-copy {
+  display: grid;
+  gap: 0.85rem;
+}
+
+.prediction-card-copy h2 {
+  margin: 0;
+  color: #130a2b;
+  font-family: "Sora", "Outfit", sans-serif;
+  font-size: clamp(1.65rem, 2.7vw, 2.25rem);
+  font-weight: 800;
+  letter-spacing: -0.05em;
+  line-height: 1.02;
+}
+
+.prediction-score-strip {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.prediction-metric {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 0.4rem;
+  border: 1px solid rgba(139, 92, 246, 0.08);
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.94);
+  padding: 0.92rem 1rem;
+}
+
+.prediction-metric-label {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  color: #7c728f;
+}
+
+.prediction-metric-label p {
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.prediction-metric-icon {
+  display: grid;
+  flex: 0 0 auto;
+  place-items: center;
+  height: 1.35rem;
+  width: 1.35rem;
+  border-radius: 999px;
+  background: rgba(139, 92, 246, 0.12);
+  color: #7c3aed;
+}
+
+.prediction-metric strong {
+  color: #130a2b;
+  font-size: 1.35rem;
+  font-weight: 800;
+  line-height: 1.05;
+}
+
+.prediction-metric--score {
+  background: linear-gradient(180deg, rgba(255, 250, 233, 0.92), rgba(255, 255, 255, 0.96));
+  border-color: rgba(212, 167, 44, 0.14);
+}
+
+.prediction-metric--confidence {
+  background: linear-gradient(180deg, rgba(244, 240, 255, 0.94), rgba(255, 255, 255, 0.96));
+  border-color: rgba(139, 92, 246, 0.14);
+}
+
+.prediction-metric--confidence strong {
+  color: var(--prediction-accent);
+}
+
+.prediction-metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.prediction-metrics-grid .prediction-metric strong {
+  font-size: 1rem;
+}
+
+.prediction-combo-panel {
+  display: grid;
+  gap: 0.85rem;
+  border: 1px solid rgba(139, 92, 246, 0.12);
+  border-radius: 26px;
+  background: rgba(250, 247, 255, 0.96);
+  padding: 1rem;
+}
+
+.prediction-section-title {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.55rem 1rem;
+}
+
+.prediction-section-title span {
+  color: #7c3aed;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.prediction-section-title strong {
+  color: #4b3c7a;
+  font-size: 0.92rem;
+  font-weight: 700;
+}
+
+.prediction-combo-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.65rem;
+}
+
+.prediction-mini-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  border: 1px solid rgba(139, 92, 246, 0.08);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.96);
+  padding: 0.78rem 0.82rem;
+}
+
+.prediction-mini-stat span {
+  color: #857aa6;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+}
+
+.prediction-mini-stat strong {
+  color: #130a2b;
+  font-size: 0.98rem;
+  font-weight: 800;
+}
+
+.prediction-footer {
+  display: grid;
+  gap: 0.85rem;
+}
+
+.prediction-key-factors {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.prediction-notes {
+  color: #5d5a72;
+  font-size: 0.95rem;
+  line-height: 1.55;
+}
+
+.prediction-action-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.prediction-weakest {
+  border: 1px solid rgba(139, 92, 246, 0.14);
+  border-radius: 999px;
+  background: rgba(245, 243, 255, 0.96);
+  color: #7c3aed;
+  font-size: 0.8rem;
+  font-weight: 700;
+  padding: 0.42rem 0.75rem;
+}
+
+.prediction-notes-card {
+  border: 1px solid rgba(139, 92, 246, 0.12);
+  border-radius: 28px;
+  background: rgba(255, 255, 255, 0.96);
+  color: #5d5a72;
+  box-shadow: 0 16px 42px rgba(91, 33, 182, 0.08);
+}
+
+.light-theme .state-panel {
+  border-color: rgba(139, 92, 246, 0.14);
+  background: rgba(255, 255, 255, 0.96);
+  color: #5d5a72;
+  box-shadow:
+    0 16px 42px rgba(91, 33, 182, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.92);
+}
+
+.light-theme .state-panel span {
+  color: #4b3c7a;
+}
+
+.light-theme .state-panel svg {
+  color: #7c3aed;
+}
+
 .page-actions {
   display: flex;
   flex-wrap: wrap;
@@ -1264,6 +1965,18 @@ input {
     width: min(100%, 560px);
     margin-inline: auto;
   }
+
+  .prediction-combo-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .races-hero-card {
+    grid-template-columns: 1fr;
+  }
+
+  .race-meta-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 @media (max-width: 720px) {
@@ -1280,6 +1993,46 @@ input {
   .detail-grid,
   .prediction-grid {
     grid-template-columns: 1fr;
+  }
+
+  .prediction-score-strip,
+  .prediction-metrics-grid,
+  .prediction-combo-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .prediction-card-head,
+  .prediction-action-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .prediction-runner-number {
+    margin-left: 0;
+  }
+
+  .races-hero-stats,
+  .race-meta-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .race-row-light,
+  .race-row-copy,
+  .race-row-action {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .race-row-heading {
+    flex-direction: column;
+  }
+
+  .race-row-action {
+    justify-content: flex-start;
+  }
+
+  .race-field-pill {
+    width: fit-content;
   }
 
   .race-row,

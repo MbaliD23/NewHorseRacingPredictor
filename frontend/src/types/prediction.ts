@@ -27,6 +27,11 @@ export type PredictionItem = {
   weight_value?: number | null;
   previous_run_rating?: number | null;
   trainer_jockey_win_percent?: number | null;
+  trainer_jockey_runs?: number | null;
+  trainer_jockey_wins?: number | null;
+  trainer_jockey_seconds?: number | null;
+  trainer_jockey_thirds?: number | null;
+  trainer_jockey_place_percent?: number | null;
   speed_index?: number | null;
   predicted_time?: number | null;
   notes?: string | null;
