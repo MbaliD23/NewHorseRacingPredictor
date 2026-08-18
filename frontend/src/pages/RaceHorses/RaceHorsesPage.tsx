@@ -9,6 +9,13 @@ import { AsyncBoundary } from "@/components/status/AsyncBoundary";
 import { useRace } from "@/hooks/useRace";
 import { formatTime, valueOrUnavailable } from "@/lib/utils";
 import { usePredictionStore, type HorseOrderBy } from "@/store/predictionStore";
+import greyvilleImg from "@/assets/greyville.png";
+import turfonteinImg from "@/assets/Turffontein.png";
+import kenilworthImg from "@/assets/Kenilworth.png";
+import scotsvilleImg from "@/assets/Scottsville.png";
+import fairviewImg from "@/assets/fairview.png";
+import vaalImg from "@/assets/Vaal.png";
+import trackConditionsImg from "@/assets/track-conditions.png";
 
 const ORDER_OPTIONS: Array<{ value: HorseOrderBy; label: string }> = [
   { value: "draw_number", label: "Draw Number (Default)" },
@@ -37,6 +44,17 @@ const formatRaceDate = (dateStr: string | null | undefined) => {
         month: "short",
         year: "numeric",
       });
+};
+
+const getVenueImage = (venueName: string | null | undefined) => {
+  const name = (venueName ?? "").toLowerCase();
+  if (name.includes("greyville")) return greyvilleImg;
+  if (name.includes("turffontein")) return turfonteinImg;
+  if (name.includes("kenilworth")) return kenilworthImg;
+  if (name.includes("scottsville")) return scotsvilleImg;
+  if (name.includes("fairview")) return fairviewImg;
+  if (name.includes("vaal")) return vaalImg;
+  return greyvilleImg;
 };
 
 export function RaceHorsesPage() {
