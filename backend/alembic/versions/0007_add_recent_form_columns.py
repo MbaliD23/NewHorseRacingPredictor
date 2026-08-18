@@ -1,9 +1,5 @@
 """add recent form columns"""
 
-from alembic import op
-import sqlalchemy as sa
-
-
 revision = "0007_add_recent_form_columns"
 down_revision = "0006_add_horse_form_entries"
 branch_labels = None

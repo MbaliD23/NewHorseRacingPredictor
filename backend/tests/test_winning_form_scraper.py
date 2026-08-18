@@ -43,6 +43,8 @@ def test_extracts_new_prediction_fields_from_source_tables():
     assert horses[0].predicted_time == 59.6
     assert horses[0].previous_run_rating == 2
     assert horses[0].trainer_jockey_win_percent == 33
+    assert horses[0].jockey_record == "12:4-1-2"
+    assert horses[0].trainer_record == "12:4-1-2"
     assert horses[0].merit_rating == 84
 
 

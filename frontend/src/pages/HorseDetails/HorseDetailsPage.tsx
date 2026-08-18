@@ -25,6 +25,7 @@ export function HorseDetailsPage() {
           horse={horse}
           raceTitle={currentRace?.title ?? undefined}
           raceNumber={currentRace?.race_number ?? undefined}
+          raceDistance={raceQuery.data?.distance ?? currentRace?.distance ?? undefined}
           venueName={currentRace?.venue ?? undefined}
         />
 

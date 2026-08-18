@@ -58,12 +58,13 @@ def run_startup_migrations() -> None:
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    await asyncio.to_thread(run_startup_migrations)
-    await monitoring_service.start()
+    monitoring_task = asyncio.create_task(monitoring_service.start())
     logger.info('application_started')
     try:
         yield
     finally:
+        if not monitoring_task.done():
+            monitoring_task.cancel()
         await monitoring_service.stop()
         await engine.dispose()
         logger.info('application_stopped')

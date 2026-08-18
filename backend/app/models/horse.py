@@ -18,6 +18,8 @@ class Horse(TimestampMixin, Base):
     weight_value: Mapped[float | None] = mapped_column(Numeric(10, 2), nullable=True)
     previous_run_rating: Mapped[float | None] = mapped_column(Numeric(10, 2), nullable=True)
     trainer_jockey_win_percent: Mapped[float | None] = mapped_column(Numeric(10, 2), nullable=True)
+    jockey_record: Mapped[str | None] = mapped_column(String(50), nullable=True)
+    trainer_record: Mapped[str | None] = mapped_column(String(50), nullable=True)
     speed_index: Mapped[float | None] = mapped_column(Numeric(10, 2), nullable=True)
     predicted_time: Mapped[float | None] = mapped_column(Numeric(10, 2), nullable=True)
     status: Mapped[str | None] = mapped_column(String(50), nullable=True)
