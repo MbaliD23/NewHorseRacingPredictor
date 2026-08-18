@@ -602,7 +602,8 @@ class WinningFormScraper:
     def _extract_form_entries(self, rows) -> list[ScrapedHorseFormEntry]:
         nested_rows = []
         for row in rows:
-            nested_rows.extend(row.find_all("tr"))
+            child_rows = row.find_all("tr")
+            nested_rows.extend(child_rows or [row])
 
         entries: list[ScrapedHorseFormEntry] = []
         index = 0

@@ -41,3 +41,8 @@ line-length = 100
 [tool.isort]
 profile = "black"
 line_length = 100
+
+[tool.pytest.ini_options]
+addopts = "-p no:cacheprovider"
+testpaths = ["tests", "test_scraper.py", "test_extended_parser.py"]
+norecursedirs = [".pytest_cache", "pytest-cache-files-*"]
