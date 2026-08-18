@@ -1,4 +1,4 @@
-import { ArrowLeft, ArrowRight } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/common/Button";
 import { GlassCard } from "@/components/common/GlassCard";
@@ -102,22 +102,6 @@ export function PredictionResultsPage() {
         ) : null}
       </AsyncBoundary>
 
-      <div className="page-actions mt-auto">
-        <Button
-          variant="outline"
-          size="lg"
-          onClick={() => {
-            if (currentRace?.id) {
-              navigate(`/analysis/${currentRace.id}`);
-            } else {
-              navigate(-1);
-            }
-          }}
-        >
-          <ArrowLeft className="h-6 w-6" />
-          Previous
-        </Button>
-      </div>
     </section>
   );
 }

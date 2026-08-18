@@ -1,10 +1,9 @@
 import { useMemo, useState } from "react";
-import { ArrowLeft, Clock, Sparkles, MapPin, Calendar, Users, Activity, Compass, Trophy } from "lucide-react";
+import { Clock, Sparkles, MapPin, Calendar, Users, Activity, Compass, Trophy } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/components/common/Button";
 import { SilksRenderer } from "@/components/horse/SilksRenderer";
 import { sortHorses } from "@/lib/horseOrdering";
-import { BackButton } from "@/components/navigation/BackButton";
 import { AsyncBoundary } from "@/components/status/AsyncBoundary";
 import { useRace } from "@/hooks/useRace";
 import { formatTime, valueOrUnavailable } from "@/lib/utils";
@@ -66,14 +65,8 @@ export function RaceHorsesPage() {
 
   return (
     <section className="flex flex-col h-[100dvh] w-full bg-[#FAFAFA] text-slate-900 overflow-hidden font-sans">
-      <div className="bg-white rounded-b-3xl shadow-sm pb-0 z-10">
+      <div className="bg-white rounded-b-3xl shadow-sm pb-0 z-10 pl-16 sm:pl-20 md:pl-24">
         <header className="flex items-center gap-3 p-4 pb-2">
-          <button 
-            onClick={() => navigate(-1)} 
-            className="flex h-10 w-10 items-center justify-center rounded-full hover:bg-slate-100 transition-colors -ml-2"
-          >
-            <ArrowLeft className="h-6 w-6 text-slate-900" />
-          </button>
           <h1 className="text-[22px] leading-none font-bold text-slate-900 tracking-tight">
             Race {race?.race_number ?? ""} &ndash; {valueOrUnavailable(race?.title)}
           </h1>
@@ -295,9 +288,7 @@ export function RaceHorsesPage() {
       </AsyncBoundary>
 
       <div className="w-full bg-white border-t border-slate-100 px-4 py-4 pb-safe-offset-4 z-20">
-        <div className="flex items-center justify-between gap-4 max-w-4xl mx-auto">
-          <BackButton label="Back" showLabel className="analysis-back light-pill-btn shrink-0" />
-          
+        <div className="flex items-center justify-end gap-4 max-w-4xl mx-auto">
           <Button 
             size="lg" 
             className="prediction-cta solid-purple-btn flex-1 max-w-sm" 

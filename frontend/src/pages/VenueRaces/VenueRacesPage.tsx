@@ -4,7 +4,6 @@ import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/components/common/Button";
 import { FilterPills } from "@/components/common/FilterPills";
 import { GlassCard } from "@/components/common/GlassCard";
-import { BackButton } from "@/components/navigation/BackButton";
 import { AsyncBoundary } from "@/components/status/AsyncBoundary";
 import { useRaces } from "@/hooks/useRaces";
 import { formatDate, formatTime, valueOrUnavailable } from "@/lib/utils";
@@ -81,7 +80,6 @@ export function VenueRacesPage() {
           ))}
         </div>
         <div className="page-actions">
-          <BackButton label="Back to locations" />
           <Button
             size="lg"
             onClick={() => {

@@ -1,14 +1,49 @@
 import type { PropsWithChildren } from "react";
 import { useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { matchPath, useLocation } from "react-router-dom";
+import { BackButton } from "@/components/navigation/BackButton";
 import { useStatus } from "@/hooks/useStatus";
 import { formatDate, formatTime } from "@/lib/utils";
+import { usePredictionStore } from "@/store/predictionStore";
 
 export function AppShell({ children }: PropsWithChildren) {
   const { data } = useStatus();
   const [liveClock, setLiveClock] = useState(() => new Date());
   const location = useLocation();
+  const currentVenue = usePredictionStore((state) => state.currentVenue);
+  const currentRace = usePredictionStore((state) => state.currentRace);
   const showHeaderLogo = location.pathname !== "/";
+  const showWorkflowBackButton = location.pathname !== "/";
+
+  const backFallback = (() => {
+    const pathname = location.pathname;
+
+    if (matchPath("/venues/:venueId", pathname)) {
+      return "/";
+    }
+
+    if (matchPath("/races/:raceId", pathname)) {
+      return currentVenue?.id ? `/venues/${currentVenue.id}` : "/";
+    }
+
+    if (matchPath("/horses/:horseId", pathname)) {
+      return currentRace?.id ? `/races/${currentRace.id}` : "/";
+    }
+
+    if (matchPath("/analysis/:raceId", pathname)) {
+      return currentRace?.id ? `/races/${currentRace.id}` : "/";
+    }
+
+    if (matchPath("/predictions/results", pathname)) {
+      return currentRace?.id ? `/analysis/${currentRace.id}` : "/";
+    }
+
+    if (matchPath("/predictions/horses/:horseId", pathname)) {
+      return "/predictions/results";
+    }
+
+    return "/";
+  })();
 
   useEffect(() => {
     const timer = window.setInterval(() => {
@@ -38,7 +73,19 @@ export function AppShell({ children }: PropsWithChildren) {
           </div>
         </div>
       </header>
-      <div className="relative z-10 mx-auto w-full max-w-[1680px] px-5 pb-8 md:px-8 lg:px-10">{children}</div>
+      <div className="relative z-10 mx-auto w-full max-w-[1680px] px-5 pb-8 md:px-8 md:pb-10 lg:px-10">
+        {showWorkflowBackButton ? (
+          <div className="pointer-events-none fixed left-4 top-[4.75rem] z-50 sm:left-6 md:left-8">
+            <BackButton
+              label="Back"
+              showLabel
+              fallbackTo={backFallback}
+              className="pointer-events-auto"
+            />
+          </div>
+        ) : null}
+        {children}
+      </div>
     </main>
   );
 }

@@ -3,7 +3,6 @@ import { BarChart3, Check, Clock, Gauge, Goal, Info, Scale, Sparkles, Trophy } f
 import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/components/common/Button";
 import { GlassCard } from "@/components/common/GlassCard";
-import { BackButton } from "@/components/navigation/BackButton";
 import { AsyncBoundary } from "@/components/status/AsyncBoundary";
 import { usePrediction } from "@/hooks/usePrediction";
 import { useRace } from "@/hooks/useRace";
@@ -200,8 +199,6 @@ export function AnalysisFactorsPage() {
         </div>
 
         <div className="analysis-bottom-section">
-          <BackButton label="Back" showLabel className="analysis-back light-pill-btn" />
-          
           <div className="bottom-selected-container light-pill-container">
             <span className="selected-container-title">SELECTED FACTORS <span className="text-purple-600">({selectedVariables.length}/3)</span></span>
             <div className="bottom-selected-bar">
