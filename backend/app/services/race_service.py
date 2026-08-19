@@ -65,6 +65,8 @@ class RaceService:
             trainer_jockey_win_percent=float(horse.trainer_jockey_win_percent)
             if horse.trainer_jockey_win_percent is not None
             else None,
+            jockey_record=horse.jockey_record,
+            trainer_record=horse.trainer_record,
             speed_index=float(horse.speed_index)
             if horse.speed_index is not None
             else None,
@@ -124,29 +126,61 @@ class RaceService:
     async def list_venues(self) -> list[VenueView]:
         meetings = await self.race_repo.list_meetings()
         payload = []
+        fallback_payload = []
 
         for meeting in meetings:
-            races = []
+            current_races = []
+            all_races = []
             for race in sorted(meeting.races, key=lambda item: item.race_number):
                 race_view = self._race_card_view(race)
+                all_races.append(race_view)
                 if not race_view.is_past:
-                    races.append(race_view)
+                    current_races.append(race_view)
 
-            if not races:
+            if not all_races:
                 continue
 
-            payload.append(
+            venue_view = VenueView(
+                id=meeting.id,
+                venue=meeting.venue,
+                meeting_date=meeting.meeting_date.isoformat()
+                if meeting.meeting_date
+                else None,
+                races=current_races,
+            )
+
+            if current_races:
+                payload.append(venue_view)
+
+            fallback_payload.append(
                 VenueView(
                     id=meeting.id,
                     venue=meeting.venue,
                     meeting_date=meeting.meeting_date.isoformat()
                     if meeting.meeting_date
                     else None,
-                    races=races,
+                    races=all_races,
                 )
             )
 
-        return payload
+        if payload:
+            return payload
+
+        if not fallback_payload:
+            return []
+
+        latest_meeting_date = max(
+            (meeting.meeting_date for meeting in meetings if meeting.meeting_date),
+            default=None,
+        )
+        if latest_meeting_date is None:
+            return fallback_payload
+
+        return [
+            venue
+            for venue in fallback_payload
+            if venue.meeting_date == latest_meeting_date.isoformat()
+        ]
 
     async def list_archived_venues(self) -> list[VenueView]:
         meetings = await self.race_repo.list_meetings()

@@ -78,6 +78,8 @@ class ScrapeService:
                 weight_value=horse.weight_value,
                 previous_run_rating=horse.previous_run_rating,
                 trainer_jockey_win_percent=horse.trainer_jockey_win_percent,
+                jockey_record=horse.jockey_record,
+                trainer_record=horse.trainer_record,
                 speed_index=horse.speed_index,
                 predicted_time=horse.predicted_time,
                 scratched=horse.scratched,
@@ -208,6 +210,13 @@ class ScrapeService:
                 meetings_seen.add(meeting_external_id)
                 horses_removed += removed
                 races_ingested += 1
+
+            if races_ingested == 0:
+                return await self._sync_sample_race(
+                    RuntimeError(
+                        f"live_scrape_returned_no_races; race_urls_found={len(race_urls)}"
+                    )
+                )
 
             await self.scrape_repo.add(
                 ScrapeHistory(

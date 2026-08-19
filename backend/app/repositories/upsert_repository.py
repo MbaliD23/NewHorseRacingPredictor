@@ -32,6 +32,8 @@ HORSE_OVERWRITE_FIELDS = {
     "weight_value",
     "previous_run_rating",
     "trainer_jockey_win_percent",
+    "jockey_record",
+    "trainer_record",
     "speed_index",
     "predicted_time",
     "scratched",
