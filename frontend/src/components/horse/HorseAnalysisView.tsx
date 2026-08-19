@@ -525,7 +525,7 @@ export function HorseAnalysisView({
   ];
 
   return (
-    <div className="mx-auto w-full max-w-5xl px-2 py-4 text-gray-800 sm:px-4">
+    <div className="mx-auto w-full max-w-7xl px-2 py-4 text-gray-800 sm:px-4 lg:px-6">
       <div className="space-y-6 rounded-3xl border border-purple-100/80 bg-white p-4 shadow-[0_10px_40px_rgba(139,92,246,0.06)] sm:p-7">
         <div className="flex items-center justify-between pb-2">
           <div className="flex items-center gap-3">
@@ -577,8 +577,7 @@ export function HorseAnalysisView({
           </button>
         </div>
 
-        <div className="grid items-stretch gap-6 lg:grid-cols-[1.4fr_0.9fr]">
-
+        <div className="grid gap-6 lg:grid-cols-[minmax(0,1.25fr)_minmax(320px,0.75fr)]">
           <SectionCard icon={User} title="Horse Profile">
             {/* SCROLLABLE PAGES */}
             <div

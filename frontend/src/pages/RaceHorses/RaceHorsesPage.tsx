@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { Activity, ArrowRight, Calendar, Clock, Compass, Sparkles, Trophy, Users } from "lucide-react";
+import { Activity, ArrowRight, Calendar, Clock, Compass, MapPin, Sparkles } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/components/common/Button";
 import { GlassCard } from "@/components/common/GlassCard";
@@ -95,10 +95,7 @@ export function RaceHorsesPage() {
                 Race {race?.race_number ?? ""}
               </span>
               <span className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1.5 text-slate-600">
-                {valueOrUnavailable(race?.distance)}
-              </span>
-              <span className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1.5 text-slate-600">
-                {valueOrUnavailable(race?.surface)}
+                {runnerCount} runners
               </span>
               <div className="ml-auto flex items-center gap-1.5 rounded-full border border-violet-200 bg-white px-2.5 py-1 text-[11px] font-bold tracking-wider text-[#6A2DF1] uppercase">
                 <div className="h-2 w-2 rounded-full bg-[#6A2DF1] animate-pulse" />
@@ -117,12 +114,6 @@ export function RaceHorsesPage() {
                 <p className="mt-3 max-w-3xl text-sm leading-relaxed text-slate-500 sm:text-base">
                   {valueOrUnavailable(race?.venue)} · {raceStatus}
                 </p>
-              </div>
-
-              <div className="grid gap-3 sm:grid-cols-3 xl:min-w-[560px]">
-                <InfoStat label="Post time" value={formatTime(race?.race_time)} />
-                <InfoStat label="Distance" value={valueOrUnavailable(race?.distance)} />
-                <InfoStat label="Field" value={`${runnerCount} runners`} />
               </div>
             </div>
           </div>
@@ -145,9 +136,7 @@ export function RaceHorsesPage() {
               </div>
               <div className="grid gap-4 bg-white p-5 sm:grid-cols-2 sm:p-6">
                 <InfoTile icon={Calendar} label="Meeting date" value={formatRaceDate(race?.meeting_date)} />
-                <InfoTile icon={Clock} label="Post time" value={formatTime(race?.race_time)} />
-                <InfoTile icon={Compass} label="Surface" value={valueOrUnavailable(race?.surface)} />
-                <InfoTile icon={Trophy} label="Declared field" value={`${runnerCount} runners`} />
+                <InfoTile icon={MapPin} label="Venue" value={valueOrUnavailable(race?.venue)} />
               </div>
             </GlassCard>
 
@@ -169,8 +158,6 @@ export function RaceHorsesPage() {
               <div className="grid gap-4 bg-white p-5 sm:grid-cols-2 sm:p-6">
                 <InfoTile icon={Activity} label="Distance" value={valueOrUnavailable(race?.distance)} />
                 <InfoTile icon={Compass} label="Surface" value={valueOrUnavailable(race?.surface)} />
-                <InfoTile icon={Users} label="Field size" value={`${runnerCount} runners`} />
-                <InfoTile icon={Trophy} label="Status" value={raceStatus} />
               </div>
             </GlassCard>
           </div>
@@ -277,16 +264,6 @@ export function RaceHorsesPage() {
     </section>
   );
 }
-
-function InfoStat({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
-      <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-slate-400">{label}</p>
-      <p className="mt-1 text-lg font-black text-slate-950">{value}</p>
-    </div>
-  );
-}
-
 function InfoTile({
   icon: Icon,
   label,
