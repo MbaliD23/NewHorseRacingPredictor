@@ -34,6 +34,8 @@ class HorseView(BaseModel):
     weight_value: float | None = None
     previous_run_rating: float | None = None
     trainer_jockey_win_percent: float | None = None
+    jockey_record: str | None = None
+    trainer_record: str | None = None
     speed_index: float | None = None
     predicted_time: float | None = None
     scratched: bool

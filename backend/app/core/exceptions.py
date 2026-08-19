@@ -1,6 +1,11 @@
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 
+from app.core.logging import get_logger
+
+
+logger = get_logger(__name__)
+
 
 class AppException(Exception):
     def __init__(self, message: str, status_code: int = 400):
@@ -14,6 +19,7 @@ async def app_exception_handler(_: Request, exc: AppException) -> JSONResponse:
 
 
 async def generic_exception_handler(_: Request, exc: Exception) -> JSONResponse:
+    logger.exception("unhandled_request_error")
     return JSONResponse(status_code=500, content={'detail': 'An unexpected error occurred.', 'error': str(exc)})
 
 

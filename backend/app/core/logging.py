@@ -13,6 +13,7 @@ def configure_logging(level: str = 'INFO') -> None:
             RotatingFileHandler(logs_dir / 'app.log', maxBytes=1_000_000, backupCount=5),
             logging.StreamHandler(),
         ],
+        force=True,
     )
 
 

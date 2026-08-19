@@ -44,11 +44,25 @@ def upgrade() -> None:
             "horses",
             sa.Column("trainer_jockey_place_percent", sa.Numeric(10, 2), nullable=True),
         )
+    if "jockey_record" not in existing_columns:
+        op.add_column(
+            "horses",
+            sa.Column("jockey_record", sa.String(length=50), nullable=True),
+        )
+    if "trainer_record" not in existing_columns:
+        op.add_column(
+            "horses",
+            sa.Column("trainer_record", sa.String(length=50), nullable=True),
+        )
 
 
 def downgrade() -> None:
     existing_columns = _horse_columns()
 
+    if "trainer_record" in existing_columns:
+        op.drop_column("horses", "trainer_record")
+    if "jockey_record" in existing_columns:
+        op.drop_column("horses", "jockey_record")
     if "trainer_jockey_place_percent" in existing_columns:
         op.drop_column("horses", "trainer_jockey_place_percent")
     if "trainer_jockey_thirds" in existing_columns:

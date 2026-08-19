@@ -70,6 +70,8 @@ class ScrapedHorse:
     weight_value: float | None = None
     previous_run_rating: float | None = None
     trainer_jockey_win_percent: float | None = None
+    jockey_record: str | None = None
+    trainer_record: str | None = None
     speed_index: float | None = None
     predicted_time: float | None = None
     scratched: bool = False
@@ -325,7 +327,7 @@ class WinningFormScraper:
         stated_runners: int | None,
     ) -> list[ScrapedHorse]:
         candidates: list[tuple[dict, list[ScrapedHorse]]] = []
-        combo_win_percentages = self._extract_trainer_jockey_combo_win_percentages(soup)
+        combo_stats = self._extract_trainer_jockey_combo_stats(soup)
         extended_data = self._extract_extended_horse_data(soup)
 
         for table in soup.find_all("table"):
@@ -361,7 +363,7 @@ class WinningFormScraper:
                 col_map,
                 race_external_id,
                 stated_runners,
-                combo_win_percentages,
+                combo_stats,
                 extended_data,
             )
             if horses:
@@ -393,7 +395,7 @@ class WinningFormScraper:
         col_map: dict[str, int],
         race_external_id: str,
         stated_runners: int | None = None,
-        combo_win_percentages: dict[int, float] | None = None,
+        combo_stats: dict[int, dict[str, float | str]] | None = None,
         extended_data: dict[str, dict] | None = None,
     ) -> list[ScrapedHorse]:
         horses: list[ScrapedHorse] = []
@@ -433,6 +435,8 @@ class WinningFormScraper:
             )
 
             ext = extended_data.get(self._pretty_name(raw_name).lower(), {}) if extended_data else {}
+            team_stats = combo_stats.get(runner_number, {}) if combo_stats and runner_number is not None else {}
+            team_record = team_stats.get("record")
 
             horses.append(
                 ScrapedHorse(
@@ -450,10 +454,12 @@ class WinningFormScraper:
                     ),
                     previous_run_rating=self._as_float(previous_run_cell, 0, 30),
                     trainer_jockey_win_percent=(
-                        combo_win_percentages.get(runner_number)
-                        if combo_win_percentages and runner_number is not None
+                        float(team_stats["win_percent"])
+                        if "win_percent" in team_stats
                         else None
                     ),
+                    jockey_record=team_record if isinstance(team_record, str) else None,
+                    trainer_record=team_record if isinstance(team_record, str) else None,
                     speed_index=speed_index,
                     predicted_time=predicted_time,
                     scratched=scratched,
@@ -602,8 +608,7 @@ class WinningFormScraper:
     def _extract_form_entries(self, rows) -> list[ScrapedHorseFormEntry]:
         nested_rows = []
         for row in rows:
-            child_rows = row.find_all("tr")
-            nested_rows.extend(child_rows or [row])
+            nested_rows.extend(row.find_all("tr"))
 
         entries: list[ScrapedHorseFormEntry] = []
         index = 0
@@ -688,14 +693,14 @@ class WinningFormScraper:
 
         return match.group("name").strip(), match.group("weight")
 
-    def _extract_trainer_jockey_combo_win_percentages(
+    def _extract_trainer_jockey_combo_stats(
         self, soup: BeautifulSoup
-    ) -> dict[int, float]:
+    ) -> dict[int, dict[str, float | str]]:
         compact = " ".join(soup.get_text(" ", strip=True).split())
         if "Trainer/Jockey Combinations" not in compact:
             return {}
 
-        result: dict[int, float] = {}
+        result: dict[int, dict[str, float | str]] = {}
         pattern = re.compile(
             r"(?P<number>\d{1,2})\s+"
             r"(?P<trainer>[A-Za-z][A-Za-z' .-]{0,30})\s+"
@@ -713,11 +718,27 @@ class WinningFormScraper:
         section = section.split("CUMULATIVE", 1)[0]
         for match in pattern.finditer(section):
             runner_number = int(match.group("number"))
+            runs = int(match.group("runs"))
+            first = int(match.group("first"))
+            second = int(match.group("second"))
+            third = int(match.group("third"))
             win_percent = float(match.group("win"))
             if 0 <= win_percent <= 100:
-                result[runner_number] = win_percent
+                result[runner_number] = {
+                    "record": f"{runs}:{first}-{second}-{third}",
+                    "win_percent": win_percent,
+                }
 
         return result
+
+    def _extract_trainer_jockey_combo_win_percentages(
+        self, soup: BeautifulSoup
+    ) -> dict[int, float]:
+        return {
+            runner_number: float(stats["win_percent"])
+            for runner_number, stats in self._extract_trainer_jockey_combo_stats(soup).items()
+            if "win_percent" in stats
+        }
 
     def _pretty_name(self, value: str) -> str:
         text = self._clean_text(value).lower()

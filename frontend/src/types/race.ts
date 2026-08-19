@@ -65,6 +65,8 @@ export type Horse = {
   weight_value: number | null;
   previous_run_rating: number | null;
   trainer_jockey_win_percent: number | null;
+  jockey_record: string | null;
+  trainer_record: string | null;
   speed_index: number | null;
   predicted_time: number | null;
   scratched: boolean;
