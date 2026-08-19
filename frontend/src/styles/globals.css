@@ -24,6 +24,19 @@ input {
   font: inherit;
 }
 
+.no-scrollbar,
+.scrollbar-none {
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+.no-scrollbar::-webkit-scrollbar,
+.scrollbar-none::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+
 .workflow-back-button {
   min-height: 3.25rem;
   min-width: 3.25rem;
