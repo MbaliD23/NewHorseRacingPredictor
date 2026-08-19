@@ -525,8 +525,8 @@ export function HorseAnalysisView({
   ];
 
   return (
-    <div className="mx-auto w-full max-w-7xl px-2 py-4 text-gray-800 sm:px-4 lg:px-6">
-      <div className="space-y-6 rounded-3xl border border-purple-100/80 bg-white p-4 shadow-[0_10px_40px_rgba(139,92,246,0.06)] sm:p-7">
+    <div className="w-full text-gray-800 p-1 sm:p-1.5">
+      <div className="space-y-4 sm:space-y-5 rounded-3xl border border-purple-100/80 bg-white p-3.5 sm:p-5 shadow-[0_10px_40px_rgba(139,92,246,0.06)]">
         <div className="flex items-center justify-between pb-2">
           <div className="flex items-center gap-3">
             <button
@@ -565,19 +565,39 @@ export function HorseAnalysisView({
             </div>
           </div>
 
-          <button
-            onClick={() => setIsFavorite(!isFavorite)}
-            className={`flex h-10 w-10 items-center justify-center rounded-full border transition-all ${isFavorite
-              ? "border-red-200 bg-red-50 text-red-500"
-              : "border-gray-200 bg-white text-gray-400 hover:text-red-500"
-              }`}
-            aria-label="Favorite horse"
-          >
-            <Heart className={`h-5 w-5 ${isFavorite ? "fill-current" : ""}`} />
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => navigate("/bar-analytics")}
+              className="flex items-center gap-1.5 h-9 px-4 rounded-full text-xs font-bold text-white transition-all
+                bg-gradient-to-r from-purple-700 to-indigo-600
+                shadow-md shadow-purple-600/25
+                hover:from-purple-600 hover:to-indigo-500 hover:shadow-purple-500/40
+                active:scale-95 cursor-pointer"
+              aria-label="Compare all 5 horses on bar chart"
+            >
+              <svg width="13" height="13" viewBox="0 0 13 13" fill="none" aria-hidden="true">
+                <rect x="1" y="5" width="2" height="7" rx="1" fill="currentColor" opacity="0.7" />
+                <rect x="4.5" y="3" width="2" height="9" rx="1" fill="currentColor" />
+                <rect x="8" y="1" width="2" height="11" rx="1" fill="currentColor" opacity="0.7" />
+                <rect x="11.5" y="4" width="1.5" height="8" rx="0.75" fill="currentColor" opacity="0.5" />
+              </svg>
+              Compare 5
+            </button>
+
+            <button
+              onClick={() => setIsFavorite(!isFavorite)}
+              className={`flex h-10 w-10 items-center justify-center rounded-full border transition-all ${isFavorite
+                ? "border-red-200 bg-red-50 text-red-500"
+                : "border-gray-200 bg-white text-gray-400 hover:text-red-500"
+                }`}
+              aria-label="Favorite horse"
+            >
+              <Heart className={`h-5 w-5 ${isFavorite ? "fill-current" : ""}`} />
+            </button>
+          </div>
         </div>
 
-        <div className="grid gap-6 lg:grid-cols-[minmax(0,1.25fr)_minmax(320px,0.75fr)]">
+        <div className="grid gap-4 grid-cols-1 md:grid-cols-2 2xl:grid-cols-2">
           <SectionCard icon={User} title="Horse Profile">
             {/* SCROLLABLE PAGES */}
             <div
@@ -607,13 +627,13 @@ export function HorseAnalysisView({
             </div>
 
             {/* PAGE DOTS */}
-            <div className="flex items-center justify-center gap-2 pt-4">
+            <div className="flex items-center justify-center gap-2 pt-3">
               <button
                 type="button"
                 onClick={() => goToProfilePage(0)}
                 aria-label="Show horse profile"
                 className={`h-2.5 w-2.5 rounded-full transition-all ${profilePage === 0
-                  ? "bg-purple-700"
+                  ? "bg-purple-700 scale-110"
                   : "bg-gray-300 hover:bg-purple-300"
                   }`}
               />
@@ -623,7 +643,7 @@ export function HorseAnalysisView({
                 onClick={() => goToProfilePage(1)}
                 aria-label="Show horse pedigree"
                 className={`h-2.5 w-2.5 rounded-full transition-all ${profilePage === 1
-                  ? "bg-purple-700"
+                  ? "bg-purple-700 scale-110"
                   : "bg-gray-300 hover:bg-purple-300"
                   }`}
               />
@@ -631,23 +651,21 @@ export function HorseAnalysisView({
           </SectionCard>
 
           <SectionCard icon={Palette} title="Jockey Colours">
-            <div className="space-y-4">
-
-              <div className="flex justify-center py-2">
+            <div className="flex flex-col items-center justify-between h-full space-y-3">
+              <div className="flex justify-center py-1 shrink-0">
                 <SilksRenderer
                   description={horse?.silks}
-                  className="h-28 w-28"
+                  className="h-24 w-24 sm:h-28 sm:w-28"
                 />
               </div>
 
-              <p className="rounded-2xl border border-purple-100 bg-purple-50/70 p-4 text-sm leading-relaxed text-purple-950">
+              <p className="w-full rounded-xl border border-purple-100 bg-purple-50/70 p-3 text-xs sm:text-sm leading-relaxed text-purple-950 font-medium text-center break-words">
                 {valueOrDash(horse?.silks)}
               </p>
-
             </div>
           </SectionCard>
-
         </div>
+
 
         <div className="grid gap-6">
           <SectionCard icon={User} title="The Team">
@@ -822,12 +840,12 @@ function SectionCard({
   children: ReactNode;
 }) {
   return (
-    <section className="rounded-2xl border border-purple-100/70 bg-white p-5 sm:p-6">
-      <div className="mb-5 flex items-center gap-2.5">
-        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-purple-100 text-purple-700">
-          <Icon className="h-5 w-5" />
+    <section className="rounded-2xl border border-purple-100/70 bg-white p-4 sm:p-5 shadow-xs">
+      <div className="mb-4 flex items-center gap-2.5">
+        <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-purple-100 text-purple-700">
+          <Icon className="h-4 w-4" />
         </div>
-        <h2 className="text-lg font-bold text-purple-900">{title}</h2>
+        <h2 className="text-base sm:text-lg font-bold text-purple-900">{title}</h2>
       </div>
       {children}
     </section>
@@ -836,21 +854,27 @@ function SectionCard({
 
 function DetailsGrid({ rows }: { rows: LabelValue[] }) {
   return (
-    <div className="grid gap-3 sm:grid-cols-2">
+    <div className="grid gap-2.5 grid-cols-1 sm:grid-cols-2">
       {rows.map((row) => (
         <div
           key={row.label}
-          className="rounded-2xl border border-gray-100 bg-gray-50/60 px-4 py-3"
+          className="flex flex-col justify-center rounded-xl border border-gray-100 bg-gray-50/70 px-3.5 py-2.5 min-w-0 transition-colors"
         >
-          <p className="text-xs font-semibold uppercase tracking-[0.12em] text-gray-500">
+          <p className="text-[11px] font-bold uppercase tracking-wider text-gray-500">
             {row.label}
           </p>
-          <p className="mt-1 text-sm font-bold text-gray-900">{row.value}</p>
+          <p
+            className="mt-0.5 text-xs sm:text-sm font-extrabold text-gray-900 break-words leading-snug"
+            title={row.value}
+          >
+            {row.value}
+          </p>
         </div>
       ))}
     </div>
   );
 }
+
 
 function MetricTile({
   icon: Icon,

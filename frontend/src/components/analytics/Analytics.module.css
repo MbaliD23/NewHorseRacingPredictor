@@ -1,0 +1,527 @@
+/* ================================================================
+   Analytics.module.css  –  Horse Deep-Dive Analytics Dashboard
+   Fixed per-horse colors, Radar (max 2) + Bar Graph
+   ================================================================ */
+
+/* ── Page wrapper ─────────────────────────────────────────────── */
+.page {
+  min-height: 100%;
+  width: 100%;
+  background: #0B1220;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 24px 20px 40px;
+  position: relative;
+  box-sizing: border-box;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 0.5s cubic-bezier(0.4,0,0.2,1),
+              transform 0.5s cubic-bezier(0.4,0,0.2,1);
+  border-radius: 24px;
+  overflow: hidden;
+}
+
+.pageVisible { opacity: 1; transform: translateY(0); }
+
+/* Embedded / Split view variant for embedded container inside split screen */
+.splitSection {
+  width: 100%;
+  min-height: 100%;
+  height: auto;
+  display: flex;
+  flex-direction: column;
+  background: transparent;
+  border-radius: 0;
+  padding: 0;
+  box-sizing: border-box;
+  position: relative;
+  transform: none !important;
+}
+
+/* Ambient glow orbs */
+.orb1 {
+  position: fixed; top: -180px; left: -120px;
+  width: 560px; height: 560px;
+  background: radial-gradient(circle, rgba(59,130,246,0.09) 0%, transparent 65%);
+  pointer-events: none;
+  animation: orbPulse 9s ease-in-out infinite; z-index: 0;
+}
+.orb2 {
+  position: fixed; bottom: -120px; right: -100px;
+  width: 480px; height: 480px;
+  background: radial-gradient(circle, rgba(99,102,241,0.07) 0%, transparent 65%);
+  pointer-events: none;
+  animation: orbPulse 12s ease-in-out infinite reverse; z-index: 0;
+}
+@keyframes orbPulse {
+  0%,100% { opacity: 0.5; transform: scale(1); }
+  50%      { opacity: 1;   transform: scale(1.08); }
+}
+
+/* ── Main layout ─────────────────────────────────────────────── */
+.layout {
+  width: 100%; max-width: 1280px;
+  display: flex; flex-direction: column;
+  gap: 14px; position: relative; z-index: 1;
+}
+
+/* ================================================================
+   TOP CARD
+   ================================================================ */
+.topCard {
+  background: #131E2F;
+  border: 1px solid rgba(148,163,184,0.10);
+  border-radius: 18px;
+  box-shadow:
+    0 0 0 1px rgba(59,130,246,0.05),
+    0 20px 60px rgba(0,0,0,0.50),
+    inset 0 1px 0 rgba(255,255,255,0.04);
+  /* No overflow:hidden – dropdown popovers must escape */
+}
+
+
+/* ── Top bar: title left | controls right ─────────────────────── */
+.topBar {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 18px 28px 14px;
+  border-bottom: 1px solid rgba(148,163,184,0.08);
+  gap: 20px;
+  flex-wrap: wrap;
+}
+.topBarLeft {
+  display: flex; flex-direction: column; gap: 5px; flex: 1; min-width: 0;
+}
+
+/* On Chart panel – now lives in the header left slot */
+.onChartHeader {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+  min-width: 0;
+  padding-top: 2px;
+}
+.onChartHeaderTitle {
+  font-size: 20px; font-weight: 700; color: #FFFFFF;
+  letter-spacing: 0.3px;
+  font-family: 'Outfit','Inter',sans-serif;
+}
+.onChartHeaderHorses {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.onChartHeaderRow {
+  display: flex; align-items: center; gap: 7px;
+}
+.onChartHeaderName {
+  font-size: 12px; font-weight: 600; color: #94A3B8;
+  font-family: 'Outfit','Inter',sans-serif;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  max-width: 220px;
+}
+
+/* Controls column – chart type + filter metrics stacked */
+.topBarControls {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex-shrink: 0;
+  width: 195px;
+  padding-top: 2px;
+}
+
+.analyticsBadge {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: rgba(59,130,246,0.10); border: 1px solid rgba(59,130,246,0.22);
+  color: #60A5FA; font-size: 9.5px; font-weight: 700; letter-spacing: 1.2px;
+  padding: 3px 10px; border-radius: 20px; text-transform: uppercase; width: fit-content;
+}
+.analyticsDot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: #3B82F6; box-shadow: 0 0 5px #3B82F6;
+  animation: dotPulse 2s ease-in-out infinite;
+}
+@keyframes dotPulse {
+  0%,100% { opacity: 1; transform: scale(1); }
+  50%      { opacity: 0.5; transform: scale(0.75); }
+}
+.mainTitle {
+  font-family: 'Outfit','Inter',sans-serif;
+  font-size: 18px; font-weight: 800; color: #E2E8F0;
+  letter-spacing: 0.4px; line-height: 1.2;
+  transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
+}
+
+/* ── Chart body: full-width canvas ── */
+.chartBody {
+  position: relative;
+  padding: 16px 20px 20px;
+  height: 500px;
+  overflow: hidden;
+}
+
+/* CENTER – canvas holds the chart, fills full chartBody */
+.chartCanvas {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+
+
+/* ── Dropdown trigger: Filter Metrics ────────────────────────── */
+.dropdownWrap { position: relative; }
+
+.dropdownTrigger {
+  display: inline-flex; align-items: center; gap: 7px;
+  background: rgba(59,130,246,0.08); border: 1px solid rgba(59,130,246,0.22);
+  color: #60A5FA; font-size: 12px; font-weight: 600;
+  padding: 8px 13px; border-radius: 9px; cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4,0,0.2,1);
+  font-family: 'Outfit','Inter',sans-serif; white-space: nowrap; width: 100%;
+  justify-content: space-between;
+}
+.dropdownTrigger:hover { background: rgba(59,130,246,0.14); border-color: rgba(59,130,246,0.35); }
+.dropdownTriggerOpen   { background: rgba(59,130,246,0.16); border-color: rgba(59,130,246,0.40); box-shadow: 0 0 0 3px rgba(59,130,246,0.08); }
+.dropdownCount {
+  background: rgba(59,130,246,0.20); color: #93C5FD;
+  font-size: 10px; font-weight: 700; padding: 1px 6px; border-radius: 10px; margin-left: 2px;
+}
+
+/* ── Dropdown panel (metrics) ─────────────────────────────────── */
+.dropdownPanel {
+  position: absolute; right: 0; top: calc(100% + 8px);
+  background: #1A2840; border: 1px solid rgba(59,130,246,0.20);
+  border-radius: 13px; padding: 6px; min-width: 195px;
+  box-shadow: 0 0 0 1px rgba(59,130,246,0.06), 0 20px 50px rgba(0,0,0,0.60), 0 4px 16px rgba(0,0,0,0.35);
+  z-index: 300; animation: dropIn 0.2s cubic-bezier(0.34,1.2,0.64,1);
+}
+@keyframes dropIn {
+  from { opacity: 0; transform: translateY(-10px) scale(0.96); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+.dropdownHeader  { display: flex; align-items: baseline; justify-content: space-between; padding: 6px 10px 4px; }
+.dropdownTitle   { font-size: 10px; font-weight: 700; color: #64748B; text-transform: uppercase; letter-spacing: 1px; }
+.dropdownSubtitle{ font-size: 9.5px; color: #334155; font-style: italic; }
+.dropdownDivider { height: 1px; background: rgba(148,163,184,0.08); margin: 4px 2px; }
+
+.dropdownItem {
+  display: flex; align-items: center; gap: 9px; width: 100%;
+  padding: 8px 10px; border-radius: 8px; cursor: pointer;
+  font-size: 12.5px; color: #64748B; font-weight: 500;
+  transition: all 0.15s ease; background: none; border: none;
+  font-family: 'Outfit','Inter',sans-serif; text-align: left;
+}
+.dropdownItem:hover        { background: rgba(59,130,246,0.06); color: #CBD5E1; }
+.dropdownItemActive        { color: #93C5FD; }
+.dropdownItemActive:hover  { background: rgba(59,130,246,0.12); }
+.dropdownItemDisabled      { opacity: 0.38; cursor: not-allowed; }
+.dropdownCheck {
+  width: 16px; height: 16px; border-radius: 4px;
+  border: 1.5px solid rgba(148,163,184,0.25); background: rgba(148,163,184,0.04);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; transition: all 0.15s ease;
+}
+.dropdownCheckActive { border-color: #3B82F6; background: rgba(59,130,246,0.18); }
+.dropdownItemLabel   { flex: 1; }
+.dropdownActivePip   { width: 6px; height: 6px; border-radius: 50%; background: #3B82F6; box-shadow: 0 0 5px #3B82F6; flex-shrink: 0; }
+.dropdownFooter      { display: flex; justify-content: flex-end; padding: 4px 8px 2px; }
+.dropdownFooterBtn   {
+  font-size: 10px; font-weight: 600; color: #475569;
+  background: none; border: none; cursor: pointer;
+  font-family: 'Outfit','Inter',sans-serif; padding: 3px 6px; border-radius: 5px; transition: color 0.15s;
+}
+.dropdownFooterBtn:hover { color: #60A5FA; }
+
+/* ================================================================
+   SHARED CHART PLACEHOLDER
+   ================================================================ */
+.chartPlaceholder {
+  display: flex; align-items: center; justify-content: center;
+  width: 100%; height: 100%; color: #475569; font-size: 13px;
+  font-family: 'Outfit','Inter',sans-serif;
+}
+
+/* ================================================================
+   SHARED TOOLTIP
+   ================================================================ */
+.chartTooltip {
+  position: fixed;
+  background: #1E293B; border: 1px solid rgba(99,102,241,0.30);
+  border-radius: 10px; padding: 10px 13px; min-width: 150px;
+  z-index: 9999; pointer-events: none;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.55), 0 0 0 1px rgba(99,102,241,0.10);
+  animation: dropIn 0.15s cubic-bezier(0.34,1.2,0.64,1);
+}
+.chartTooltipHeader  { display: flex; align-items: center; gap: 7px; margin-bottom: 5px; }
+.chartTooltipSwatch  { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.chartTooltipName    { font-size: 10.5px; font-weight: 700; color: #CBD5E1; font-family: 'Outfit','Inter',sans-serif; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 140px; }
+.chartTooltipMetric  { font-size: 9.5px; font-weight: 600; color: #475569; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 3px; }
+.chartTooltipValue   { font-size: 13px; font-weight: 700; color: #E2E8F0; font-variant-numeric: tabular-nums; }
+.chartTooltipPct     { font-size: 10px; color: #475569; margin-top: 2px; }
+
+/* ================================================================
+   GROUPED BAR CHART
+   ================================================================ */
+.barChartRoot {
+  width: 100%;
+  height: 100%;
+  min-height: 380px;
+  padding: 8px 0 0;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.barChartBody {
+  display: flex; flex-direction: row;
+  flex: 1; gap: 0; height: 100%;
+}
+
+.barYAxis {
+  display: flex; flex-direction: column;
+  justify-content: space-between; align-items: flex-end;
+  padding: 0 6px 28px 0; flex-shrink: 0; width: 28px;
+}
+.barYLabel {
+  font-size: 9px; font-weight: 600; color: rgba(148,163,184,0.40);
+  font-family: 'Outfit','Inter',sans-serif; font-variant-numeric: tabular-nums; line-height: 1;
+}
+
+.barPlotArea {
+  flex: 1; position: relative; display: flex; flex-direction: column;
+  padding-bottom: 28px;
+}
+
+.barGridLine {
+  position: absolute; left: 0; right: 0; height: 1px;
+  background: rgba(148,163,184,0.08); pointer-events: none;
+}
+.barGridLineBase { background: rgba(148,163,184,0.20); }
+
+/* Row of metric groups */
+.barGroups {
+  display: flex; flex-direction: row;
+  align-items: flex-end;
+  gap: 16px; flex: 1; height: 100%;
+}
+
+/* One group per metric */
+.barGroup {
+  flex: 1; display: flex; flex-direction: column;
+  align-items: center; gap: 0; min-width: 0; height: 100%;
+}
+
+/* Side-by-side bar wrappers */
+.barGroupBars {
+  display: flex; flex-direction: row;
+  align-items: flex-end;
+  gap: 3px; flex: 1; width: 100%; height: 100%;
+}
+
+.barWrapper {
+  flex: 1; height: 100%;
+  display: flex; flex-direction: column; justify-content: flex-end;
+  cursor: pointer;
+}
+
+.bar {
+  width: 100%;
+  border-radius: 5px 5px 2px 2px;
+  min-height: 3px;
+  transition: height 0.5s cubic-bezier(0.34,1.1,0.64,1), filter 0.2s ease;
+}
+.barWrapper:hover .bar {
+  filter: brightness(1.25);
+}
+
+.barGroupLabel {
+  font-size: 9px; font-weight: 700; color: #FFFFFF; text-align: center;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%;
+  font-family: 'Outfit','Inter',sans-serif; text-transform: uppercase;
+  margin-top: 5px; letter-spacing: 0.2px;
+}
+
+/* ================================================================
+   TABLE COMPONENTS
+   ================================================================ */
+.perfBadge {
+  font-size: 12px; font-weight: 700; color: #64748B;
+  background: rgba(148,163,184,0.07); border: 1px solid rgba(148,163,184,0.14);
+  padding: 3px 9px; border-radius: 7px; font-variant-numeric: tabular-nums; white-space: nowrap;
+}
+
+/* Active row – color injected inline via style prop */
+.trActive  { background: rgba(59,130,246,0.08) !important; }
+.trActive:hover { background: rgba(59,130,246,0.14) !important; }
+/* Dimmed rows when radar limit is reached */
+.trDimmed  { opacity: 0.45; pointer-events: auto; }
+.trDimmed:hover { opacity: 0.65; }
+
+/* "ON" active badge next to horse name */
+.activeBadge {
+  font-size: 8px; font-weight: 800;
+  padding: 1px 5px; border-radius: 4px;
+  border: 1px solid; letter-spacing: 0.6px;
+  flex-shrink: 0; margin-left: 2px;
+}
+
+/* ================================================================
+   BOTTOM CARD – Table
+   ================================================================ */
+.bottomCard {
+  background: #131E2F;
+  border: 1px solid rgba(148,163,184,0.10);
+  border-radius: 18px;
+  box-shadow: 0 0 0 1px rgba(59,130,246,0.05), 0 20px 60px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.04);
+  display: flex; flex-direction: column;
+}
+.tableHeader {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 24px;
+  border-bottom: 1px solid rgba(148,163,184,0.08);
+  background: rgba(0,0,0,0.10); flex-shrink: 0;
+}
+.tableSectionTitle {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 11px; font-weight: 700; color: #64748B;
+  text-transform: uppercase; letter-spacing: 1px;
+}
+.tableTitleIconWrap { display: flex; align-items: center; }
+.tableHint { font-size: 10.5px; color: #334155; font-style: italic; }
+
+.tableScroll {
+  overflow-x: auto;
+  flex: 1;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.tableScroll::-webkit-scrollbar {
+  display: none;
+}
+
+.table { width: 100%; border-collapse: collapse; table-layout: auto; }
+
+.thead { background: rgba(148,163,184,0.04); }
+.th {
+  padding: 11px 16px; text-align: left;
+  font-size: 10.5px; font-weight: 600; color: #64748B;
+  border-bottom: 1px solid rgba(148,163,184,0.09);
+  white-space: nowrap; user-select: none;
+}
+.thInner { display: inline-flex; align-items: center; gap: 4px; cursor: pointer; transition: color 0.15s; }
+.thInner:hover { color: #94A3B8; }
+
+.tr {
+  cursor: pointer; transition: background 0.15s ease;
+  border-bottom: 1px solid rgba(148,163,184,0.06);
+}
+.tr:last-child { border-bottom: none; }
+.tr:hover      { background: rgba(148,163,184,0.04); }
+.tr:focus      { outline: none; background: rgba(59,130,246,0.04); }
+
+.td { padding: 12px 16px; vertical-align: middle; }
+
+.horseNameCell { display: flex; align-items: center; gap: 8px; }
+.selectedBar {
+  width: 3px; height: 20px; border-radius: 2px; flex-shrink: 0;
+  animation: barSlide 0.25s ease;
+}
+@keyframes barSlide {
+  from { transform: scaleY(0); opacity: 0; }
+  to   { transform: scaleY(1); opacity: 1; }
+}
+.horseName       { font-size: 12.5px; font-weight: 600; color: #94A3B8; letter-spacing: 0.25px; white-space: nowrap; transition: color 0.2s; }
+.horseNameActive { font-weight: 700; }
+
+.statVal {
+  font-size: 12.5px; color: #64748B; font-weight: 500;
+  font-variant-numeric: tabular-nums; letter-spacing: 0.2px; white-space: nowrap;
+}
+.oddsBadge {
+  font-size: 12px; font-weight: 700; color: #94A3B8;
+  background: rgba(148,163,184,0.08); border: 1px solid rgba(148,163,184,0.15);
+  padding: 3px 9px; border-radius: 7px; font-variant-numeric: tabular-nums; white-space: nowrap;
+}
+.oddsBadgeActive { color: #F59E0B; background: rgba(245,158,11,0.10); border-color: rgba(245,158,11,0.25); }
+
+.meritCell { display: flex; flex-direction: column; gap: 5px; min-width: 80px; }
+.meritVal  { font-size: 13px; font-weight: 700; color: #94A3B8; font-variant-numeric: tabular-nums; transition: color 0.2s; }
+.meritBarTrack { height: 4px; background: rgba(148,163,184,0.10); border-radius: 2px; overflow: hidden; }
+.meritBarFill  { height: 100%; border-radius: 2px; transition: width 0.5s cubic-bezier(0.4,0,0.2,1), background 0.3s ease; }
+
+/* ── Responsive ──────────────────────────────────────────────── */
+@media (max-width: 900px) {
+  .chartBody { height: auto; min-height: 420px; }
+  .legendPanel { flex-direction: row; flex-wrap: wrap; gap: 12px 20px; padding-top: 0; }
+  .activeLegend { flex-direction: row; flex-wrap: wrap; }
+  .topBarControls { width: 100%; flex-direction: row; }
+  .dropdownPanel { right: auto; left: 0; }
+}
+@media (max-width: 600px) {
+  .page { padding: 12px 8px; }
+  .topCard, .bottomCard { border-radius: 14px; }
+  .topBar { padding: 14px 16px 12px; }
+  .mainTitle { font-size: 14px; }
+  .th, .td { padding: 10px 10px; }
+  .barGroupLabel { font-size: 8px; }
+}
+
+/* ── Navigation bar for switching between standalone pages ─── */
+.navContainer {
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto 12px;
+  display: flex;
+  justify-content: flex-start;
+  z-index: 10;
+  position: relative;
+}
+
+.navBar {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(19, 30, 47, 0.85);
+  border: 1px solid rgba(148, 163, 184, 0.12);
+  backdrop-filter: blur(12px);
+  padding: 5px 6px;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
+}
+
+.navLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: 'Outfit', 'Inter', sans-serif;
+  color: #94A3B8;
+  text-decoration: none;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid transparent;
+}
+
+.navLink:hover {
+  color: #F1F5F9;
+  background: rgba(148, 163, 184, 0.08);
+}
+
+.navLinkActive {
+  color: #FFFFFF !important;
+  background: rgba(59, 130, 246, 0.20) !important;
+  border-color: rgba(59, 130, 246, 0.40) !important;
+  box-shadow: 0 0 12px rgba(59, 130, 246, 0.25);
+}

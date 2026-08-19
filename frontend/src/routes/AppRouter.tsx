@@ -7,6 +7,8 @@ import { PredictionResultsPage } from "@/pages/PredictionResults/PredictionResul
 import { RaceHorsesPage } from "@/pages/RaceHorses/RaceHorsesPage";
 import { SelectedHorsePage } from "@/pages/SelectedHorse/SelectedHorsePage";
 import { VenueRacesPage } from "@/pages/VenueRaces/VenueRacesPage";
+import { RadarAnalyticsPage } from "@/pages/RadarAnalytics/RadarAnalyticsPage";
+import { BarAnalyticsPage } from "@/pages/BarAnalytics/BarAnalyticsPage";
 
 export function AppRouter() {
   return (
@@ -19,8 +21,11 @@ export function AppRouter() {
         <Route path="/analysis/:raceId" element={<AnalysisFactorsPage />} />
         <Route path="/predictions/results" element={<PredictionResultsPage />} />
         <Route path="/predictions/horses/:horseId" element={<SelectedHorsePage />} />
+        <Route path="/radar-analytics" element={<RadarAnalyticsPage />} />
+        <Route path="/bar-analytics" element={<BarAnalyticsPage />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </AppShell>
   );
 }
+

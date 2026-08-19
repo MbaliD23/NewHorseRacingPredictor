@@ -1,8 +1,8 @@
-import { RotateCcw } from "lucide-react";
+import { ArrowLeft, RotateCcw } from "lucide-react";
 import { useMemo } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/components/common/Button";
-import { HorseAnalysisView } from "@/components/horse/HorseAnalysisView";
+import { HorseSplitView } from "@/components/analytics/HorseSplitView";
 import { AsyncBoundary } from "@/components/status/AsyncBoundary";
 import { usePredictionStore } from "@/store/predictionStore";
 
@@ -22,28 +22,43 @@ export function SelectedHorsePage() {
   const horse = currentHorse?.id && String(currentHorse.id) === horseId ? currentHorse : raceHorse;
 
   return (
-    <section className="page-section screen-shell py-4">
-      <AsyncBoundary isEmpty={!horse && !prediction} emptyMessage="Selected horse data is unavailable for this prediction.">
-        <HorseAnalysisView
+    <section className="w-full h-full min-h-0 py-0">
+      <AsyncBoundary
+        isEmpty={!horse && !prediction}
+        emptyMessage="Selected horse data is unavailable for this prediction."
+      >
+        <HorseSplitView
           horse={horse}
           raceTitle={currentRace?.title ?? undefined}
           raceNumber={currentRace?.race_number ?? undefined}
           venueName={currentRace?.venue ?? undefined}
+          horses={currentRace?.horses}
+          footerActions={
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 max-w-4xl mx-auto pb-4 w-full px-2">
+              <Button
+                variant="outline"
+                size="lg"
+                className="w-full sm:w-auto rounded-full"
+                onClick={() => navigate("/predictions/results")}
+              >
+                <ArrowLeft className="mr-2 h-5 w-5" />
+                Back to Predictions
+              </Button>
+              <Button
+                size="lg"
+                className="w-full sm:w-auto rounded-full bg-purple-700 hover:bg-purple-800 text-white"
+                onClick={() => {
+                  resetFlow();
+                  navigate("/");
+                }}
+              >
+                Start Over <RotateCcw className="ml-2 h-4 w-4" />
+              </Button>
+            </div>
+          }
         />
       </AsyncBoundary>
-
-      <div className="flex w-full max-w-7xl flex-col items-center justify-end gap-4 px-2 pb-6 sm:flex-row sm:px-4 lg:px-6">
-        <Button
-          size="lg"
-          className="w-full sm:w-auto rounded-full bg-purple-700 hover:bg-purple-800 text-white"
-          onClick={() => {
-            resetFlow();
-            navigate("/");
-          }}
-        >
-          Start Over <RotateCcw className="ml-2 h-4 w-4" />
-        </Button>
-      </div>
     </section>
   );
 }
+

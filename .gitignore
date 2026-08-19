@@ -54,8 +54,11 @@ logs/
 # Databases
 # ==========================================
 *.db
+*.db-journal
 *.sqlite
 *.sqlite3
+*.tsbuildinfo
+
 
 # ==========================================
 # Operating System Files
