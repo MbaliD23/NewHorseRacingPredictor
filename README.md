@@ -98,6 +98,11 @@ The frontend is built with React and Vite. You will need Node.js installed.
 
 When returning to work on the project, you need to run both the backend and frontend simultaneously.
 
+**Windows shortcut:**
+```powershell
+.\start-dev.ps1
+```
+
 **Terminal 1 (Backend):**
 ```bash
 cd backend

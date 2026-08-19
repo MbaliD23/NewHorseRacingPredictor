@@ -45,6 +45,24 @@ def _detect_legacy_alembic_revision() -> str | None:
         sync_engine.dispose()
 
 
+def _repair_stale_alembic_revision() -> None:
+    sync_engine = create_engine(settings.sync_database_url, future=True)
+    try:
+        inspector = inspect(sync_engine)
+        if 'alembic_version' not in inspector.get_table_names():
+            return
+
+        with sync_engine.begin() as connection:
+            existing_revision = connection.execute(text('SELECT version_num FROM alembic_version LIMIT 1')).scalar_one_or_none()
+            if existing_revision == '0008_add_team_record_columns':
+                connection.execute(
+                    text("UPDATE alembic_version SET version_num = '0007_add_recent_form_columns'")
+                )
+                logger.warning('repaired_stale_alembic_revision from=%s to=%s', existing_revision, '0007_add_recent_form_columns')
+    finally:
+        sync_engine.dispose()
+
+
 def run_startup_migrations() -> None:
     backend_dir = Path(__file__).resolve().parents[1]
     alembic_cfg = Config(str(backend_dir / 'alembic.ini'))
@@ -53,6 +71,7 @@ def run_startup_migrations() -> None:
     legacy_revision = _detect_legacy_alembic_revision()
     if legacy_revision is not None:
         command.stamp(alembic_cfg, legacy_revision)
+    _repair_stale_alembic_revision()
     command.upgrade(alembic_cfg, 'head')
 
 
