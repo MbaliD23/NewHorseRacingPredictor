@@ -33,3 +33,60 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 );
 
 Button.displayName = "Button";
+
+import { ArrowRight } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { usePredictionStore } from "@/store/predictionStore";
+
+export interface PredictorButtonProps {
+  raceId?: number | string | null;
+  className?: string;
+  disabled?: boolean;
+  onClick?: () => void;
+  label?: string;
+}
+
+export function PredictorButton({
+  raceId,
+  className,
+  disabled = false,
+  onClick,
+  label = "✦ Go to Prediction",
+}: PredictorButtonProps) {
+  const navigate = useNavigate();
+  const { currentRace } = usePredictionStore();
+  const targetRaceId = raceId ?? currentRace?.id;
+
+  const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.stopPropagation();
+    if (onClick) {
+      onClick();
+      return;
+    }
+    if (targetRaceId) {
+      navigate(`/analysis/${targetRaceId}`);
+    }
+  };
+
+  const isDisabled = disabled || !targetRaceId;
+
+  return (
+    <button
+      type="button"
+      onClick={handleClick}
+      disabled={isDisabled}
+      className={cn(
+        "group relative inline-flex items-center justify-center gap-2 rounded-full px-7 py-3 text-sm md:text-base font-bold text-white transition-all duration-300",
+        "bg-gradient-to-r from-[#6A2DF1] via-[#7C3AED] to-[#4F46E5]",
+        "shadow-[0_4px_20px_rgba(106,45,241,0.35)] hover:shadow-[0_6px_28px_rgba(106,45,241,0.55)]",
+        "hover:scale-[1.02] active:scale-[0.98] cursor-pointer select-none",
+        "disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:shadow-none",
+        className
+      )}
+      aria-label="Go to Prediction"
+    >
+      <span className="tracking-wide">{label}</span>
+      <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+    </button>
+  );
+}

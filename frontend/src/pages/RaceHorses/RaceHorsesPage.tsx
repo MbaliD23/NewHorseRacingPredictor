@@ -1,11 +1,12 @@
 import { useMemo } from "react";
 import { Activity, ArrowRight, Calendar, Clock, Compass, MapPin, Sparkles } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
-import { Button } from "@/components/common/Button";
+import { Button, PredictorButton } from "@/components/common/Button";
 import { GlassCard } from "@/components/common/GlassCard";
 import { SilksRenderer } from "@/components/horse/SilksRenderer";
 import { sortHorses } from "@/lib/horseOrdering";
 import { AsyncBoundary } from "@/components/status/AsyncBoundary";
+import { BackButton } from "@/components/navigation/BackButton";
 import { useRace } from "@/hooks/useRace";
 import { formatTime, valueOrUnavailable } from "@/lib/utils";
 import { usePredictionStore, type HorseOrderBy } from "@/store/predictionStore";
@@ -61,7 +62,7 @@ export function RaceHorsesPage() {
   const { raceId } = useParams();
   const navigate = useNavigate();
   const { data: race, isLoading, isError } = useRace(raceId);
-  const { setCurrentRace, setCurrentHorse, horseOrderBy, setHorseOrderBy } = usePredictionStore();
+  const { currentVenue, setCurrentRace, setCurrentHorse, horseOrderBy, setHorseOrderBy } = usePredictionStore();
   const runnerCount = race?.horses?.length ?? race?.field_size ?? 0;
   const raceStatus = valueOrUnavailable(race?.status);
   const orderedHorses = useMemo(
@@ -86,20 +87,27 @@ export function RaceHorsesPage() {
       <AsyncBoundary isLoading={isLoading} isError={isError} isEmpty={!race} emptyMessage="Race unavailable.">
         <div className="mx-auto flex w-full max-w-[1600px] flex-col gap-6 px-2 sm:px-4 lg:px-6">
           <div className="rounded-[32px] border border-slate-200/80 bg-white px-4 py-4 shadow-[0_1px_8px_-4px_rgba(0,0,0,0.08)] sm:px-6 lg:px-8">
-            <div className="flex flex-wrap items-center gap-2 text-[11px] font-bold uppercase tracking-[0.18em] text-[#6A2DF1]">
-              <span className="inline-flex items-center gap-1.5 rounded-full border border-violet-200 bg-violet-50 px-3 py-1.5">
-                <Clock className="h-3.5 w-3.5" />
-                {formatTime(race?.race_time)}
-              </span>
-              <span className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1.5 text-slate-600">
-                Race {race?.race_number ?? ""}
-              </span>
-              <span className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1.5 text-slate-600">
-                {runnerCount} runners
-              </span>
-              <div className="ml-auto flex items-center gap-1.5 rounded-full border border-violet-200 bg-white px-2.5 py-1 text-[11px] font-bold tracking-wider text-[#6A2DF1] uppercase">
-                <div className="h-2 w-2 rounded-full bg-[#6A2DF1] animate-pulse" />
-                Live
+            <div className="flex flex-wrap items-center gap-3">
+              <BackButton
+                to={race?.meeting_id ? `/venues/${race.meeting_id}` : currentVenue?.id ? `/venues/${currentVenue.id}` : "/"}
+                fallbackTo={race?.meeting_id ? `/venues/${race.meeting_id}` : currentVenue?.id ? `/venues/${currentVenue.id}` : "/"}
+                label="Back to Races"
+              />
+              <div className="flex flex-wrap items-center gap-2 text-[11px] font-bold uppercase tracking-[0.18em] text-[#6A2DF1] flex-1">
+                <span className="inline-flex items-center gap-1.5 rounded-full border border-violet-200 bg-violet-50 px-3 py-1.5">
+                  <Clock className="h-3.5 w-3.5" />
+                  {formatTime(race?.race_time)}
+                </span>
+                <span className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1.5 text-slate-600">
+                  Race {race?.race_number ?? ""}
+                </span>
+                <span className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1.5 text-slate-600">
+                  {runnerCount} runners
+                </span>
+                <div className="ml-auto flex items-center gap-1.5 rounded-full border border-violet-200 bg-white px-2.5 py-1 text-[11px] font-bold tracking-wider text-[#6A2DF1] uppercase">
+                  <div className="h-2 w-2 rounded-full bg-[#6A2DF1] animate-pulse" />
+                  Live
+                </div>
               </div>
             </div>
 
@@ -192,28 +200,28 @@ export function RaceHorsesPage() {
               {orderedHorses.map((horse) => (
                 <div
                   key={horse.id}
-                  className="grid cursor-pointer gap-4 rounded-[26px] border border-slate-200 bg-white p-4 shadow-[0_1px_8px_-4px_rgba(0,0,0,0.08)] transition-all duration-200 hover:-translate-y-0.5 hover:border-[#6A2DF1]/60 hover:shadow-[0_0_22px_rgba(106,45,241,0.14)] sm:p-5 xl:grid-cols-[auto_auto_minmax(0,1.8fr)_repeat(4,minmax(108px,0.7fr))_minmax(128px,auto)] xl:items-center"
+                  className="group grid cursor-pointer gap-4 rounded-[26px] border border-slate-200 bg-white p-4 sm:p-5 shadow-[0_1px_8px_-4px_rgba(0,0,0,0.08)] transition-all duration-300 hover:bg-slate-900/80 hover:backdrop-blur-md hover:border-purple-600 hover:ring-[3px] hover:ring-purple-600 hover:shadow-[0_12px_40px_rgb(0,0,0,0.25)] hover:-translate-y-1 xl:grid-cols-[auto_auto_minmax(0,1.8fr)_repeat(4,minmax(108px,0.7fr))_minmax(128px,auto)_auto] xl:items-center"
                   onClick={() => {
                     setCurrentRace(race ?? null);
                     setCurrentHorse(horse);
                     navigate(`/horses/${horse.id}`);
                   }}
                 >
-                  <div className={`flex h-12 w-12 items-center justify-center rounded-xl font-bold text-xl ${getNumberStyle(horse.runner_number)}`}>
+                  <div className={`flex h-12 w-12 items-center justify-center rounded-xl font-bold text-xl transition-transform duration-300 group-hover:scale-105 ${getNumberStyle(horse.runner_number)}`}>
                     {valueOrUnavailable(horse.runner_number)}
                   </div>
 
-                  <div className="h-16 w-16 overflow-hidden rounded-2xl border border-slate-100 bg-slate-50">
+                  <div className="h-16 w-16 overflow-hidden rounded-2xl border border-slate-100 bg-slate-50 group-hover:border-white/10 group-hover:bg-white/5 transition-colors duration-300">
                     <div className="flex h-full w-full items-center justify-center">
                       <SilksRenderer description={horse.silks} className="h-14 w-14" />
                     </div>
                   </div>
 
                   <div className="min-w-0">
-                    <h2 className="truncate text-[17px] font-black leading-tight text-slate-950 sm:text-[18px]">
+                    <h2 className="truncate text-[17px] font-black leading-tight text-slate-950 group-hover:text-white transition-colors duration-300 sm:text-[18px]">
                       {horse.name}
                     </h2>
-                    <p className="mt-1 text-sm text-slate-500">
+                    <p className="mt-1 text-sm text-slate-500 group-hover:text-slate-400 transition-colors duration-300">
                       {valueOrUnavailable(race?.venue)} · Race {valueOrUnavailable(race?.race_number)}
                     </p>
                   </div>
@@ -223,17 +231,18 @@ export function RaceHorsesPage() {
                   <InfoColumn label="Weight" value={valueOrUnavailable(horse.weight_value)} />
                   <InfoColumn label="MR" value={valueOrUnavailable(horse.merit_rating)} />
 
-                  <div className="grid gap-2 text-sm text-slate-500">
+                  <div className="grid gap-1 text-sm text-slate-500 group-hover:text-slate-400 transition-colors duration-300">
                     <p className="truncate">
-                      <span className="font-semibold text-slate-600">J:</span> {valueOrUnavailable(horse.jockey_name)}
+                      <span className="font-semibold text-slate-600 group-hover:text-purple-300">J:</span> {valueOrUnavailable(horse.jockey_name)}
                     </p>
                     <p className="truncate">
-                      <span className="font-semibold text-slate-600">T:</span> {valueOrUnavailable(horse.trainer_name)}
+                      <span className="font-semibold text-slate-600 group-hover:text-purple-300">T:</span> {valueOrUnavailable(horse.trainer_name)}
                     </p>
                   </div>
 
                   <button
-                    className="justify-self-start whitespace-nowrap rounded-[10px] border-[1.5px] border-[#6A2DF1] px-4 py-2 text-[13px] font-bold text-[#6A2DF1] transition-colors hover:bg-violet-50 active:scale-[0.99]"
+                    type="button"
+                    className="justify-self-start whitespace-nowrap rounded-xl border-[1.5px] border-[#6A2DF1] bg-white group-hover:bg-purple-600 group-hover:text-white group-hover:border-purple-500 group-hover:shadow-[0_4px_14px_0_rgba(147,51,234,0.39)] px-4 py-2 text-[13px] font-bold text-[#6A2DF1] transition-all duration-300 active:scale-[0.99] cursor-pointer"
                     onClick={(e) => {
                       e.stopPropagation();
                       setCurrentRace(race ?? null);
@@ -251,14 +260,10 @@ export function RaceHorsesPage() {
       </AsyncBoundary>
       <div className="mx-auto w-full max-w-[1600px] px-2 pb-6 sm:px-4 lg:px-6">
         <div className="flex justify-end">
-          <Button
-            size="lg"
-            className="prediction-cta solid-purple-btn w-full sm:w-auto sm:min-w-[320px]"
-            onClick={() => navigate(`/analysis/${race?.id}`)}
-          >
-            <Sparkles className="h-5 w-5" /> Go to Prediction
-            <ArrowRight className="h-5 w-5" />
-          </Button>
+          <PredictorButton
+            raceId={race?.id}
+            className="w-full sm:w-auto min-w-[280px]"
+          />
         </div>
       </div>
     </section>
@@ -285,8 +290,8 @@ function InfoTile({
 function InfoColumn({ label, value }: { label: string; value: string }) {
   return (
     <div className="min-w-0">
-      <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-slate-400">{label}</p>
-      <p className="mt-1 text-[15px] font-bold text-slate-950">{value}</p>
+      <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-slate-400 group-hover:text-purple-300/80 transition-colors duration-300">{label}</p>
+      <p className="mt-1 text-[15px] font-bold text-slate-950 group-hover:text-white transition-colors duration-300">{value}</p>
     </div>
   );
 }

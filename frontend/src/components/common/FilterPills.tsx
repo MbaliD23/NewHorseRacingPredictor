@@ -1,6 +1,6 @@
 import { Clock } from "lucide-react";
 
-type FilterValue = "all" | "live" | "upcoming";
+export type FilterValue = "all" | "today" | "upcoming";
 
 export function FilterPills({
   value,
@@ -10,17 +10,18 @@ export function FilterPills({
   onChange: (value: FilterValue) => void;
 }) {
   const pillClass = (isActive: boolean) =>
-    `rounded-full border px-5 py-2 text-sm font-semibold shadow-sm transition-all duration-200 focus:outline-none focus:ring-4 focus:ring-purple-100 ${
+    `whitespace-nowrap shrink-0 rounded-xl border px-4 py-2 text-sm font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-purple-500 cursor-pointer h-10 sm:h-11 flex items-center justify-center ${
       isActive
-        ? "border-purple-600 bg-purple-600 text-white shadow-purple-200"
-        : "border-gray-200 bg-white/75 text-gray-700 hover:-translate-y-0.5 hover:border-purple-300 hover:bg-white hover:text-purple-700 hover:shadow-md"
+        ? "border-purple-600 bg-purple-600 text-white shadow-md shadow-purple-500/20"
+        : "border-slate-200 bg-white/80 text-gray-700 hover:-translate-y-0.5 hover:border-purple-300 hover:bg-white hover:text-purple-700 hover:shadow-xs"
     }`;
 
   const iconClass = (isActive: boolean) => (isActive ? "text-white" : "text-purple-600");
 
   return (
-    <div className="flex items-center gap-3">
+    <div className="flex flex-row items-center flex-nowrap gap-2 shrink-0">
       <button
+        type="button"
         aria-pressed={value === "all"}
         onClick={() => onChange("all")}
         className={pillClass(value === "all")}
@@ -28,20 +29,22 @@ export function FilterPills({
         All
       </button>
       <button
-        aria-pressed={value === "live"}
-        onClick={() => onChange("live")}
-        className={`flex items-center gap-2 ${pillClass(value === "live")}`}
+        type="button"
+        aria-pressed={value === "today"}
+        onClick={() => onChange("today")}
+        className={`flex items-center gap-2 ${pillClass(value === "today")}`}
       >
-        <div className={`h-2.5 w-2.5 shrink-0 aspect-square rounded-full ${value === "live" ? "bg-white" : "bg-purple-600"}`} />
-        Live Now
+        <div className={`h-2.5 w-2.5 shrink-0 aspect-square rounded-full ${value === "today" ? "bg-white" : "bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(52,211,153,0.8)]"}`} />
+        Today's Races
       </button>
       <button
+        type="button"
         aria-pressed={value === "upcoming"}
         onClick={() => onChange("upcoming")}
         className={`flex items-center gap-2 ${pillClass(value === "upcoming")}`}
       >
         <Clock className={`h-4 w-4 ${iconClass(value === "upcoming")}`} />
-        Upcoming
+        Upcoming Races
       </button>
     </div>
   );

@@ -5,6 +5,7 @@ import {
   ArrowUp,
   ChevronDown,
   ChevronLeft,
+  ChevronRight,
   ChevronUp,
   Footprints,
   Glasses,
@@ -20,6 +21,9 @@ import {
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { SilksRenderer } from "@/components/horse/SilksRenderer";
+import { BackButton } from "@/components/navigation/BackButton";
+import { usePredictionStore } from "@/store/predictionStore";
+import { horseColor } from "@/lib/horseAnalytics";
 import type { Horse, HorseFormEntry } from "@/types/race";
 
 interface HorseAnalysisViewProps {
@@ -28,6 +32,8 @@ interface HorseAnalysisViewProps {
   raceNumber?: number;
   raceDistance?: string | null;
   venueName?: string;
+  horses?: Horse[];
+  onSelectHorse?: (horse: Horse) => void;
 }
 
 type LabelValue = {
@@ -445,9 +451,11 @@ export function HorseAnalysisView({
   raceNumber,
   raceDistance,
   venueName,
+  horses,
+  onSelectHorse,
 }: HorseAnalysisViewProps) {
   const navigate = useNavigate();
-  const [isFavorite, setIsFavorite] = useState(false);
+  const { currentRace } = usePredictionStore();
   const [showFormHistory, setShowFormHistory] = useState(false);
   const [visibleFormColumnKeys, setVisibleFormColumnKeys] = useState<FormColumnKey[]>(
     loadStoredFormColumns,
@@ -455,6 +463,34 @@ export function HorseAnalysisView({
 
   const [profilePage, setProfilePage] = useState(0);
   const profileScrollRef = useRef<HTMLDivElement>(null);
+
+  const horseList = horses && horses.length > 0 ? horses : [];
+  const currentIndex = horse ? horseList.findIndex((h) => String(h.id) === String(horse.id)) : -1;
+  const hasPrev = currentIndex > 0;
+  const hasNext = currentIndex >= 0 && currentIndex < horseList.length - 1;
+
+  const assignedColor = useMemo(() => {
+    if (!horse) return "#6A2DF1";
+    if (currentIndex >= 0) {
+      return horseColor(horse.id, currentIndex);
+    }
+    if (horse.runner_number !== undefined && horse.runner_number !== null) {
+      return horseColor(horse.runner_number);
+    }
+    return horseColor(horse.id);
+  }, [horse, currentIndex]);
+
+  const handlePrev = () => {
+    if (hasPrev && onSelectHorse) {
+      onSelectHorse(horseList[currentIndex - 1]);
+    }
+  };
+
+  const handleNext = () => {
+    if (hasNext && onSelectHorse) {
+      onSelectHorse(horseList[currentIndex + 1]);
+    }
+  };
 
   useEffect(() => {
     window.localStorage.setItem(
@@ -552,16 +588,21 @@ export function HorseAnalysisView({
       <div className="space-y-4 sm:space-y-5 rounded-3xl border border-purple-100/80 bg-white p-3.5 sm:p-5 shadow-[0_10px_40px_rgba(139,92,246,0.06)]">
         <div className="flex items-center justify-between pb-2">
           <div className="flex items-center gap-3">
-            <button
-              onClick={() => navigate(-1)}
-              className="flex h-10 w-10 shrink-0 aspect-square items-center justify-center rounded-full bg-gray-50 text-gray-600 transition-colors hover:bg-purple-50 hover:text-purple-700"
-              aria-label="Go back"
-            >
-              <ChevronLeft className="h-6 w-6" />
-            </button>
+            <BackButton
+              to={horse?.race_id ? `/races/${horse.race_id}` : currentRace?.id ? `/races/${currentRace.id}` : "/"}
+              fallbackTo={horse?.race_id ? `/races/${horse.race_id}` : currentRace?.id ? `/races/${currentRace.id}` : "/"}
+              label="Back to Horses"
+            />
 
             <div className="flex items-center gap-3">
-              <span className="flex h-10 w-10 shrink-0 aspect-square items-center justify-center rounded-xl bg-purple-700 text-lg font-bold text-white shadow-md shadow-purple-600/20">
+              <span
+                className="flex h-10 w-10 shrink-0 aspect-square items-center justify-center rounded-xl text-lg font-bold text-white transition-all duration-300"
+                style={{
+                  backgroundColor: assignedColor,
+                  boxShadow: `0 0 14px ${assignedColor}55`,
+                  border: `1px solid ${assignedColor}88`,
+                }}
+              >
                 {saddleNo}
               </span>
               <div>
@@ -588,36 +629,40 @@ export function HorseAnalysisView({
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => navigate("/bar-analytics")}
-              className="flex items-center gap-1.5 h-9 px-4 rounded-full text-xs font-bold text-white transition-all
-                bg-gradient-to-r from-purple-700 to-indigo-600
-                shadow-md shadow-purple-600/25
-                hover:from-purple-600 hover:to-indigo-500 hover:shadow-purple-500/40
-                active:scale-95 cursor-pointer shrink-0"
-              aria-label="Compare all 5 horses on bar chart"
-            >
-              <svg width="13" height="13" viewBox="0 0 13 13" fill="none" aria-hidden="true">
-                <rect x="1" y="5" width="2" height="7" rx="1" fill="currentColor" opacity="0.7" />
-                <rect x="4.5" y="3" width="2" height="9" rx="1" fill="currentColor" />
-                <rect x="8" y="1" width="2" height="11" rx="1" fill="currentColor" opacity="0.7" />
-                <rect x="11.5" y="4" width="1.5" height="8" rx="0.75" fill="currentColor" opacity="0.5" />
-              </svg>
-              Compare 5
-            </button>
-
-            <button
-              onClick={() => setIsFavorite(!isFavorite)}
-              className={`flex h-10 w-10 shrink-0 aspect-square items-center justify-center rounded-full border transition-all ${isFavorite
-                ? "border-red-200 bg-red-50 text-red-500"
-                : "border-gray-200 bg-white text-gray-400 hover:text-red-500"
+          {/* Paired Previous / Next Horse Arrow Navigation */}
+          {horseList.length > 0 && (
+            <div className="flex items-center gap-1.5 shrink-0">
+              <button
+                type="button"
+                onClick={handlePrev}
+                disabled={!hasPrev}
+                aria-label="Previous Horse"
+                title={hasPrev ? `Previous: ${horseList[currentIndex - 1].name}` : "First horse in race"}
+                className={`w-9 h-9 flex items-center justify-center rounded-xl transition-all ${
+                  hasPrev
+                    ? "bg-purple-950/50 border border-purple-800/40 hover:bg-purple-800/50 text-white shadow-xs active:scale-95 cursor-pointer"
+                    : "bg-purple-950/20 border border-purple-900/20 text-purple-300/40 opacity-30 pointer-events-none cursor-not-allowed"
                 }`}
-              aria-label="Favorite horse"
-            >
-              <Heart className={`h-5 w-5 ${isFavorite ? "fill-current" : ""}`} />
-            </button>
-          </div>
+              >
+                <ChevronLeft className="h-5 w-5" />
+              </button>
+
+              <button
+                type="button"
+                onClick={handleNext}
+                disabled={!hasNext}
+                aria-label="Next Horse"
+                title={hasNext ? `Next: ${horseList[currentIndex + 1].name}` : "Last horse in race"}
+                className={`w-9 h-9 flex items-center justify-center rounded-xl transition-all ${
+                  hasNext
+                    ? "bg-purple-950/50 border border-purple-800/40 hover:bg-purple-800/50 text-white shadow-xs active:scale-95 cursor-pointer"
+                    : "bg-purple-950/20 border border-purple-900/20 text-purple-300/40 opacity-30 pointer-events-none cursor-not-allowed"
+                }`}
+              >
+                <ChevronRight className="h-5 w-5" />
+              </button>
+            </div>
+          )}
         </div>
 
         <div className="grid gap-4 grid-cols-1 md:grid-cols-2 2xl:grid-cols-2">

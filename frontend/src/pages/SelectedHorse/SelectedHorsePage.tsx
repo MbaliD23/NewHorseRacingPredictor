@@ -5,21 +5,27 @@ import { Button } from "@/components/common/Button";
 import { HorseSplitView } from "@/components/analytics/HorseSplitView";
 import { AsyncBoundary } from "@/components/status/AsyncBoundary";
 import { usePredictionStore } from "@/store/predictionStore";
+import type { Horse } from "@/types/race";
 
 export function SelectedHorsePage() {
   const { horseId } = useParams();
   const navigate = useNavigate();
-  const { currentHorse, currentRace, predictionResult, resetFlow } = usePredictionStore();
+  const { currentHorse, currentRace, setCurrentHorse, predictionResult, resetFlow } = usePredictionStore();
 
   const prediction = useMemo(() => {
     return predictionResult?.predictions.find((item) => String(item.horse_id) === horseId) ?? null;
   }, [horseId, predictionResult?.predictions]);
 
   const raceHorse = useMemo(() => {
-    return currentRace?.horses.find((horse) => String(horse.id) === horseId) ?? null;
+    return currentRace?.horses.find((h) => String(h.id) === horseId) ?? null;
   }, [currentRace?.horses, horseId]);
 
-  const horse = currentHorse?.id && String(currentHorse.id) === horseId ? currentHorse : raceHorse;
+  const horse = (horseId && String(currentHorse?.id) === horseId ? currentHorse : raceHorse) ?? currentHorse ?? null;
+
+  const handleSelectHorse = (newHorse: Horse) => {
+    setCurrentHorse(newHorse);
+    navigate(`/predictions/horses/${newHorse.id}`);
+  };
 
   return (
     <section className="w-full h-full min-h-0 py-0">
@@ -44,8 +50,10 @@ export function SelectedHorsePage() {
           horse={horse}
           raceTitle={currentRace?.title ?? undefined}
           raceNumber={currentRace?.race_number ?? undefined}
+          raceDistance={currentRace?.distance ?? undefined}
           venueName={currentRace?.venue ?? undefined}
           horses={currentRace?.horses}
+          onSelectHorse={handleSelectHorse}
           footerActions={
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4 max-w-4xl mx-auto pb-4 w-full px-2">
               <Button

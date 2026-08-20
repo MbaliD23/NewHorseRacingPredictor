@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import styles from "@/components/analytics/Analytics.module.css";
 import {
   ALL_AXES,
@@ -19,11 +19,16 @@ import { MetricsDropdown } from "@/components/analytics/MetricsDropdown";
 import { BarChart } from "@/components/analytics/BarChart";
 import { NavigationHeader } from "@/components/analytics/NavigationHeader";
 import { VenueRaceSelector, FALLBACK_VENUES } from "@/components/analytics/VenueRaceSelector";
+import { BackButton } from "@/components/navigation/BackButton";
 
 const BAR_MAX = 5;
 
 export function BarAnalyticsPage() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const stateVenueId = (location.state as { venueId?: string | number } | undefined)?.venueId;
+  const stateRaceId = (location.state as { raceId?: string | number } | undefined)?.raceId;
+
   const { currentVenue, currentRace, currentHorse, setCurrentVenue, setCurrentRace } = usePredictionStore();
   const { data: allVenues = [] } = useRaces();
 
@@ -33,6 +38,7 @@ export function BarAnalyticsPage() {
 
   // Stage 1 & 2 selection states
   const [selectedVenueId, setSelectedVenueId] = useState<number | string | null>(() => {
+    if (stateVenueId) return stateVenueId;
     if (currentVenue?.id) return currentVenue.id;
     if (currentRace?.venue) {
       const match = effectiveVenues.find((v) => v.venue.toLowerCase() === currentRace.venue.toLowerCase());
@@ -42,10 +48,35 @@ export function BarAnalyticsPage() {
   });
 
   const [selectedRaceId, setSelectedRaceId] = useState<number | string | null>(() => {
+    if (stateRaceId) return stateRaceId;
     if (currentRace?.id) return currentRace.id;
     if (currentHorse?.race_id) return currentHorse.race_id;
     return null;
   });
+
+  // Sync state if navigation or store updates
+  useEffect(() => {
+    if (stateVenueId && stateVenueId !== selectedVenueId) {
+      setSelectedVenueId(stateVenueId);
+    } else if (!selectedVenueId) {
+      if (currentVenue?.id) {
+        setSelectedVenueId(currentVenue.id);
+      } else if (currentRace?.venue) {
+        const match = effectiveVenues.find((v) => v.venue.toLowerCase() === currentRace.venue?.toLowerCase());
+        if (match) setSelectedVenueId(match.id);
+      }
+    }
+
+    if (stateRaceId && stateRaceId !== selectedRaceId) {
+      setSelectedRaceId(stateRaceId);
+    } else if (!selectedRaceId) {
+      if (currentRace?.id) {
+        setSelectedRaceId(currentRace.id);
+      } else if (currentHorse?.race_id) {
+        setSelectedRaceId(currentHorse.race_id);
+      }
+    }
+  }, [stateVenueId, stateRaceId, currentVenue, currentRace, currentHorse, effectiveVenues, selectedVenueId, selectedRaceId]);
 
   const isRaceActive = Boolean(selectedVenueId && selectedRaceId);
 
@@ -161,38 +192,7 @@ export function BarAnalyticsPage() {
       >
         {/* Left: Back button & On Chart text aligned */}
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <button
-            onClick={() => navigate(-1)}
-            aria-label="Go back"
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              width: 32,
-              height: 32,
-              borderRadius: "50%",
-              background: "rgba(148,163,184,0.08)",
-              border: "1px solid rgba(148,163,184,0.14)",
-              color: "#94A3B8",
-              cursor: "pointer",
-              transition: "all 0.2s ease",
-              flexShrink: 0,
-            }}
-            onMouseEnter={(e) => {
-              (e.currentTarget as HTMLButtonElement).style.background = "rgba(139,92,246,0.15)";
-              (e.currentTarget as HTMLButtonElement).style.color = "#A78BFA";
-              (e.currentTarget as HTMLButtonElement).style.borderColor = "rgba(139,92,246,0.3)";
-            }}
-            onMouseLeave={(e) => {
-              (e.currentTarget as HTMLButtonElement).style.background = "rgba(148,163,184,0.08)";
-              (e.currentTarget as HTMLButtonElement).style.color = "#94A3B8";
-              (e.currentTarget as HTMLButtonElement).style.borderColor = "rgba(148,163,184,0.14)";
-            }}
-          >
-            <svg width="16" height="16" viewBox="0 0 18 18" fill="none" aria-hidden="true">
-              <path d="M11 5L7 9l4 4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-          </button>
+          <BackButton to="/" fallbackTo="/" theme="dark" label="Go back" className="!h-8 !w-8 sm:!h-8 sm:!w-8" />
 
           <span
             style={{

@@ -19,6 +19,7 @@ import { MetricsDropdown } from "@/components/analytics/MetricsDropdown";
 import { RadarChart } from "@/components/analytics/RadarChart";
 import { NavigationHeader } from "@/components/analytics/NavigationHeader";
 import { VenueRaceSelector, FALLBACK_VENUES } from "@/components/analytics/VenueRaceSelector";
+import { BackButton } from "@/components/navigation/BackButton";
 
 const RADAR_MAX = 2;
 
@@ -161,38 +162,7 @@ export function RadarAnalyticsPage() {
       >
         {/* Left: Back button & On Chart text aligned */}
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <button
-            onClick={() => navigate(-1)}
-            aria-label="Go back"
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              width: 32,
-              height: 32,
-              borderRadius: "50%",
-              background: "rgba(148,163,184,0.08)",
-              border: "1px solid rgba(148,163,184,0.14)",
-              color: "#94A3B8",
-              cursor: "pointer",
-              transition: "all 0.2s ease",
-              flexShrink: 0,
-            }}
-            onMouseEnter={(e) => {
-              (e.currentTarget as HTMLButtonElement).style.background = "rgba(139,92,246,0.15)";
-              (e.currentTarget as HTMLButtonElement).style.color = "#A78BFA";
-              (e.currentTarget as HTMLButtonElement).style.borderColor = "rgba(139,92,246,0.3)";
-            }}
-            onMouseLeave={(e) => {
-              (e.currentTarget as HTMLButtonElement).style.background = "rgba(148,163,184,0.08)";
-              (e.currentTarget as HTMLButtonElement).style.color = "#94A3B8";
-              (e.currentTarget as HTMLButtonElement).style.borderColor = "rgba(148,163,184,0.14)";
-            }}
-          >
-            <svg width="16" height="16" viewBox="0 0 18 18" fill="none" aria-hidden="true">
-              <path d="M11 5L7 9l4 4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-          </button>
+          <BackButton to="/" fallbackTo="/" theme="dark" label="Go back" className="!h-8 !w-8 sm:!h-8 sm:!w-8" />
 
           <span
             style={{

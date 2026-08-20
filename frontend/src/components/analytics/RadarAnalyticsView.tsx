@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 import styles from "./Analytics.module.css";
 import {
   ALL_AXES,
@@ -27,6 +28,7 @@ interface RadarAnalyticsViewProps {
   isEmbedded?: boolean;
   horses?: Horse[];
   raceId?: number | string;
+  onSelectHorse?: (horse: Horse) => void;
 }
 
 export function RadarAnalyticsView({
@@ -36,8 +38,10 @@ export function RadarAnalyticsView({
   isEmbedded = false,
   horses: explicitHorses,
   raceId,
+  onSelectHorse,
 }: RadarAnalyticsViewProps) {
-  const { currentRace, currentHorse } = usePredictionStore();
+  const navigate = useNavigate();
+  const { currentVenue, currentRace, currentHorse, setCurrentVenue, setCurrentRace } = usePredictionStore();
   const { data: allVenues = [] } = useRaces();
 
   // Resolve the active race ID
@@ -98,8 +102,8 @@ export function RadarAnalyticsView({
         const secondary = validPrev.find((id) => id !== primaryHorseId);
         return secondary !== undefined ? [primaryHorseId, secondary] : [primaryHorseId];
       }
-      const secondary = validPrev.find((id) => id !== primaryHorseId);
-      return secondary !== undefined ? [primaryHorseId, secondary] : [primaryHorseId];
+      const existingSecondary = validPrev.find((id) => id !== primaryHorseId);
+      return existingSecondary !== undefined ? [primaryHorseId, existingSecondary] : [primaryHorseId];
     });
   }, [primaryHorseId, dynamicHorses]);
 
@@ -110,21 +114,41 @@ export function RadarAnalyticsView({
 
   const toggleHorse = useCallback(
     (id: number) => {
+      const rawList = explicitHorses ?? fetchedRace?.horses ?? currentRace?.horses ?? [];
+
       setActiveHorseIds((prev) => {
+        // If clicking an already active horse
         if (prev.includes(id)) {
+          // If only 1 horse is active, keep it selected
           if (prev.length <= 1) return prev;
-          return prev.filter((x) => x !== id);
+
+          // If 2 horses are active, remove this one
+          const remaining = prev.filter((x) => x !== id);
+
+          // If we removed the primary horse, the remaining one becomes the new primary horse on left panel
+          if (id === primaryHorseId && remaining.length > 0 && onSelectHorse) {
+            const nextPrimary = rawList.find(
+              (h) => Number(h.id) === Number(remaining[0]) || Number(h.runner_number) === Number(remaining[0])
+            );
+            if (nextPrimary) onSelectHorse(nextPrimary);
+          }
+          return remaining;
         }
+
+        // If clicking a new horse and already at limit (RADAR_MAX = 2)
         if (prev.length >= RADAR_MAX) {
+          // Keep primary horse and replace the second comparison horse
           if (prev.includes(primaryHorseId)) {
             return [primaryHorseId, id];
           }
           return [prev[0], id];
         }
+
+        // Add as second horse (2-horse head-to-head comparison)
         return [...prev, id];
       });
     },
-    [primaryHorseId]
+    [explicitHorses, fetchedRace?.horses, currentRace?.horses, primaryHorseId, onSelectHorse]
   );
 
   const toggleMetric = useCallback((key: string) => {
@@ -224,6 +248,27 @@ export function RadarAnalyticsView({
     </div>
   );
 
+  const handleGoToCompare = useCallback(() => {
+    const venueId =
+      currentVenue?.id ??
+      allVenues.find((v) => v.races.some((r) => String(r.id) === String(activeRaceId)))?.id ??
+      (currentRace?.venue ? allVenues.find((v) => v.venue.toLowerCase() === currentRace.venue?.toLowerCase())?.id : undefined);
+
+    if (venueId) {
+      const v = allVenues.find((item) => String(item.id) === String(venueId));
+      if (v) setCurrentVenue(v);
+    }
+    if (activeRaceId && fetchedRace) {
+      setCurrentRace(fetchedRace);
+    }
+    navigate("/bar-analytics", {
+      state: {
+        venueId,
+        raceId: activeRaceId,
+      },
+    });
+  }, [currentVenue, allVenues, activeRaceId, currentRace, fetchedRace, setCurrentVenue, setCurrentRace, navigate]);
+
   /** Reusable horse pill controls header */
   const controlsHeader = (
     <div style={{
@@ -294,8 +339,73 @@ export function RadarAnalyticsView({
           })}
         </div>
       </div>
-      <div style={{ flexShrink: 0, position: "relative" as const }}>
-        <MetricsDropdown activeKeys={activeMetricKeys} onToggle={toggleMetric} />
+
+      {/* Right Control Group: Compare 5 button stacked vertically above Filter Metrics dropdown */}
+      <div style={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "flex-end",
+        gap: 8,
+        flexShrink: 0,
+        position: "relative" as const,
+      }}>
+        <button
+          type="button"
+          onClick={handleGoToCompare}
+          title="Compare 5 horses on Bar Analytics"
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: 7,
+            background: "rgba(59,130,246,0.08)",
+            border: "1px solid rgba(59,130,246,0.22)",
+            color: "#60A5FA",
+            fontSize: 12,
+            fontWeight: 600,
+            padding: "6px 13px",
+            borderRadius: 9,
+            cursor: "pointer",
+            transition: "all 0.2s cubic-bezier(0.4,0,0.2,1)",
+            fontFamily: "'Outfit','Inter',sans-serif",
+            whiteSpace: "nowrap" as const,
+            boxSizing: "border-box" as const,
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.background = "rgba(59,130,246,0.14)";
+            e.currentTarget.style.borderColor = "rgba(59,130,246,0.35)";
+            e.currentTarget.style.color = "#93C5FD";
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.background = "rgba(59,130,246,0.08)";
+            e.currentTarget.style.borderColor = "rgba(59,130,246,0.22)";
+            e.currentTarget.style.color = "#60A5FA";
+          }}
+        >
+          <svg width="13" height="13" viewBox="0 0 13 13" fill="none" aria-hidden="true">
+            <rect x="1" y="5" width="2" height="7" rx="1" fill="currentColor" opacity="0.7" />
+            <rect x="4.5" y="3" width="2" height="9" rx="1" fill="currentColor" />
+            <rect x="8" y="1" width="2" height="11" rx="1" fill="currentColor" opacity="0.7" />
+            <rect x="11.5" y="4" width="1.5" height="8" rx="0.75" fill="currentColor" opacity="0.5" />
+          </svg>
+          Compare 5
+          <span
+            style={{
+              background: "rgba(59,130,246,0.20)",
+              color: "#93C5FD",
+              fontSize: 10,
+              fontWeight: 700,
+              padding: "1px 6px",
+              borderRadius: 10,
+              marginLeft: 2,
+            }}
+          >
+            5
+          </span>
+        </button>
+
+        <div style={{ position: "relative" as const }}>
+          <MetricsDropdown activeKeys={activeMetricKeys} onToggle={toggleMetric} />
+        </div>
       </div>
     </div>
   );

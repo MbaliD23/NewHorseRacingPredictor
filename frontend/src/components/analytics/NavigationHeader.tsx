@@ -13,7 +13,7 @@ export function NavigationHeader() {
           }
         >
           <span style={{ fontSize: "14px", lineHeight: 1 }}>◎</span>
-          <span>Radar Analytics</span>
+          <span>Head to Head Analysis</span>
         </NavLink>
         <NavLink
           to="/bar-analytics"

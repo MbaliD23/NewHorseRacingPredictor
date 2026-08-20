@@ -20,6 +20,7 @@ import { usePredictionStore } from "@/store/predictionStore";
 import { useRaces } from "@/hooks/useRaces";
 import { useRace } from "@/hooks/useRace";
 import { formatDate, formatTime, valueOrUnavailable } from "@/lib/utils";
+import { horseColor } from "@/lib/horseAnalytics";
 import type { Venue, RaceCard, Horse } from "@/types/race";
 
 /* ─── Rail Tooltip (collapsed mode) ─────────────────────────────── */
@@ -41,25 +42,6 @@ function RailTooltip({ text, children }: { text: string; children: React.ReactEl
   );
 }
 
-/* ─── Draw-number color helper ──────────────────────────────────── */
-function getDrawBadge(draw: number | null, isSelected: boolean) {
-  const num = draw ?? 1;
-  switch (num) {
-    case 1:
-      return { bg: "#6A2DF1", text: "#ffffff", border: "transparent" };
-    case 2:
-      return { bg: isSelected ? "#ffffff" : "#f1f5f9", text: "#0f172a", border: "#cbd5e1" };
-    case 3:
-      return { bg: "#1A56DB", text: "#ffffff", border: "transparent" };
-    case 4:
-      return { bg: "#e2e8f0", text: "#0f172a", border: "transparent" };
-    case 5:
-      return { bg: "#DC2626", text: "#ffffff", border: "transparent" };
-    default:
-      return { bg: "#334155", text: "#ffffff", border: "transparent" };
-  }
-}
-
 type SectionKey = "events" | "races" | "horses" | "predictor" | null;
 
 const accordionAnimation = {
@@ -71,7 +53,6 @@ const accordionAnimation = {
 
 /* ─── Main Sidebar Component ─────────────────────────────────────── */
 export function Sidebar() {
-  const [expanded, setExpanded] = useState(true);
   const [liveClock, setLiveClock] = useState(() => new Date());
   const [lockedAlertMessage, setLockedAlertMessage] = useState<string | null>(null);
   const navigate = useNavigate();
@@ -96,7 +77,11 @@ export function Sidebar() {
     setCurrentRace,
     setCurrentHorse,
     resetFlow,
+    isSidebarOpen,
+    toggleSidebar,
   } = usePredictionStore();
+
+  const expanded = isSidebarOpen;
 
   // Backend queries
   const { data: allVenues = [] } = useRaces();
@@ -325,19 +310,10 @@ export function Sidebar() {
               </span>
             </div>
           </div>
-        ) : (
-          <button
-            onClick={handleHomeClick}
-            className="flex h-8 w-8 shrink-0 aspect-square items-center justify-center rounded-xl bg-[#6A2DF1] shadow-sm shadow-purple-600/20 hover:bg-[#5822d8] transition-colors"
-            title="Reset and go to Home"
-            aria-label="Home"
-          >
-            <Home className="h-4 w-4 text-white" />
-          </button>
-        )}
+        ) : null}
         <button
-          onClick={() => setExpanded((v) => !v)}
-          className="flex h-8 w-8 shrink-0 aspect-square items-center justify-center rounded-lg text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-900"
+          onClick={toggleSidebar}
+          className="flex h-8 w-8 shrink-0 aspect-square items-center justify-center rounded-lg text-slate-500 transition-colors hover:bg-purple-50 hover:text-purple-700"
           aria-label={expanded ? "Collapse sidebar" : "Expand sidebar"}
           title={expanded ? "Collapse sidebar" : "Expand sidebar"}
         >
@@ -346,7 +322,7 @@ export function Sidebar() {
       </div>
 
       {/* ── Navigation Body ────────────────────────────────────── */}
-      <nav className="flex-1 overflow-y-auto py-3 px-2.5 min-h-0 space-y-2.5 scroll-smooth">
+      <nav className="flex-1 overflow-y-auto overflow-x-hidden py-3 px-2.5 min-h-0 space-y-2.5 scroll-smooth [scrollbar-width:thin]">
         {expanded ? (
           /* ══════════════════════════════════════════════════════════
              EXPANDED ACCORDION VIEW (MUTUAL EXCLUSION)
@@ -360,7 +336,7 @@ export function Sidebar() {
                 aria-expanded={expandedSection === "events"}
               >
                 <div className="flex items-center gap-2 min-w-0">
-                  <MapPin className="h-4 w-4 text-[#6A2DF1] shrink-0" />
+                  <MapPin className="h-4 w-4 text-[#8B5CF6] shrink-0" />
                   <span className="text-xs font-bold uppercase tracking-wider text-slate-800">
                     Events
                   </span>
@@ -387,7 +363,7 @@ export function Sidebar() {
                     transition={accordionAnimation.transition}
                     className="overflow-hidden"
                   >
-                    <div className="mt-1 space-y-0.5 pt-1 border-t border-slate-100 max-h-60 overflow-y-auto">
+                    <div className="mt-1 space-y-0.5 pt-1 border-t border-slate-100 max-h-60 overflow-y-auto overflow-x-hidden [scrollbar-width:thin]">
                       {allVenues.map((venue) => {
                         const isSelected = activeVenue?.id === venue.id && (location.pathname.startsWith("/venues") || location.pathname === "/");
                         return (
@@ -436,7 +412,7 @@ export function Sidebar() {
                 aria-expanded={expandedSection === "races"}
               >
                 <div className="flex items-center gap-2 min-w-0">
-                  <Flag className="h-4 w-4 text-[#1A56DB] shrink-0" />
+                  <Flag className="h-4 w-4 text-[#8B5CF6] shrink-0" />
                   <span className="text-xs font-bold uppercase tracking-wider text-slate-800 truncate">
                     {activeVenue ? `${activeVenue.venue} Races` : "Races"}
                   </span>
@@ -465,7 +441,7 @@ export function Sidebar() {
                     transition={accordionAnimation.transition}
                     className="overflow-hidden"
                   >
-                    <div className="mt-1 space-y-0.5 pt-1 border-t border-slate-100 max-h-60 overflow-y-auto">
+                    <div className="mt-1 space-y-0.5 pt-1 border-t border-slate-100 max-h-60 overflow-y-auto overflow-x-hidden [scrollbar-width:thin]">
                       {activeVenueRaces.length > 0 ? (
                         activeVenueRaces.map((race) => {
                           const isSelected = (String(currentRace?.id) === String(race.id) || String(urlRaceId) === String(race.id)) && location.pathname.startsWith("/races");
@@ -527,7 +503,7 @@ export function Sidebar() {
                 aria-expanded={expandedSection === "horses"}
               >
                 <div className="flex items-center gap-2 min-w-0">
-                  <Activity className="h-4 w-4 text-[#DC2626] shrink-0" />
+                  <Activity className="h-4 w-4 text-[#8B5CF6] shrink-0" />
                   <span className="text-xs font-bold uppercase tracking-wider text-slate-800 truncate">
                     {currentRace ? `Race ${currentRace.race_number} Horses` : "Horses"}
                   </span>
@@ -556,33 +532,33 @@ export function Sidebar() {
                     transition={accordionAnimation.transition}
                     className="overflow-hidden"
                   >
-                    <div className="mt-1 space-y-0.5 pt-1 border-t border-slate-100 max-h-60 overflow-y-auto">
+                    <div className="mt-1 space-y-0.5 pt-1 border-t border-slate-100 max-h-60 overflow-y-auto overflow-x-hidden [scrollbar-width:thin]">
                       {activeHorses.length > 0 ? (
-                        activeHorses.map((horse) => {
+                        activeHorses.map((horse, idx) => {
                           const isSelected = (String(currentHorse?.id) === String(horse.id) || String(urlHorseId) === String(horse.id)) && location.pathname.startsWith("/horses");
-                          const badge = getDrawBadge(horse.draw_number, isSelected);
+                          const assignedColor = horseColor(horse.id, idx);
+                          const saddleNumber = horse.runner_number ?? horse.draw_number ?? idx + 1;
                           return (
                             <button
                               key={horse.id}
                               onClick={() => handleSelectHorse(horse)}
                               className={[
-                                "flex w-full items-center gap-2.5 rounded-xl px-2.5 py-2 text-left transition-all duration-200 ease-in-out",
+                                "flex w-full items-center gap-2.5 rounded-xl px-2.5 py-2 text-left transition-all duration-200 ease-in-out overflow-hidden",
                                 isSelected
                                   ? "bg-white text-slate-950 font-bold shadow-xs border-l-4 border-slate-900"
                                   : "text-slate-600 hover:bg-white/80 hover:text-slate-900 font-medium",
                               ].join(" ")}
                             >
                               <span
-                                className="flex h-6 w-6 shrink-0 aspect-square items-center justify-center rounded-[4px] text-xs font-black transition-all duration-200"
+                                className="flex h-6 w-6 shrink-0 aspect-square items-center justify-center rounded-full text-[11px] font-black text-white transition-all duration-200"
                                 style={{
-                                  backgroundColor: badge.bg,
-                                  color: badge.text,
-                                  border: badge.border !== "transparent" ? `1px solid ${badge.border}` : undefined,
+                                  backgroundColor: assignedColor,
+                                  boxShadow: isSelected ? `0 0 8px ${assignedColor}88` : undefined,
                                 }}
                               >
-                                {horse.draw_number ?? "—"}
+                                {saddleNumber}
                               </span>
-                              <div className="min-w-0 flex-1">
+                              <div className="min-w-0 flex-1 overflow-hidden">
                                 <div className="truncate text-xs font-bold leading-tight">
                                   {horse.name}
                                 </div>
@@ -591,7 +567,7 @@ export function Sidebar() {
                                 </div>
                               </div>
                               {isSelected && (
-                                <span className="rounded bg-slate-900 px-1.5 py-0.5 text-[9px] font-bold text-white uppercase tracking-wider transition-all duration-200">
+                                <span className="rounded bg-slate-900 px-1.5 py-0.5 text-[9px] font-bold text-white uppercase tracking-wider shrink-0">
                                   Active
                                 </span>
                               )}
@@ -615,30 +591,25 @@ export function Sidebar() {
               className={[
                 "rounded-2xl border bg-slate-50/40 p-1.5 transition-all duration-200 relative",
                 !isPredictorUnlocked
-                  ? "border-slate-200/60 opacity-60"
+                  ? "border-slate-200/60 opacity-40 pointer-events-none cursor-not-allowed"
                   : "border-slate-200/80",
               ].join(" ")}
               title={!isPredictorUnlocked ? "Please select an event and race first." : undefined}
             >
               <button
                 onClick={() => toggleSection("predictor")}
-                className={[
-                  "flex w-full items-center justify-between px-2 py-1.5 text-left rounded-lg transition-all duration-200 group",
-                  !isPredictorUnlocked
-                    ? "cursor-not-allowed hover:bg-slate-100/40"
-                    : "hover:bg-slate-100/70",
-                ].join(" ")}
+                className="flex w-full items-center justify-between px-2 py-1.5 text-left rounded-lg transition-all duration-200 group hover:bg-slate-100/70"
                 aria-expanded={expandedSection === "predictor"}
                 title={!isPredictorUnlocked ? "Please select an event and race first." : undefined}
               >
                 <div className="flex items-center gap-2 min-w-0">
-                  <Sparkles className={`h-4 w-4 shrink-0 ${isPredictorUnlocked ? "text-[#8B5CF6]" : "text-slate-400"}`} />
+                  <Sparkles className="h-4 w-4 text-[#8B5CF6] shrink-0" />
                   <span className="text-xs font-bold uppercase tracking-wider text-slate-800">
                     Predictor
                   </span>
                   {!isPredictorUnlocked ? (
-                    <span className="flex items-center gap-1 rounded-full bg-slate-200/80 px-1.5 py-0.2 text-[9px] font-bold text-slate-500">
-                      <Lock className="h-2.5 w-2.5" /> Locked
+                    <span className="flex items-center rounded-full bg-purple-50 p-0.5 text-purple-400">
+                      <Lock className="h-3 w-3" />
                     </span>
                   ) : isPredictorActive ? (
                     <span className="rounded-full bg-purple-100 px-1.5 py-0.2 text-[9px] font-bold text-purple-700">
@@ -655,13 +626,6 @@ export function Sidebar() {
                 />
               </button>
 
-              {/* Subtle alert message when clicked while locked */}
-              {lockedAlertMessage && expanded && (
-                <div className="mx-1 mt-1.5 rounded-lg bg-purple-50 border border-purple-200 px-2.5 py-1.5 text-[11px] font-semibold text-purple-800 shadow-xs">
-                  {lockedAlertMessage}
-                </div>
-              )}
-
               <AnimatePresence initial={false}>
                 {expandedSection === "predictor" && isPredictorUnlocked && (
                   <motion.div
@@ -673,7 +637,7 @@ export function Sidebar() {
                     className="overflow-hidden"
                   >
                     <div className="mt-1 space-y-0.5 pt-1 border-t border-slate-100">
-                      {/* Factor Analysis / Tuning */}
+                      {/* Analysis Factor */}
                       <button
                         onClick={handleGoToPredictor}
                         className={[
@@ -686,39 +650,10 @@ export function Sidebar() {
                         <Sliders className="h-4 w-4 text-[#8B5CF6] shrink-0" />
                         <div className="min-w-0 flex-1">
                           <div className="truncate text-xs font-bold leading-tight">
-                            Factor Tuning
+                            Analysis Factor
                           </div>
                           <div className="truncate text-[10px] text-slate-500 mt-0.5">
                             {currentRace ? `Race ${currentRace.race_number} Model` : "Select race factors"}
-                          </div>
-                        </div>
-                      </button>
-
-                      {/* Prediction Results */}
-                      <button
-                        onClick={() => {
-                          if (predictionResult) {
-                            navigate("/predictions/results");
-                          } else if (activeRaceId) {
-                            navigate(`/analysis/${activeRaceId}`);
-                          } else {
-                            handleGoToPredictor();
-                          }
-                        }}
-                        className={[
-                          "flex w-full items-center gap-2.5 rounded-xl px-2.5 py-2 text-left transition-all duration-200 ease-in-out",
-                          location.pathname.startsWith("/predictions")
-                            ? "bg-white text-slate-950 font-bold shadow-xs border-l-4 border-slate-900"
-                            : "text-slate-600 hover:bg-white/80 hover:text-slate-900 font-medium",
-                        ].join(" ")}
-                      >
-                        <Trophy className="h-4 w-4 text-[#EAB308] shrink-0" />
-                        <div className="min-w-0 flex-1">
-                          <div className="truncate text-xs font-bold leading-tight">
-                            Results & Rankings
-                          </div>
-                          <div className="truncate text-[10px] text-slate-500 mt-0.5">
-                            {predictionResult ? "View top predictions" : "Run model first"}
                           </div>
                         </div>
                       </button>
@@ -745,8 +680,8 @@ export function Sidebar() {
                     : "text-slate-600 hover:bg-slate-50 hover:text-slate-900 font-medium",
                 ].join(" ")}
               >
-                <Activity className="h-4 w-4 text-[#6A2DF1] shrink-0" />
-                <span className="text-sm">Radar Analytics</span>
+                <Activity className="h-4 w-4 text-[#8B5CF6] shrink-0" />
+                <span className="text-sm">Head to Head Analysis</span>
               </button>
 
               <button
@@ -758,7 +693,7 @@ export function Sidebar() {
                     : "text-slate-600 hover:bg-slate-50 hover:text-slate-900 font-medium",
                 ].join(" ")}
               >
-                <BarChart2 className="h-4 w-4 text-[#10B981] shrink-0" />
+                <BarChart2 className="h-4 w-4 text-[#8B5CF6] shrink-0" />
                 <span className="text-sm">Bar Analytics (5 Horses)</span>
               </button>
             </div>
@@ -768,28 +703,15 @@ export function Sidebar() {
              COLLAPSED RAIL VIEW (64px)
              ══════════════════════════════════════════════════════════ */
           <div className="flex flex-col items-center gap-1.5 w-full">
-            <RailTooltip text="Home (Reset All)">
-              <button
-                onClick={handleHomeClick}
-                className={railBtn(location.pathname === "/")}
-                title="Reset and go to Home"
-                aria-label="Home"
-              >
-                <Home className="h-5 w-5 text-[#6A2DF1]" />
-              </button>
-            </RailTooltip>
-
-            <div className="my-1 w-8 h-px bg-slate-200" />
-
             <RailTooltip text={activeVenue ? `Events: ${activeVenue.venue}` : "Events"}>
               <button
                 onClick={() => {
                   if (activeVenue) navigate(`/venues/${activeVenue.id}`);
                   else navigate("/");
                 }}
-                className={railBtn(location.pathname.startsWith("/venues"))}
+                className={railBtn(location.pathname === "/" || location.pathname.startsWith("/venues"))}
               >
-                <MapPin className="h-5 w-5 text-[#6A2DF1]" />
+                <MapPin className="h-5 w-5 text-[#8B5CF6]" />
               </button>
             </RailTooltip>
 
@@ -801,7 +723,7 @@ export function Sidebar() {
                 }}
                 className={railBtn(Boolean(location.pathname.startsWith("/races")))}
               >
-                <Flag className="h-5 w-5 text-[#1A56DB]" />
+                <Flag className="h-5 w-5 text-[#8B5CF6]" />
               </button>
             </RailTooltip>
 
@@ -809,25 +731,25 @@ export function Sidebar() {
             {activeHorses.length > 0 && (
               <>
                 <div className="my-1 w-8 h-px bg-slate-200" />
-                <div className="flex flex-col items-center gap-1.5 w-full max-h-48 overflow-y-auto">
-                  {activeHorses.map((horse) => {
+                <div className="flex flex-col items-center gap-1.5 w-full max-h-48 overflow-y-auto overflow-x-hidden [scrollbar-width:thin]">
+                  {activeHorses.map((horse, idx) => {
                     const isSelected = (String(currentHorse?.id) === String(horse.id) || String(urlHorseId) === String(horse.id)) && location.pathname.startsWith("/horses");
-                    const badge = getDrawBadge(horse.draw_number, isSelected);
+                    const assignedColor = horseColor(horse.id, idx);
+                    const saddleNumber = horse.runner_number ?? horse.draw_number ?? idx + 1;
                     return (
-                      <RailTooltip key={horse.id} text={`[${horse.draw_number ?? "?"}] ${horse.name}`}>
+                      <RailTooltip key={horse.id} text={`[${saddleNumber}] ${horse.name}`}>
                         <button
                           onClick={() => handleSelectHorse(horse)}
                           className={[
-                            "flex h-8 w-8 shrink-0 aspect-square items-center justify-center rounded-lg text-xs font-black transition-all duration-200",
-                            isSelected ? "ring-2 ring-slate-900 ring-offset-1 scale-110 shadow-sm" : "hover:opacity-80",
+                            "flex h-7 w-7 shrink-0 aspect-square items-center justify-center rounded-full text-xs font-black text-white transition-all duration-200",
+                            isSelected ? "ring-2 ring-purple-600 ring-offset-1 scale-110 shadow-sm" : "hover:opacity-80",
                           ].join(" ")}
                           style={{
-                            backgroundColor: badge.bg,
-                            color: badge.text,
-                            border: badge.border !== "transparent" ? `1px solid ${badge.border}` : undefined,
+                            backgroundColor: assignedColor,
+                            boxShadow: isSelected ? `0 0 8px ${assignedColor}88` : undefined,
                           }}
                         >
-                          {horse.draw_number ?? "?"}
+                          {saddleNumber}
                         </button>
                       </RailTooltip>
                     );
@@ -843,7 +765,7 @@ export function Sidebar() {
                 onClick={handleGoToPredictor}
                 className={[
                   railBtn(isPredictorActive),
-                  !isPredictorUnlocked ? "opacity-40 cursor-not-allowed" : "",
+                  !isPredictorUnlocked ? "opacity-40 pointer-events-none cursor-not-allowed" : "",
                 ].join(" ")}
                 title={!isPredictorUnlocked ? "Please select an event and race first." : undefined}
                 aria-disabled={!isPredictorUnlocked}
@@ -854,21 +776,21 @@ export function Sidebar() {
 
             <div className="my-1 w-8 h-px bg-slate-200" />
 
-            <RailTooltip text="Radar Analytics">
+            <RailTooltip text="Head to Head Analysis">
               <button
                 onClick={() => navigate("/radar-analytics")}
                 className={railBtn(location.pathname === "/radar-analytics")}
               >
-                <Activity className="h-5 w-5 text-[#6A2DF1]" />
+                <Activity className="h-5 w-5 text-[#8B5CF6]" />
               </button>
             </RailTooltip>
 
-            <RailTooltip text="Bar Analytics (Compare 5)">
+            <RailTooltip text="Bar Analytics (5 Horses)">
               <button
                 onClick={() => navigate("/bar-analytics")}
                 className={railBtn(location.pathname === "/bar-analytics")}
               >
-                <BarChart2 className="h-5 w-5 text-[#10B981]" />
+                <BarChart2 className="h-5 w-5 text-[#8B5CF6]" />
               </button>
             </RailTooltip>
           </div>

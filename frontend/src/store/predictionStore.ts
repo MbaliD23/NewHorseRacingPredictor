@@ -18,12 +18,15 @@ type PredictionState = {
   horseOrderBy: HorseOrderBy;
   selectedVariables: PredictionVariable[];
   predictionResult: PredictionResponse | null;
+  isSidebarOpen: boolean;
   setCurrentVenue: (venue: Venue | null) => void;
   setCurrentRace: (race: Race | null) => void;
   setCurrentHorse: (horse: Horse | null) => void;
   setHorseOrderBy: (horseOrderBy: HorseOrderBy) => void;
   setSelectedVariables: (variables: PredictionVariable[]) => void;
   setPredictionResult: (result: PredictionResponse | null) => void;
+  setSidebarOpen: (open: boolean) => void;
+  toggleSidebar: () => void;
   resetFlow: () => void;
 };
 
@@ -34,12 +37,15 @@ export const usePredictionStore = create<PredictionState>((set) => ({
   horseOrderBy: "draw_number",
   selectedVariables: [],
   predictionResult: null,
+  isSidebarOpen: true,
   setCurrentVenue: (currentVenue) => set({ currentVenue }),
   setCurrentRace: (currentRace) => set({ currentRace }),
   setCurrentHorse: (currentHorse) => set({ currentHorse }),
   setHorseOrderBy: (horseOrderBy) => set({ horseOrderBy }),
   setSelectedVariables: (selectedVariables) => set({ selectedVariables }),
   setPredictionResult: (predictionResult) => set({ predictionResult }),
+  setSidebarOpen: (isSidebarOpen) => set({ isSidebarOpen }),
+  toggleSidebar: () => set((state) => ({ isSidebarOpen: !state.isSidebarOpen })),
   resetFlow: () =>
     set({
       currentVenue: null,

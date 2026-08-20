@@ -7,8 +7,10 @@ interface HorseSplitViewProps {
   horse: Horse | null;
   raceTitle?: string;
   raceNumber?: number;
+  raceDistance?: string | null;
   venueName?: string;
   horses?: Horse[];
+  onSelectHorse?: (horse: Horse) => void;
   footerActions?: React.ReactNode;
 }
 
@@ -16,8 +18,10 @@ export function HorseSplitView({
   horse,
   raceTitle,
   raceNumber,
+  raceDistance,
   venueName,
   horses,
+  onSelectHorse,
   footerActions,
 }: HorseSplitViewProps) {
   return (
@@ -32,7 +36,10 @@ export function HorseSplitView({
             horse={horse}
             raceTitle={raceTitle}
             raceNumber={raceNumber}
+            raceDistance={raceDistance}
             venueName={venueName}
+            horses={horses}
+            onSelectHorse={onSelectHorse}
           />
           {footerActions && <div className="mt-4 px-2">{footerActions}</div>}
         </div>
@@ -43,6 +50,7 @@ export function HorseSplitView({
             selectedHorseId={horse?.id}
             selectedHorseName={horse?.name}
             horses={horses}
+            onSelectHorse={onSelectHorse}
             isEmbedded
           />
         </div>

@@ -3,6 +3,7 @@ import { ArrowRight, BarChart3, BadgeCheck, Flame, Gauge, Medal, Scale, Trophy }
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/common/Button";
 import { AsyncBoundary } from "@/components/status/AsyncBoundary";
+import { BackButton } from "@/components/navigation/BackButton";
 import { cn, valueOrUnavailable } from "@/lib/utils";
 import { usePredictionStore } from "@/store/predictionStore";
 import { predictionVariableLabels } from "@/types/prediction";
@@ -28,9 +29,16 @@ export function PredictionResultsPage() {
   return (
     <section className="page-section screen-shell prediction-results-page light-theme min-h-[calc(100vh-96px)]">
       <div className="page-heading page-heading-wide light-heading prediction-results-heading">
-        <h1>
-          Top <span>Predictions</span>
-        </h1>
+        <div className="flex items-center gap-3">
+          <BackButton
+            to={currentRace?.id ? `/analysis/${currentRace.id}` : "/"}
+            fallbackTo={currentRace?.id ? `/analysis/${currentRace.id}` : "/"}
+            label="Back to Factors"
+          />
+          <h1 className="text-3xl font-black text-slate-950">
+            Top <span className="text-purple-600">Predictions</span>
+          </h1>
+        </div>
         <p>
           {currentRace?.title
             ? `${currentRace.title} ranked through your selected analysis mix.`

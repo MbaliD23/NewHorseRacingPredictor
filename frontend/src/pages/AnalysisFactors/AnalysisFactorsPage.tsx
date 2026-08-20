@@ -4,6 +4,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/components/common/Button";
 import { GlassCard } from "@/components/common/GlassCard";
 import { AsyncBoundary } from "@/components/status/AsyncBoundary";
+import { BackButton } from "@/components/navigation/BackButton";
 import { usePrediction } from "@/hooks/usePrediction";
 import { useRace } from "@/hooks/useRace";
 import { usePredictionStore } from "@/store/predictionStore";
@@ -72,7 +73,7 @@ export function AnalysisFactorsPage() {
   const navigate = useNavigate();
   const { data: race, isLoading, isError } = useRace(raceId);
   const prediction = usePrediction();
-  const { selectedVariables, setSelectedVariables, setCurrentRace, setPredictionResult } = usePredictionStore();
+  const { selectedVariables, setSelectedVariables, currentRace, setCurrentRace, setPredictionResult } = usePredictionStore();
   const [activeInfo, setActiveInfo] = useState<PredictionVariable | null>(null);
 
   const activeFactor = useMemo(() => factors.find((factor) => factor.code === activeInfo), [activeInfo]);
@@ -101,9 +102,16 @@ export function AnalysisFactorsPage() {
   return (
     <section className="page-section screen-shell analysis-page light-theme min-h-[calc(100vh-96px)]">
       <div className="page-heading page-heading-wide analysis-heading light-heading">
-        <h1>
-          Choose Your <span>Analysis Factors</span>
-        </h1>
+        <div className="flex items-center gap-3">
+          <BackButton
+            to={raceId ? `/races/${raceId}` : currentRace?.id ? `/races/${currentRace.id}` : "/"}
+            fallbackTo={raceId ? `/races/${raceId}` : currentRace?.id ? `/races/${currentRace.id}` : "/"}
+            label="Back to Race"
+          />
+          <h1 className="text-3xl font-black text-slate-950">
+            Choose Your <span className="text-purple-600">Analysis Factors</span>
+          </h1>
+        </div>
         <p>Select up to 3 factors to weight the prediction algorithm</p>
       </div>
 

@@ -94,11 +94,16 @@ export function normMerit(val: number): number {
   return Math.min(Math.max(((val - 50) / 80) * 100, 5), 100);
 }
 
-export function parsePct(str?: string | number): number {
+export function parsePct(str?: string | number | null): number {
   if (str == null || str === "-") return 0;
-  if (typeof str === "number") return Math.min(Math.max(str, 0), 100);
+  if (typeof str === "number") {
+    const num = str > 0 && str <= 1 ? str * 100 : str;
+    return Math.min(Math.max(num, 0), 100);
+  }
   const val = parseFloat(String(str).replace("%", "").trim());
-  return isNaN(val) ? 0 : Math.min(Math.max(val, 0), 100);
+  if (isNaN(val)) return 0;
+  const num = val > 0 && val <= 1 ? val * 100 : val;
+  return Math.min(Math.max(num, 0), 100);
 }
 
 export function extractPerformanceValue(
@@ -109,12 +114,14 @@ export function extractPerformanceValue(
   // 1. Direct numeric or percentage value from backend payload
   if (directValue != null && directValue !== "" && directValue !== "-") {
     if (typeof directValue === "number") {
-      const clamped = Math.min(Math.max(directValue, 0), 100);
-      return { display: `${Math.round(directValue)}%`, normalized: clamped };
+      const num = directValue > 0 && directValue <= 1 ? directValue * 100 : directValue;
+      const clamped = Math.min(Math.max(num, 0), 100);
+      return { display: `${Math.round(num)}%`, normalized: clamped };
     }
     const cleanStr = String(directValue).trim();
-    const num = parseFloat(cleanStr.replace("%", ""));
-    if (!isNaN(num)) {
+    const parsed = parseFloat(cleanStr.replace("%", ""));
+    if (!isNaN(parsed)) {
+      const num = parsed > 0 && parsed <= 1 ? parsed * 100 : parsed;
       const clamped = Math.min(Math.max(num, 0), 100);
       return { display: `${Math.round(num)}%`, normalized: clamped };
     }

@@ -1,18 +1,31 @@
-import { ArrowRight } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
-import { Button } from "@/components/common/Button";
+import { PredictorButton } from "@/components/common/Button";
 import { HorseSplitView } from "@/components/analytics/HorseSplitView";
 import { AsyncBoundary } from "@/components/status/AsyncBoundary";
 import { useRace } from "@/hooks/useRace";
 import { usePredictionStore } from "@/store/predictionStore";
+import type { Horse } from "@/types/race";
 
 export function HorseDetailsPage() {
   const { horseId } = useParams();
   const navigate = useNavigate();
   const { currentHorse, currentRace, setCurrentHorse } = usePredictionStore();
   const raceQuery = useRace(currentHorse?.race_id ?? currentRace?.id);
+  const race = raceQuery.data ?? currentRace;
+  const horses = race?.horses ?? currentRace?.horses ?? [];
+
+  // Find horse matching horseId from url param or store
   const horse =
-    currentHorse ?? raceQuery.data?.horses.find((item) => String(item.id) === horseId) ?? null;
+    (horseId ? horses.find((item) => String(item.id) === String(horseId)) : null) ??
+    (horseId && String(currentHorse?.id) === String(horseId) ? currentHorse : null) ??
+    currentHorse ??
+    horses[0] ??
+    null;
+
+  const handleSelectHorse = (newHorse: Horse) => {
+    setCurrentHorse(newHorse);
+    navigate(`/horses/${newHorse.id}`);
+  };
 
   return (
     <section className="w-full h-full min-h-0 py-0">
@@ -24,23 +37,23 @@ export function HorseDetailsPage() {
       >
         <HorseSplitView
           horse={horse}
-          raceTitle={currentRace?.title ?? raceQuery.data?.title ?? undefined}
-          raceNumber={currentRace?.race_number ?? raceQuery.data?.race_number ?? undefined}
-          venueName={currentRace?.venue ?? raceQuery.data?.venue ?? undefined}
-          horses={raceQuery.data?.horses ?? currentRace?.horses}
+          raceTitle={race?.title ?? undefined}
+          raceNumber={race?.race_number ?? undefined}
+          raceDistance={race?.distance ?? currentRace?.distance ?? undefined}
+          venueName={race?.venue ?? undefined}
+          horses={horses}
+          onSelectHorse={handleSelectHorse}
           footerActions={
             <div className="flex items-center justify-center max-w-4xl mx-auto pb-4">
-              <Button
-                size="lg"
-                className="w-full sm:w-auto px-8 py-3 rounded-full bg-purple-700 hover:bg-purple-800 text-white font-bold shadow-lg shadow-purple-600/20"
+              <PredictorButton
+                raceId={horse?.race_id ?? currentRace?.id}
                 onClick={() => {
                   if (horse) setCurrentHorse(horse);
                   navigate(`/analysis/${horse?.race_id ?? currentRace?.id}`);
                 }}
                 disabled={!horse?.race_id && !currentRace?.id}
-              >
-                Go To Prediction Factor Selection <ArrowRight className="ml-2 h-5 w-5" />
-              </Button>
+                className="w-full sm:w-auto min-w-[280px]"
+              />
             </div>
           }
         />
