@@ -167,6 +167,49 @@ export function RadarAnalyticsView({
   const activeAxes = ALL_AXES.filter((ax) => activeMetricKeys.has(ax.key));
   const radarLimitReached = activeHorseIds.length >= RADAR_MAX;
 
+  const [sortCol, setSortCol] = useState<string | null>(null);
+  const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
+
+  const handleSort = useCallback((colKey: string) => {
+    setSortCol((prevCol) => {
+      if (prevCol === colKey) {
+        setSortDir((prevDir) => (prevDir === "asc" ? "desc" : "asc"));
+        return prevCol;
+      }
+      setSortDir("desc");
+      return colKey;
+    });
+  }, []);
+
+  const sortedHorses = useMemo(() => {
+    if (!sortCol) return dynamicHorses;
+    return [...dynamicHorses].sort((a, b) => {
+      let comparison = 0;
+      if (sortCol === "name") {
+        comparison = a.name.localeCompare(b.name);
+      } else if (sortCol === "meritRating") {
+        comparison = (a.meritRating ?? 0) - (b.meritRating ?? 0);
+      } else if (sortCol === "jockeyPerf") {
+        const valA = parseFloat(String(a.jockeyPerf).replace("%", "").trim());
+        const valB = parseFloat(String(b.jockeyPerf).replace("%", "").trim());
+        const numA = isNaN(valA) ? -Infinity : valA;
+        const numB = isNaN(valB) ? -Infinity : valB;
+        comparison = numA - numB;
+      } else if (sortCol === "trainerPerf") {
+        const valA = parseFloat(String(a.trainerPerf).replace("%", "").trim());
+        const valB = parseFloat(String(b.trainerPerf).replace("%", "").trim());
+        const numA = isNaN(valA) ? -Infinity : valA;
+        const numB = isNaN(valB) ? -Infinity : valB;
+        comparison = numA - numB;
+      } else if (sortCol === "totRns" || sortCol === "crs" || sortCol === "dst" || sortCol === "cd" || sortCol === "wet") {
+        comparison = (a.norm[sortCol as keyof typeof a.norm] ?? 0) - (b.norm[sortCol as keyof typeof b.norm] ?? 0);
+      } else if (sortCol === "forecastOdds") {
+        comparison = (a.norm.forecastOdds ?? 0) - (b.norm.forecastOdds ?? 0);
+      }
+      return sortDir === "asc" ? comparison : -comparison;
+    });
+  }, [dynamicHorses, sortCol, sortDir]);
+
   /** Reusable table for both embedded + standalone */
   const tableSection = (
     <div className={styles.bottomCard}>
@@ -188,20 +231,35 @@ export function RadarAnalyticsView({
         <table className={styles.table} role="grid" aria-label="Race record comparison">
           <thead>
             <tr className={styles.thead}>
-              {TABLE_COLS.map((col) => (
-                <th key={col.key} className={styles.th}>
-                  <span className={styles.thInner}>
-                    {col.label}
-                    <svg width="9" height="9" viewBox="0 0 9 9" fill="none" aria-hidden="true">
-                      <path d="M4.5 1v7M2 4l2.5-3 2.5 3" stroke="currentColor" strokeWidth="1.1" strokeLinecap="round" />
-                    </svg>
-                  </span>
-                </th>
-              ))}
+              {TABLE_COLS.map((col) => {
+                const isSorted = sortCol === col.key;
+                return (
+                  <th key={col.key} className={styles.th} onClick={() => handleSort(col.key)}>
+                    <span className={styles.thInner}>
+                      {col.label}
+                      <svg
+                        width="9"
+                        height="9"
+                        viewBox="0 0 9 9"
+                        fill="none"
+                        aria-hidden="true"
+                        style={{
+                          transform: isSorted && sortDir === "asc" ? "rotate(180deg)" : "none",
+                          opacity: isSorted ? 1 : 0.4,
+                          color: isSorted ? "#60A5FA" : "currentColor",
+                          transition: "transform 0.15s ease, opacity 0.15s ease",
+                        }}
+                      >
+                        <path d="M4.5 1v7M2 4l2.5-3 2.5 3" stroke="currentColor" strokeWidth="1.1" strokeLinecap="round" />
+                      </svg>
+                    </span>
+                  </th>
+                );
+              })}
             </tr>
           </thead>
           <tbody>
-            {dynamicHorses.map((horse, idx) => {
+            {sortedHorses.map((horse, idx) => {
               const isActive = activeHorseIds.includes(horse.id);
               const color = horse.color ?? horseColor(horse.id, idx);
               const isLimitedOut = radarLimitReached && !isActive;

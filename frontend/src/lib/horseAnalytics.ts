@@ -111,30 +111,26 @@ export function extractPerformanceValue(
   recordStr?: string | null,
   comboPercent?: number | string | null
 ): { display: string; normalized: number } {
-  // 1. Direct numeric or percentage value from backend payload
+  // 1. Direct numeric or string value from backend payload
   if (directValue != null && directValue !== "" && directValue !== "-") {
-    if (typeof directValue === "number") {
-      const num = directValue > 0 && directValue <= 1 ? directValue * 100 : directValue;
-      const clamped = Math.min(Math.max(num, 0), 100);
-      return { display: `${Math.round(num)}%`, normalized: clamped };
-    }
-    const cleanStr = String(directValue).trim();
-    const parsed = parseFloat(cleanStr.replace("%", ""));
+    const rawStr = String(directValue).replace("%", "").trim();
+    const parsed = parseFloat(rawStr);
     if (!isNaN(parsed)) {
-      const num = parsed > 0 && parsed <= 1 ? parsed * 100 : parsed;
-      const clamped = Math.min(Math.max(num, 0), 100);
-      return { display: `${Math.round(num)}%`, normalized: clamped };
+      const normalized = Math.min(Math.max(parsed > 0 && parsed <= 1 ? parsed * 100 : parsed, 0), 100);
+      return { display: rawStr, normalized };
     }
+    return { display: String(directValue).trim(), normalized: 0 };
   }
 
-  // 2. Parse from individual record string (e.g. "12:3-2-1", "3/12", or "18%")
+  // 2. Parse from individual record string (e.g. "12:3-2-1", "3/12", or "18")
   if (recordStr && recordStr !== "-" && recordStr !== "0:0-0-0") {
     const cleanStr = recordStr.trim();
     if (cleanStr.includes("%")) {
-      const num = parseFloat(cleanStr.replace("%", ""));
+      const raw = cleanStr.replace("%", "").trim();
+      const num = parseFloat(raw);
       if (!isNaN(num)) {
-        const clamped = Math.min(Math.max(num, 0), 100);
-        return { display: `${Math.round(num)}%`, normalized: clamped };
+        const clamped = Math.min(Math.max(num > 0 && num <= 1 ? num * 100 : num, 0), 100);
+        return { display: raw, normalized: clamped };
       }
     }
 
@@ -143,8 +139,9 @@ export function extractPerformanceValue(
       const wins = parseInt(wStr, 10);
       const total = parseInt(tStr, 10);
       if (!isNaN(wins) && !isNaN(total) && total > 0) {
-        const winPct = Math.min(Math.max((wins / total) * 100, 0), 100);
-        return { display: `${Math.round(winPct)}%`, normalized: winPct };
+        const winPct = (wins / total) * 100;
+        const formatted = winPct % 1 === 0 ? String(winPct) : winPct.toFixed(1);
+        return { display: formatted, normalized: Math.min(Math.max(winPct, 0), 100) };
       }
     }
 
@@ -157,18 +154,20 @@ export function extractPerformanceValue(
         const seconds = parts[1] || 0;
         const thirds = parts[2] || 0;
         const weightedScore = Math.min(Math.max(((wins * 1.0 + seconds * 0.5 + thirds * 0.25) / total) * 100, 0), 100);
-        const winPct = Math.round((wins / total) * 100);
-        return { display: `${winPct}%`, normalized: weightedScore };
+        const winPct = (wins / total) * 100;
+        const formatted = winPct % 1 === 0 ? String(winPct) : winPct.toFixed(1);
+        return { display: formatted, normalized: weightedScore };
       }
     }
   }
 
   // 3. Combo percentage fallback if individual record is absent
   if (comboPercent != null && comboPercent !== "" && comboPercent !== "-") {
-    const num = typeof comboPercent === "number" ? comboPercent : parseFloat(String(comboPercent).replace("%", "").trim());
+    const raw = String(comboPercent).replace("%", "").trim();
+    const num = parseFloat(raw);
     if (!isNaN(num)) {
-      const clamped = Math.min(Math.max(num, 0), 100);
-      return { display: `${Math.round(num)}%`, normalized: clamped };
+      const normalized = Math.min(Math.max(num > 0 && num <= 1 ? num * 100 : num, 0), 100);
+      return { display: raw, normalized };
     }
   }
 
@@ -272,8 +271,8 @@ export const HORSES_RAW: RawHorse[] = [
     dst: "14:4-2-1",
     cd: "3:1-0-1",
     meritRating: 112,
-    jockeyPerf: "18%",
-    trainerPerf: "14%",
+    jockeyPerf: "18",
+    trainerPerf: "14",
   },
   {
     id: 2,
@@ -287,8 +286,8 @@ export const HORSES_RAW: RawHorse[] = [
     dst: "10:2-3-1",
     cd: "2:0-1-0",
     meritRating: 98,
-    jockeyPerf: "22%",
-    trainerPerf: "11%",
+    jockeyPerf: "22",
+    trainerPerf: "11",
   },
   {
     id: 3,
@@ -302,8 +301,8 @@ export const HORSES_RAW: RawHorse[] = [
     dst: "12:3-1-2",
     cd: "4:1-1-0",
     meritRating: 105,
-    jockeyPerf: "15%",
-    trainerPerf: "19%",
+    jockeyPerf: "15",
+    trainerPerf: "19",
   },
   {
     id: 4,
@@ -317,8 +316,8 @@ export const HORSES_RAW: RawHorse[] = [
     dst: "16:5-3-2",
     cd: "5:2-1-0",
     meritRating: 118,
-    jockeyPerf: "26%",
-    trainerPerf: "21%",
+    jockeyPerf: "26",
+    trainerPerf: "21",
   },
   {
     id: 5,
@@ -332,8 +331,8 @@ export const HORSES_RAW: RawHorse[] = [
     dst: "7:2-1-0",
     cd: "1:0-0-0",
     meritRating: 88,
-    jockeyPerf: "12%",
-    trainerPerf: "9%",
+    jockeyPerf: "12",
+    trainerPerf: "9",
   },
 ];
 

@@ -1,18 +1,21 @@
-import type { CSSProperties, ReactNode } from "react";
-import { ArrowRight, BarChart3, BadgeCheck, Flame, Gauge, Medal, Scale, Trophy } from "lucide-react";
+import type { ReactNode } from "react";
+import {
+  ArrowRight,
+  BarChart3,
+  BadgeCheck,
+  Flame,
+  Gauge,
+  Medal,
+  Scale,
+  Sparkles,
+  Trophy,
+} from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/common/Button";
 import { AsyncBoundary } from "@/components/status/AsyncBoundary";
 import { BackButton } from "@/components/navigation/BackButton";
-import { cn, valueOrUnavailable } from "@/lib/utils";
 import { usePredictionStore } from "@/store/predictionStore";
 import { predictionVariableLabels } from "@/types/prediction";
-
-const rankAccentMap: Record<1 | 2 | 3, { tone: string; glow: string }> = {
-  1: { tone: "#d4a72c", glow: "rgba(212, 167, 44, 0.18)" },
-  2: { tone: "#8b5cf6", glow: "rgba(139, 92, 246, 0.18)" },
-  3: { tone: "#7c3aed", glow: "rgba(124, 58, 237, 0.16)" },
-};
 
 const rankLabels: Record<1 | 2 | 3, string> = {
   1: "1st Prediction",
@@ -27,202 +30,177 @@ export function PredictionResultsPage() {
   const weightedBy = predictionResult?.selected_variables ?? selectedVariables;
 
   return (
-    <section className="page-section screen-shell prediction-results-page light-theme min-h-[calc(100vh-96px)]">
-      <div className="page-heading page-heading-wide light-heading prediction-results-heading">
-        <div className="flex items-center gap-3">
-          <BackButton
-            to={currentRace?.id ? `/analysis/${currentRace.id}` : "/"}
-            fallbackTo={currentRace?.id ? `/analysis/${currentRace.id}` : "/"}
-            label="Back to Factors"
-          />
-          <h1 className="text-3xl font-black text-slate-950">
-            Top <span className="text-purple-600">Predictions</span>
-          </h1>
-        </div>
-        <p>
-          {currentRace?.title
-            ? `${currentRace.title} ranked through your selected analysis mix.`
-            : "Algorithmic ranking based on your selected factors."}
-        </p>
-        <div className="prediction-weighted-by">
-          {weightedBy.map((variable) => (
-            <span className="prediction-chip" key={variable}>
-              {predictionVariableLabels[variable]}
-            </span>
-          ))}
-        </div>
-      </div>
-
-      <AsyncBoundary
-        isEmpty={predictions.length === 0}
-        emptyMessage={
-          <div className="flex flex-col items-center justify-center p-8 max-w-md mx-auto text-center space-y-4 rounded-2xl bg-white shadow-sm border border-purple-100 my-8">
-            <div className="flex h-12 w-12 shrink-0 aspect-square items-center justify-center rounded-full bg-purple-100 text-purple-700">
-              <Trophy className="h-6 w-6" />
-            </div>
-            <h2 className="text-lg font-bold text-slate-900">Please select an event and race first</h2>
-            <p className="text-sm text-slate-500">
-              To view predictions, please select an event and race to configure and run the algorithm.
-            </p>
-            <Button
-              onClick={() => navigate("/")}
-              className="rounded-full px-6 bg-purple-700 hover:bg-purple-800 text-white font-bold"
-            >
-              Select Event & Race
-            </Button>
+    <section className="page-section screen-shell w-full gap-6 py-4">
+      <div className="mx-auto flex w-full max-w-[1600px] flex-col gap-6 px-2 sm:px-4 lg:px-6">
+        {/* Centered Header Card */}
+        <div className="relative rounded-[32px] border border-slate-200/80 bg-white px-4 py-6 shadow-[0_1px_8px_-4px_rgba(0,0,0,0.08)] sm:px-6 lg:px-8">
+          <div className="absolute left-4 top-4 sm:left-6 sm:top-6">
+            <BackButton
+              to={currentRace?.id ? `/analysis/${currentRace.id}` : "/"}
+              fallbackTo={currentRace?.id ? `/analysis/${currentRace.id}` : "/"}
+              label="Back to Factors"
+            />
           </div>
-        }
-      >
-        <div className="prediction-grid prediction-grid--premium">
-          {predictions.map((item, index) => {
-            const selected = currentHorse?.id === item.horse_id;
-            const matchingHorse = currentRace?.horses.find((horse) => horse.id === item.horse_id) ?? null;
-            const rank = item.predicted_position;
-            const accent = rankAccentMap[rank];
 
-            function openSelectedHorse() {
-              setCurrentHorse(matchingHorse);
-              navigate(`/predictions/horses/${item.horse_id}`);
-            }
+          <div className="flex flex-col items-center justify-center text-center w-full max-w-3xl mx-auto pt-2 sm:pt-0">
+            <h1 className="text-[clamp(2rem,3.4vw,3.4rem)] font-black leading-[1.05] tracking-tight text-slate-950">
+              Top <span className="text-[#6A2DF1]">Predictions</span>
+            </h1>
+            <p className="mt-2 text-sm font-medium text-slate-500 max-w-2xl">
+              {currentRace?.title
+                ? `${currentRace.title} ranked through your selected factor weighting.`
+                : "Algorithmic ranking based on your selected factors."}
+            </p>
+            <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
+              {weightedBy.map((variable) => (
+                <span
+                  className="inline-flex items-center gap-1.5 rounded-full border border-purple-200/90 bg-purple-50 px-3.5 py-1 text-xs font-bold text-purple-700 shadow-2xs"
+                  key={variable}
+                >
+                  <Sparkles className="h-3 w-3 text-purple-600" />
+                  {predictionVariableLabels[variable]}
+                </span>
+              ))}
+            </div>
+          </div>
+        </div>
 
-            return (
-              <article
-                key={`${item.horse_id ?? item.horse_name ?? index}`}
-                className={cn(
-                  "prediction-results-card prediction-card-selectable",
-                  `prediction-results-card--rank-${rank}`,
-                  selected && "selected",
-                )}
-                onClick={openSelectedHorse}
-                onKeyDown={(event) => {
-                  if (event.key === "Enter" || event.key === " ") {
-                    event.preventDefault();
-                    openSelectedHorse();
-                  }
-                }}
-                role="button"
-                tabIndex={0}
-                style={
-                  {
-                    "--prediction-accent": accent.tone,
-                    "--prediction-accent-soft": accent.glow,
-                  } as CSSProperties
-                }
+        <AsyncBoundary
+          isEmpty={predictions.length === 0}
+          emptyMessage={
+            <div className="flex flex-col items-center justify-center p-8 max-w-md mx-auto text-center space-y-4 rounded-2xl bg-white shadow-sm border border-purple-100 my-8">
+              <div className="flex h-12 w-12 shrink-0 aspect-square items-center justify-center rounded-full bg-purple-100 text-purple-700">
+                <Trophy className="h-6 w-6" />
+              </div>
+              <h2 className="text-lg font-bold text-slate-900">Please select an event and race first</h2>
+              <p className="text-sm text-slate-500">
+                To view predictions, please select an event and race to configure and run the algorithm.
+              </p>
+              <Button
+                onClick={() => navigate("/")}
+                className="rounded-full px-6 bg-purple-700 hover:bg-purple-800 text-white font-bold"
               >
-                <div className="prediction-card-shell">
-                  <div className="prediction-card-head">
-                    <div className="prediction-rank-stack">
-                      <div className="prediction-rank-badge">
-                        <Medal className="h-4 w-4" />
-                        <span>{rankLabels[rank]}</span>
-                      </div>
-                      <div className="prediction-position-pill">
-                        <span>Rank</span>
-                        <strong>{rank}</strong>
+                Select Event & Race
+              </Button>
+            </div>
+          }
+        >
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 pb-6">
+            {predictions.map((item, index) => {
+              const matchingHorse = currentRace?.horses.find((horse) => horse.id === item.horse_id) ?? null;
+              const rank = (item.predicted_position ?? (index + 1)) as 1 | 2 | 3;
+
+              function openSelectedHorse() {
+                setCurrentHorse(matchingHorse);
+                navigate(`/predictions/horses/${item.horse_id}`);
+              }
+
+              return (
+                <article
+                  key={`${item.horse_id ?? item.horse_name ?? index}`}
+                  className="group relative flex flex-col justify-between overflow-hidden rounded-[26px] border border-slate-200/90 bg-white p-5 shadow-[0_1px_8px_-4px_rgba(0,0,0,0.08)] transition-all duration-300 hover:bg-slate-900/80 hover:backdrop-blur-md hover:border-purple-600 hover:ring-[3px] hover:ring-purple-600 hover:shadow-[0_12px_40px_rgb(0,0,0,0.25)] hover:-translate-y-1 cursor-pointer"
+                  onClick={openSelectedHorse}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter" || event.key === " ") {
+                      event.preventDefault();
+                      openSelectedHorse();
+                    }
+                  }}
+                  role="button"
+                  tabIndex={0}
+                >
+                  <div className="flex flex-col gap-4">
+                    {/* Top Header: Unified Purple Rank Badge */}
+                    <div className="flex items-center justify-between gap-3">
+                      <div className="inline-flex items-center gap-1.5 rounded-full border border-purple-200 bg-purple-50 px-3 py-1 text-xs font-bold text-purple-700">
+                        <Medal className="h-3.5 w-3.5 text-purple-600" />
+                        <span>{rankLabels[rank] ?? `Rank #${rank}`}</span>
                       </div>
                     </div>
-                    {item.runner_number ? <div className="horse-number prediction-runner-number">{item.runner_number}</div> : null}
-                  </div>
 
-                  <div className="prediction-card-copy">
-                    {item.horse_name ? <h2>{item.horse_name}</h2> : null}
-                    <div className="prediction-score-strip">
-                      {typeof item.overall_score === "number" ? (
-                        <Metric
-                          icon={<BarChart3 className="h-4 w-4" />}
-                          label="Overall Score"
-                          value={formatScore(item.overall_score)}
-                          tone="score"
-                        />
-                      ) : null}
-                      {typeof item.confidence_percent === "number" ? (
-                        <Metric
-                          icon={<Trophy className="h-4 w-4" />}
-                          label="Confidence"
-                          value={`${formatPercent(item.confidence_percent)}%`}
-                          tone="confidence"
-                        />
-                      ) : null}
+                    {/* Horse Name */}
+                    <div>
+                      <h2 className="truncate text-xl font-black tracking-tight text-slate-950 group-hover:text-white transition-colors duration-300">
+                        {item.horse_name ?? `Horse #${item.runner_number ?? index + 1}`}
+                      </h2>
                     </div>
-                  </div>
 
-                  <div className="prediction-metrics-grid">
-                    <Metric label="Weight" value={formatWeight(item.weight_value)} icon={<Scale className="h-4 w-4" />} />
-                    <Metric label="Draw" value={formatDraw(item.draw_number)} icon={<BadgeCheck className="h-4 w-4" />} />
-                    <Metric
-                      label="Speed Index"
-                      value={formatMetric(item.speed_index)}
-                      icon={<Gauge className="h-4 w-4" />}
-                    />
-                    <Metric
-                      label="Predicted Time"
-                      value={formatMetric(item.predicted_time)}
-                      icon={<Flame className="h-4 w-4" />}
-                    />
-                    <Metric
-                      label="Previous Run"
-                      value={formatMetric(item.previous_run_rating)}
-                      icon={<BarChart3 className="h-4 w-4" />}
-                    />
-                    <Metric
-                      label="Strongest"
-                      value={valueOrUnavailable(item.strongest_metric)}
-                      icon={<BadgeCheck className="h-4 w-4" />}
-                    />
-                  </div>
+                    {/* Unified Score & Confidence Summary Strip */}
+                    <div className="grid grid-cols-2 gap-2.5">
+                      {typeof item.overall_score === "number" && (
+                        <div className="flex flex-col rounded-xl border border-purple-200/70 bg-purple-50/60 p-2.5 group-hover:border-white/10 group-hover:bg-white/5 transition-colors duration-300">
+                          <div className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-purple-700 group-hover:text-purple-300">
+                            <BarChart3 className="h-3.5 w-3.5 text-purple-600 group-hover:text-purple-300" />
+                            <span>Score</span>
+                          </div>
+                          <p className="mt-1 text-lg font-black text-slate-950 group-hover:text-white">
+                            {formatScore(item.overall_score)}
+                          </p>
+                        </div>
+                      )}
 
-                  <div className="prediction-footer">
-                    <div className="prediction-key-factors">
-                      {item.key_factors?.length ? (
-                        item.key_factors.map((factor) => (
-                          <span className="prediction-chip prediction-chip--soft" key={factor}>
-                            {factor}
-                          </span>
-                        ))
-                      ) : (
-                        <span className="prediction-chip prediction-chip--soft">Structured for factor-led analysis</span>
+                      {typeof item.confidence_percent === "number" && (
+                        <div className="flex flex-col rounded-xl border border-purple-200/70 bg-purple-50/60 p-2.5 group-hover:border-white/10 group-hover:bg-white/5 transition-colors duration-300">
+                          <div className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-purple-700 group-hover:text-purple-300">
+                            <Trophy className="h-3.5 w-3.5 text-purple-600 group-hover:text-purple-300" />
+                            <span>Confidence</span>
+                          </div>
+                          <p className="mt-1 text-lg font-black text-slate-950 group-hover:text-white">
+                            {formatPercent(item.confidence_percent)}%
+                          </p>
+                        </div>
                       )}
                     </div>
-                    {item.notes ? <p className="prediction-notes">{item.notes}</p> : null}
-                    <div className="prediction-action-row">
-                      <Button variant="outline" className="pointer-events-none justify-self-start">
-                        View Horse <ArrowRight className="h-5 w-5" />
-                      </Button>
-                      {item.weakest_metric ? <span className="prediction-weakest">{valueOrUnavailable(item.weakest_metric)}</span> : null}
+
+                    {/* Metric Breakdown Grid */}
+                    <div className="grid grid-cols-2 gap-2 text-xs">
+                      <MetricCard label="Weight" value={formatWeight(item.weight_value)} icon={<Scale className="h-3.5 w-3.5" />} />
+                      <MetricCard label="Draw" value={formatDraw(item.draw_number)} icon={<BadgeCheck className="h-3.5 w-3.5" />} />
+                      <MetricCard label="Speed Index" value={formatMetric(item.speed_index)} icon={<Gauge className="h-3.5 w-3.5" />} />
+                      <MetricCard label="Predicted Time" value={formatMetric(item.predicted_time)} icon={<Flame className="h-3.5 w-3.5" />} />
+                      <MetricCard label="Previous Run" value={formatMetric(item.previous_run_rating)} icon={<BarChart3 className="h-3.5 w-3.5" />} />
+                      <MetricCard label="Strongest" value={formatMetric(item.speed_index ?? item.previous_run_rating)} icon={<BadgeCheck className="h-3.5 w-3.5" />} />
                     </div>
                   </div>
-                </div>
-              </article>
-            );
-          })}
-        </div>
-        {predictionResult?.notes ? (
-          <div className="prediction-notes-card w-full p-5 text-center">{predictionResult.notes}</div>
-        ) : null}
-      </AsyncBoundary>
 
+                  {/* Card Bottom CTA: Clean button without raw trailing labels */}
+                  <div className="mt-5 pt-3 border-t border-slate-100 group-hover:border-white/10 transition-colors duration-300">
+                    <button
+                      type="button"
+                      className="w-full inline-flex items-center justify-center gap-1.5 whitespace-nowrap rounded-xl bg-purple-50 border border-purple-200 px-4 py-2.5 text-xs font-bold text-[#6A2DF1] transition-all duration-300 group-hover:bg-purple-600 group-hover:text-white group-hover:border-purple-500 group-hover:shadow-[0_4px_14px_0_rgba(147,51,234,0.39)] cursor-pointer"
+                    >
+                      View Horse
+                      <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
+                    </button>
+                  </div>
+                </article>
+              );
+            })}
+          </div>
+        </AsyncBoundary>
+      </div>
     </section>
   );
 }
 
-function Metric({
+function MetricCard({
   icon,
   label,
   value,
-  tone = "default",
 }: {
   icon?: ReactNode;
   label: string;
   value: string | number;
-  tone?: "default" | "score" | "confidence";
 }) {
   return (
-    <div className={cn("prediction-metric", tone !== "default" && `prediction-metric--${tone}`)}>
-      <div className="prediction-metric-label">
-        {icon ? <span className="prediction-metric-icon">{icon}</span> : null}
-        <p>{label}</p>
+    <div className="flex flex-col rounded-xl border border-slate-100 bg-slate-50/70 p-2 group-hover:border-white/10 group-hover:bg-white/5 transition-colors duration-300">
+      <div className="flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wider text-slate-400 group-hover:text-slate-400">
+        {icon && <span className="text-purple-600 group-hover:text-purple-400">{icon}</span>}
+        <span className="truncate">{label}</span>
       </div>
-      <strong>{value}</strong>
+      <p className="mt-0.5 truncate font-bold text-slate-900 group-hover:text-white">
+        {value}
+      </p>
     </div>
   );
 }
