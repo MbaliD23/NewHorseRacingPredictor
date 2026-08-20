@@ -94,10 +94,78 @@ export function normMerit(val: number): number {
   return Math.min(Math.max(((val - 50) / 80) * 100, 5), 100);
 }
 
-export function parsePct(str?: string): number {
-  if (!str || str === "-") return 0;
-  const val = parseFloat(str.replace("%", "").trim());
+export function parsePct(str?: string | number): number {
+  if (str == null || str === "-") return 0;
+  if (typeof str === "number") return Math.min(Math.max(str, 0), 100);
+  const val = parseFloat(String(str).replace("%", "").trim());
   return isNaN(val) ? 0 : Math.min(Math.max(val, 0), 100);
+}
+
+export function extractPerformanceValue(
+  directValue?: number | string | null,
+  recordStr?: string | null,
+  comboPercent?: number | string | null
+): { display: string; normalized: number } {
+  // 1. Direct numeric or percentage value from backend payload
+  if (directValue != null && directValue !== "" && directValue !== "-") {
+    if (typeof directValue === "number") {
+      const clamped = Math.min(Math.max(directValue, 0), 100);
+      return { display: `${Math.round(directValue)}%`, normalized: clamped };
+    }
+    const cleanStr = String(directValue).trim();
+    const num = parseFloat(cleanStr.replace("%", ""));
+    if (!isNaN(num)) {
+      const clamped = Math.min(Math.max(num, 0), 100);
+      return { display: `${Math.round(num)}%`, normalized: clamped };
+    }
+  }
+
+  // 2. Parse from individual record string (e.g. "12:3-2-1", "3/12", or "18%")
+  if (recordStr && recordStr !== "-" && recordStr !== "0:0-0-0") {
+    const cleanStr = recordStr.trim();
+    if (cleanStr.includes("%")) {
+      const num = parseFloat(cleanStr.replace("%", ""));
+      if (!isNaN(num)) {
+        const clamped = Math.min(Math.max(num, 0), 100);
+        return { display: `${Math.round(num)}%`, normalized: clamped };
+      }
+    }
+
+    if (cleanStr.includes("/")) {
+      const [wStr, tStr] = cleanStr.split("/");
+      const wins = parseInt(wStr, 10);
+      const total = parseInt(tStr, 10);
+      if (!isNaN(wins) && !isNaN(total) && total > 0) {
+        const winPct = Math.min(Math.max((wins / total) * 100, 0), 100);
+        return { display: `${Math.round(winPct)}%`, normalized: winPct };
+      }
+    }
+
+    if (cleanStr.includes(":")) {
+      const [totStr, rest] = cleanStr.split(":");
+      const total = parseInt(totStr, 10);
+      if (!isNaN(total) && total > 0 && rest) {
+        const parts = rest.split("-").map((x) => parseInt(x, 10));
+        const wins = parts[0] || 0;
+        const seconds = parts[1] || 0;
+        const thirds = parts[2] || 0;
+        const weightedScore = Math.min(Math.max(((wins * 1.0 + seconds * 0.5 + thirds * 0.25) / total) * 100, 0), 100);
+        const winPct = Math.round((wins / total) * 100);
+        return { display: `${winPct}%`, normalized: weightedScore };
+      }
+    }
+  }
+
+  // 3. Combo percentage fallback if individual record is absent
+  if (comboPercent != null && comboPercent !== "" && comboPercent !== "-") {
+    const num = typeof comboPercent === "number" ? comboPercent : parseFloat(String(comboPercent).replace("%", "").trim());
+    if (!isNaN(num)) {
+      const clamped = Math.min(Math.max(num, 0), 100);
+      return { display: `${Math.round(num)}%`, normalized: clamped };
+    }
+  }
+
+  return { display: "-", normalized: 0 };
 }
 
 /* ================================================================
@@ -119,15 +187,30 @@ export function mapBackendHorseToRaw(horse: Horse, index?: number): RawHorse {
   const wet = horse.wet_record || "-";
   const crs = horse.course_record || "-";
   const dst = horse.distance_record || "-";
-  const cd = horse.course_distance_record || "-";
+  const cd =
+    horse.course_distance_record ||
+    horse.course_distance ||
+    horse.cd_record ||
+    horse.c_and_d ||
+    horse.candd_stat ||
+    horse.course_and_distance ||
+    "-";
   const meritRating = horse.merit_rating ?? (horse.previous_run_rating ? Math.round(horse.previous_run_rating * 10) : 70);
 
-  const jockeyPerf = horse.trainer_jockey_win_percent != null
-    ? `${horse.trainer_jockey_win_percent}%`
-    : "-";
-  const trainerPerf = horse.trainer_jockey_win_percent != null
-    ? `${horse.trainer_jockey_win_percent}%`
-    : "-";
+  const jockeyPerfData = extractPerformanceValue(
+    horse.jockey_perf ?? horse.jockey_win_rate,
+    horse.jockey_record,
+    horse.trainer_jockey_win_percent
+  );
+
+  const trainerPerfData = extractPerformanceValue(
+    horse.trainer_perf ?? horse.trainer_win_rate,
+    horse.trainer_record,
+    horse.trainer_jockey_win_percent
+  );
+
+  const jockeyPerf = jockeyPerfData.display;
+  const trainerPerf = trainerPerfData.display;
 
   return {
     id: horse.id,

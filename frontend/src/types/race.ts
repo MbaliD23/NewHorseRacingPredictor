@@ -86,7 +86,17 @@ export type Horse = {
   course_record: string | null;
   distance_record: string | null;
   course_distance_record: string | null;
+  course_distance?: string | null;
+  cd_record?: string | null;
+  c_and_d?: string | null;
+  candd_stat?: string | null;
+  course_and_distance?: string | null;
+  jockey_perf?: number | string | null;
+  jockey_win_rate?: number | string | null;
+  trainer_perf?: number | string | null;
+  trainer_win_rate?: number | string | null;
   stakes: string | null;
   sale_price: string | null;
   form_entries: HorseFormEntry[];
 };
+

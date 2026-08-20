@@ -45,7 +45,26 @@ export function PredictionResultsPage() {
         </div>
       </div>
 
-      <AsyncBoundary isEmpty={predictions.length === 0} emptyMessage="No prediction result available.">
+      <AsyncBoundary
+        isEmpty={predictions.length === 0}
+        emptyMessage={
+          <div className="flex flex-col items-center justify-center p-8 max-w-md mx-auto text-center space-y-4 rounded-2xl bg-white shadow-sm border border-purple-100 my-8">
+            <div className="flex h-12 w-12 shrink-0 aspect-square items-center justify-center rounded-full bg-purple-100 text-purple-700">
+              <Trophy className="h-6 w-6" />
+            </div>
+            <h2 className="text-lg font-bold text-slate-900">Please select an event and race first</h2>
+            <p className="text-sm text-slate-500">
+              To view predictions, please select an event and race to configure and run the algorithm.
+            </p>
+            <Button
+              onClick={() => navigate("/")}
+              className="rounded-full px-6 bg-purple-700 hover:bg-purple-800 text-white font-bold"
+            >
+              Select Event & Race
+            </Button>
+          </div>
+        }
+      >
         <div className="prediction-grid prediction-grid--premium">
           {predictions.map((item, index) => {
             const selected = currentHorse?.id === item.horse_id;

@@ -1,3 +1,5 @@
+import type { ReactNode } from "react";
+
 export type ApiStatus = {
   app_name: string;
   last_scrape_at: string | null;
@@ -12,5 +14,6 @@ export type AsyncStateProps = {
   isError?: boolean;
   isEmpty?: boolean;
   error?: unknown;
-  emptyMessage?: string;
+  emptyMessage?: ReactNode;
 };
+

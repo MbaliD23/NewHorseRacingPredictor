@@ -25,7 +25,20 @@ export function SelectedHorsePage() {
     <section className="w-full h-full min-h-0 py-0">
       <AsyncBoundary
         isEmpty={!horse && !prediction}
-        emptyMessage="Selected horse data is unavailable for this prediction."
+        emptyMessage={
+          <div className="flex flex-col items-center justify-center p-8 max-w-md mx-auto text-center space-y-4 rounded-2xl bg-white shadow-sm border border-purple-100 my-8">
+            <h2 className="text-lg font-bold text-slate-900">Please select an event and race first</h2>
+            <p className="text-sm text-slate-500">
+              Selected horse prediction details are unavailable without an active prediction run.
+            </p>
+            <Button
+              onClick={() => navigate("/")}
+              className="rounded-full px-6 bg-purple-700 hover:bg-purple-800 text-white font-bold"
+            >
+              Select Event & Race
+            </Button>
+          </div>
+        }
       >
         <HorseSplitView
           horse={horse}

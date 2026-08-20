@@ -32,7 +32,7 @@ export function FilterPills({
         onClick={() => onChange("live")}
         className={`flex items-center gap-2 ${pillClass(value === "live")}`}
       >
-        <div className={`h-2.5 w-2.5 rounded-full ${value === "live" ? "bg-white" : "bg-purple-600"}`} />
+        <div className={`h-2.5 w-2.5 shrink-0 aspect-square rounded-full ${value === "live" ? "bg-white" : "bg-purple-600"}`} />
         Live Now
       </button>
       <button

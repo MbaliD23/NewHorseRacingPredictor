@@ -107,7 +107,28 @@ export function AnalysisFactorsPage() {
         <p>Select up to 3 factors to weight the prediction algorithm</p>
       </div>
 
-      <AsyncBoundary isLoading={isLoading} isError={isError} isEmpty={!race} emptyMessage="Race unavailable.">
+      <AsyncBoundary
+        isLoading={isLoading}
+        isError={isError}
+        isEmpty={!race}
+        emptyMessage={
+          <div className="flex flex-col items-center justify-center p-8 max-w-md mx-auto text-center space-y-4 rounded-2xl bg-white shadow-sm border border-purple-100 my-8">
+            <div className="flex h-12 w-12 shrink-0 aspect-square items-center justify-center rounded-full bg-purple-100 text-purple-700">
+              <Sparkles className="h-6 w-6" />
+            </div>
+            <h2 className="text-lg font-bold text-slate-900">Please select an event and race first</h2>
+            <p className="text-sm text-slate-500">
+              To configure predictor analysis factors, please select an active event and race from the navigation.
+            </p>
+            <Button
+              onClick={() => navigate("/")}
+              className="rounded-full px-6 bg-purple-700 hover:bg-purple-800 text-white font-bold"
+            >
+              Select Event & Race
+            </Button>
+          </div>
+        }
+      >
         <div className="factor-layout">
           <div className="factor-left-col">
             <div className="factor-wheel">

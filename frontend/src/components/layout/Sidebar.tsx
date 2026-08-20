@@ -14,6 +14,7 @@ import {
   Trophy,
   Sliders,
   Home,
+  Lock,
 } from "lucide-react";
 import { usePredictionStore } from "@/store/predictionStore";
 import { useRaces } from "@/hooks/useRaces";
@@ -72,6 +73,7 @@ const accordionAnimation = {
 export function Sidebar() {
   const [expanded, setExpanded] = useState(true);
   const [liveClock, setLiveClock] = useState(() => new Date());
+  const [lockedAlertMessage, setLockedAlertMessage] = useState<string | null>(null);
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -84,13 +86,17 @@ export function Sidebar() {
   // Single active expanded section (mutual exclusion)
   const [expandedSection, setExpandedSection] = useState<SectionKey>("events");
 
-  const toggleSection = (section: SectionKey) => {
-    setExpandedSection((prev) => (prev === section ? null : section));
-  };
-
   // Global store
-  const { currentVenue, currentRace, currentHorse, predictionResult, setCurrentVenue, setCurrentRace, setCurrentHorse } =
-    usePredictionStore();
+  const {
+    currentVenue,
+    currentRace,
+    currentHorse,
+    predictionResult,
+    setCurrentVenue,
+    setCurrentRace,
+    setCurrentHorse,
+    resetFlow,
+  } = usePredictionStore();
 
   // Backend queries
   const { data: allVenues = [] } = useRaces();
@@ -144,6 +150,22 @@ export function Sidebar() {
   // Query Race Details to get full horses list
   const { data: raceDetails } = useRace(activeRaceId ?? undefined);
 
+  // Predictor locked / unlocked enforcement: requires an active venue/event AND an active race
+  const isPredictorUnlocked = Boolean(activeVenue && (currentRace || activeRaceId));
+
+  const triggerLockedAlert = () => {
+    setLockedAlertMessage("Please select an event and race first.");
+    window.setTimeout(() => setLockedAlertMessage(null), 3000);
+  };
+
+  const toggleSection = (section: SectionKey) => {
+    if (section === "predictor" && !isPredictorUnlocked) {
+      triggerLockedAlert();
+      return;
+    }
+    setExpandedSection((prev) => (prev === section ? null : section));
+  };
+
   // Synchronize store when navigating via URL
   useEffect(() => {
     if (urlVenueId && allVenues.length > 0) {
@@ -189,22 +211,36 @@ export function Sidebar() {
     return [];
   }, [raceDetails, currentRace]);
 
-  /* ─── Context-Aware Auto-Open & Auto-Scroll (Single Expanded Section) ─ */
+  /* ─── Context-Aware Auto-Open (Single Expanded Section) ─────────── */
   useEffect(() => {
-    if (location.pathname === "/" || location.pathname.startsWith("/venues")) {
+    if (location.pathname === "/" || location.pathname === "") {
       setExpandedSection("events");
-      eventsRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
-    } else if (location.pathname.startsWith("/races")) {
+    } else if (location.pathname.startsWith("/venues")) {
       setExpandedSection("races");
-      racesRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
-    } else if (location.pathname.startsWith("/horses")) {
+    } else if (location.pathname.startsWith("/races") || location.pathname.startsWith("/horses")) {
       setExpandedSection("horses");
-      horsesRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
-    } else if (isPredictorActive) {
+    } else if (isPredictorActive && isPredictorUnlocked) {
       setExpandedSection("predictor");
-      predictorRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    } else if (location.pathname === "/radar-analytics" || location.pathname === "/bar-analytics") {
+      setExpandedSection(null);
     }
-  }, [location.pathname, isPredictorActive]);
+  }, [location.pathname, isPredictorActive, isPredictorUnlocked]);
+
+  /* ─── Smooth Auto-Scroll on Accordion Transition ────────────────── */
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      if (expandedSection === "events") {
+        eventsRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      } else if (expandedSection === "races") {
+        racesRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      } else if (expandedSection === "horses") {
+        horsesRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      } else if (expandedSection === "predictor") {
+        predictorRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      }
+    }, 120);
+    return () => window.clearTimeout(timer);
+  }, [expandedSection]);
 
   /* ─── Selection Handlers ────────────────────────────────────────── */
   const handleSelectVenue = (venue: Venue) => {
@@ -229,22 +265,31 @@ export function Sidebar() {
     navigate(`/horses/${horse.id}`);
   };
 
+  const handleHomeClick = () => {
+    resetFlow();
+    setCurrentVenue(null);
+    setCurrentRace(null);
+    setCurrentHorse(null);
+    setExpandedSection("events");
+    navigate("/");
+  };
+
   const handleGoToPredictor = () => {
+    if (!isPredictorUnlocked) {
+      triggerLockedAlert();
+      return;
+    }
     setExpandedSection("predictor");
     if (activeRaceId) {
       navigate(`/analysis/${activeRaceId}`);
     } else if (activeVenue?.races?.[0]) {
       navigate(`/analysis/${activeVenue.races[0].id}`);
-    } else if (allVenues?.[0]?.races?.[0]) {
-      navigate(`/analysis/${allVenues[0].races[0].id}`);
-    } else {
-      navigate("/");
     }
   };
 
   const railBtn = (active: boolean) =>
     [
-      "flex h-10 w-10 items-center justify-center rounded-xl transition-all duration-200 mx-auto",
+      "flex h-10 w-10 shrink-0 aspect-square items-center justify-center rounded-xl transition-all duration-200 mx-auto",
       active ? "bg-slate-100 text-slate-950 font-bold" : "text-slate-500 hover:bg-slate-100 hover:text-slate-900",
     ].join(" ");
 
@@ -263,21 +308,36 @@ export function Sidebar() {
           expanded ? "justify-between" : "justify-center",
         ].join(" ")}
       >
-        {expanded && (
-          <div className="flex items-center gap-2.5 min-w-0 cursor-pointer" onClick={() => navigate("/")}>
-            <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-[#6A2DF1] shrink-0 shadow-sm shadow-purple-600/20">
+        {expanded ? (
+          <div
+            className="flex items-center gap-2.5 min-w-0 cursor-pointer group"
+            onClick={handleHomeClick}
+            role="button"
+            tabIndex={0}
+            title="Reset and go to Home"
+          >
+            <div className="flex h-8 w-8 shrink-0 aspect-square items-center justify-center rounded-xl bg-[#6A2DF1] shadow-sm shadow-purple-600/20 group-hover:bg-[#5822d8] transition-colors">
               <Home className="h-4 w-4 text-white" />
             </div>
             <div className="min-w-0">
-              <span className="block truncate text-sm font-black text-slate-900 tracking-tight leading-none">
+              <span className="block truncate text-sm font-black text-slate-900 tracking-tight leading-none group-hover:text-purple-700 transition-colors">
                 winning form +
               </span>
             </div>
           </div>
+        ) : (
+          <button
+            onClick={handleHomeClick}
+            className="flex h-8 w-8 shrink-0 aspect-square items-center justify-center rounded-xl bg-[#6A2DF1] shadow-sm shadow-purple-600/20 hover:bg-[#5822d8] transition-colors"
+            title="Reset and go to Home"
+            aria-label="Home"
+          >
+            <Home className="h-4 w-4 text-white" />
+          </button>
         )}
         <button
           onClick={() => setExpanded((v) => !v)}
-          className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-900"
+          className="flex h-8 w-8 shrink-0 aspect-square items-center justify-center rounded-lg text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-900"
           aria-label={expanded ? "Collapse sidebar" : "Expand sidebar"}
           title={expanded ? "Collapse sidebar" : "Expand sidebar"}
         >
@@ -443,7 +503,7 @@ export function Sidebar() {
                                 </div>
                               </div>
                               {race.is_live && (
-                                <span className="h-2 w-2 rounded-full bg-purple-600 animate-pulse shrink-0" />
+                                <span className="h-2 w-2 rounded-full bg-purple-600 animate-pulse shrink-0 aspect-square" />
                               )}
                             </button>
                           );
@@ -513,7 +573,7 @@ export function Sidebar() {
                               ].join(" ")}
                             >
                               <span
-                                className="flex h-6 w-6 shrink-0 items-center justify-center rounded-[4px] text-xs font-black transition-all duration-200"
+                                className="flex h-6 w-6 shrink-0 aspect-square items-center justify-center rounded-[4px] text-xs font-black transition-all duration-200"
                                 style={{
                                   backgroundColor: badge.bg,
                                   color: badge.text,
@@ -550,22 +610,41 @@ export function Sidebar() {
             </div>
 
             {/* ── LEVEL 4: PREDICTOR SECTION ──────────────────────── */}
-            <div ref={predictorRef} className="rounded-2xl border border-slate-200/80 bg-slate-50/40 p-1.5 transition-all duration-200">
+            <div
+              ref={predictorRef}
+              className={[
+                "rounded-2xl border bg-slate-50/40 p-1.5 transition-all duration-200 relative",
+                !isPredictorUnlocked
+                  ? "border-slate-200/60 opacity-60"
+                  : "border-slate-200/80",
+              ].join(" ")}
+              title={!isPredictorUnlocked ? "Please select an event and race first." : undefined}
+            >
               <button
                 onClick={() => toggleSection("predictor")}
-                className="flex w-full items-center justify-between px-2 py-1.5 text-left rounded-lg hover:bg-slate-100/70 transition-all duration-200 group"
+                className={[
+                  "flex w-full items-center justify-between px-2 py-1.5 text-left rounded-lg transition-all duration-200 group",
+                  !isPredictorUnlocked
+                    ? "cursor-not-allowed hover:bg-slate-100/40"
+                    : "hover:bg-slate-100/70",
+                ].join(" ")}
                 aria-expanded={expandedSection === "predictor"}
+                title={!isPredictorUnlocked ? "Please select an event and race first." : undefined}
               >
                 <div className="flex items-center gap-2 min-w-0">
-                  <Sparkles className="h-4 w-4 text-[#8B5CF6] shrink-0" />
+                  <Sparkles className={`h-4 w-4 shrink-0 ${isPredictorUnlocked ? "text-[#8B5CF6]" : "text-slate-400"}`} />
                   <span className="text-xs font-bold uppercase tracking-wider text-slate-800">
                     Predictor
                   </span>
-                  {isPredictorActive && (
+                  {!isPredictorUnlocked ? (
+                    <span className="flex items-center gap-1 rounded-full bg-slate-200/80 px-1.5 py-0.2 text-[9px] font-bold text-slate-500">
+                      <Lock className="h-2.5 w-2.5" /> Locked
+                    </span>
+                  ) : isPredictorActive ? (
                     <span className="rounded-full bg-purple-100 px-1.5 py-0.2 text-[9px] font-bold text-purple-700">
                       Active
                     </span>
-                  )}
+                  ) : null}
                 </div>
                 <ChevronDown
                   className={`h-4 w-4 transition-transform duration-300 ease-in-out ${
@@ -576,8 +655,15 @@ export function Sidebar() {
                 />
               </button>
 
+              {/* Subtle alert message when clicked while locked */}
+              {lockedAlertMessage && expanded && (
+                <div className="mx-1 mt-1.5 rounded-lg bg-purple-50 border border-purple-200 px-2.5 py-1.5 text-[11px] font-semibold text-purple-800 shadow-xs">
+                  {lockedAlertMessage}
+                </div>
+              )}
+
               <AnimatePresence initial={false}>
-                {expandedSection === "predictor" && (
+                {expandedSection === "predictor" && isPredictorUnlocked && (
                   <motion.div
                     key="predictor-content"
                     initial={accordionAnimation.initial}
@@ -682,13 +768,26 @@ export function Sidebar() {
              COLLAPSED RAIL VIEW (64px)
              ══════════════════════════════════════════════════════════ */
           <div className="flex flex-col items-center gap-1.5 w-full">
+            <RailTooltip text="Home (Reset All)">
+              <button
+                onClick={handleHomeClick}
+                className={railBtn(location.pathname === "/")}
+                title="Reset and go to Home"
+                aria-label="Home"
+              >
+                <Home className="h-5 w-5 text-[#6A2DF1]" />
+              </button>
+            </RailTooltip>
+
+            <div className="my-1 w-8 h-px bg-slate-200" />
+
             <RailTooltip text={activeVenue ? `Events: ${activeVenue.venue}` : "Events"}>
               <button
                 onClick={() => {
                   if (activeVenue) navigate(`/venues/${activeVenue.id}`);
                   else navigate("/");
                 }}
-                className={railBtn(location.pathname === "/" || location.pathname.startsWith("/venues"))}
+                className={railBtn(location.pathname.startsWith("/venues"))}
               >
                 <MapPin className="h-5 w-5 text-[#6A2DF1]" />
               </button>
@@ -719,7 +818,7 @@ export function Sidebar() {
                         <button
                           onClick={() => handleSelectHorse(horse)}
                           className={[
-                            "flex h-8 w-8 items-center justify-center rounded-lg text-xs font-black transition-all duration-200",
+                            "flex h-8 w-8 shrink-0 aspect-square items-center justify-center rounded-lg text-xs font-black transition-all duration-200",
                             isSelected ? "ring-2 ring-slate-900 ring-offset-1 scale-110 shadow-sm" : "hover:opacity-80",
                           ].join(" ")}
                           style={{
@@ -739,10 +838,15 @@ export function Sidebar() {
 
             <div className="my-1 w-8 h-px bg-slate-200" />
 
-            <RailTooltip text="Predictor">
+            <RailTooltip text={isPredictorUnlocked ? "Predictor" : "Please select an event and race first."}>
               <button
                 onClick={handleGoToPredictor}
-                className={railBtn(isPredictorActive)}
+                className={[
+                  railBtn(isPredictorActive),
+                  !isPredictorUnlocked ? "opacity-40 cursor-not-allowed" : "",
+                ].join(" ")}
+                title={!isPredictorUnlocked ? "Please select an event and race first." : undefined}
+                aria-disabled={!isPredictorUnlocked}
               >
                 <Sparkles className="h-5 w-5 text-[#8B5CF6]" />
               </button>

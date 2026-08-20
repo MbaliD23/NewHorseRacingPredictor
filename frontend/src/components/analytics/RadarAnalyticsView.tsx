@@ -283,6 +283,7 @@ export function RadarAnalyticsView({
                   background: isSelected ? c : "#475569",
                   boxShadow: isSelected ? `0 0 6px ${c}99` : "none",
                   fontSize: 10, fontWeight: 800, color: "#fff", flexShrink: 0,
+                  aspectRatio: "1 / 1",
                   transition: "background 0.2s ease",
                 }}>
                   {displayNum}

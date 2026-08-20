@@ -16,6 +16,7 @@ export function ColorSwatch({ color, size = 10 }: ColorSwatchProps) {
         background: color,
         boxShadow: `0 0 6px ${color}99`,
         flexShrink: 0,
+        aspectRatio: "1 / 1",
       }}
     />
   );

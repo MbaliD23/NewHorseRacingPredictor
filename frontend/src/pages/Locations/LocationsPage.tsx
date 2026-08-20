@@ -113,10 +113,10 @@ export function LocationsPage() {
       <div className="relative z-10 mb-10 text-center">
         <img src={wfLogo} alt="Winning Form" className="mx-auto -mt-2 mb-4 h-24 w-auto object-contain md:-mt-4 md:mb-3 md:h-28" />
         <h1 className="mb-4 text-[2.55rem] font-extrabold leading-tight tracking-tight text-gray-900 sm:text-[2.95rem] md:text-[3.3rem]">
-          Select Your <span className="text-purple-600">Location</span>
+          Select Your <span className="text-purple-600">Event</span>
         </h1>
         <p className="text-lg font-medium text-gray-500 md:text-[1.35rem]">
-          Pick a race track to see what's racing today
+          Pick an event to see what's racing today
         </p>
       </div>
 
@@ -126,7 +126,7 @@ export function LocationsPage() {
           <input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search location..."
+            placeholder="Search events..."
             className="w-full rounded-2xl border border-gray-200 bg-white/80 backdrop-blur-md py-4 pl-14 pr-4 text-base font-medium outline-none transition-shadow focus:border-purple-300 focus:ring-4 focus:ring-purple-100 shadow-sm"
           />
         </div>

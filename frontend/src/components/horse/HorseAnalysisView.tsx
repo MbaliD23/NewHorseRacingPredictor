@@ -289,31 +289,45 @@ function parsePerformanceRecord(record: string | null | undefined): ParsedPerfor
     };
   }
 
-  const match = record.trim().match(/^(\d+)\s*:\s*(\d+)-(\d+)-(\d+)$/);
-  if (!match) {
+  const matchColon = record.trim().match(/^(\d+)\s*:\s*(\d+)-(\d+)-(\d+)$/);
+  if (matchColon) {
+    const totalRuns = Number(matchColon[1]);
+    const wins = Number(matchColon[2]);
+    const seconds = Number(matchColon[3]);
+    const thirds = Number(matchColon[4]);
+    const remainingRuns = Math.max(totalRuns - wins - seconds - thirds, 0);
+
     return {
-      totalRuns: 0,
-      wins: 0,
-      seconds: 0,
-      thirds: 0,
-      remainingRuns: 0,
-      isValid: false,
+      totalRuns,
+      wins,
+      seconds,
+      thirds,
+      remainingRuns,
+      isValid: totalRuns > 0,
     };
   }
 
-  const totalRuns = Number(match[1]);
-  const wins = Number(match[2]);
-  const seconds = Number(match[3]);
-  const thirds = Number(match[4]);
-  const remainingRuns = Math.max(totalRuns - wins - seconds - thirds, 0);
+  const matchSlash = record.trim().match(/^(\d+)\s*\/\s*(\d+)$/);
+  if (matchSlash) {
+    const wins = Number(matchSlash[1]);
+    const totalRuns = Number(matchSlash[2]);
+    return {
+      totalRuns,
+      wins,
+      seconds: 0,
+      thirds: 0,
+      remainingRuns: Math.max(totalRuns - wins, 0),
+      isValid: totalRuns > 0,
+    };
+  }
 
   return {
-    totalRuns,
-    wins,
-    seconds,
-    thirds,
-    remainingRuns,
-    isValid: totalRuns > 0,
+    totalRuns: 0,
+    wins: 0,
+    seconds: 0,
+    thirds: 0,
+    remainingRuns: 0,
+    isValid: false,
   };
 }
 
@@ -516,12 +530,21 @@ export function HorseAnalysisView({
     { label: "Sale Price", value: valueOrDash(horse?.sale_price) },
   ];
 
+  const canddRecord =
+    horse?.course_distance_record ??
+    horse?.course_distance ??
+    horse?.cd_record ??
+    horse?.c_and_d ??
+    horse?.candd_stat ??
+    horse?.course_and_distance ??
+    null;
+
   const recordCharts = [
     { label: "Record", record: horse?.total_runs },
     { label: "Wet", record: horse?.wet_record },
     { label: "Course", record: horse?.course_record },
     { label: "Distance", record: horse?.distance_record },
-    { label: "Course & Distance", record: horse?.course_distance_record },
+    { label: "Course & Distance", record: canddRecord },
   ];
 
   return (
@@ -531,14 +554,14 @@ export function HorseAnalysisView({
           <div className="flex items-center gap-3">
             <button
               onClick={() => navigate(-1)}
-              className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-50 text-gray-600 transition-colors hover:bg-purple-50 hover:text-purple-700"
+              className="flex h-10 w-10 shrink-0 aspect-square items-center justify-center rounded-full bg-gray-50 text-gray-600 transition-colors hover:bg-purple-50 hover:text-purple-700"
               aria-label="Go back"
             >
               <ChevronLeft className="h-6 w-6" />
             </button>
 
             <div className="flex items-center gap-3">
-              <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-purple-700 text-lg font-bold text-white shadow-md shadow-purple-600/20">
+              <span className="flex h-10 w-10 shrink-0 aspect-square items-center justify-center rounded-xl bg-purple-700 text-lg font-bold text-white shadow-md shadow-purple-600/20">
                 {saddleNo}
               </span>
               <div>
@@ -572,7 +595,7 @@ export function HorseAnalysisView({
                 bg-gradient-to-r from-purple-700 to-indigo-600
                 shadow-md shadow-purple-600/25
                 hover:from-purple-600 hover:to-indigo-500 hover:shadow-purple-500/40
-                active:scale-95 cursor-pointer"
+                active:scale-95 cursor-pointer shrink-0"
               aria-label="Compare all 5 horses on bar chart"
             >
               <svg width="13" height="13" viewBox="0 0 13 13" fill="none" aria-hidden="true">
@@ -586,7 +609,7 @@ export function HorseAnalysisView({
 
             <button
               onClick={() => setIsFavorite(!isFavorite)}
-              className={`flex h-10 w-10 items-center justify-center rounded-full border transition-all ${isFavorite
+              className={`flex h-10 w-10 shrink-0 aspect-square items-center justify-center rounded-full border transition-all ${isFavorite
                 ? "border-red-200 bg-red-50 text-red-500"
                 : "border-gray-200 bg-white text-gray-400 hover:text-red-500"
                 }`}
@@ -632,7 +655,7 @@ export function HorseAnalysisView({
                 type="button"
                 onClick={() => goToProfilePage(0)}
                 aria-label="Show horse profile"
-                className={`h-2.5 w-2.5 rounded-full transition-all ${profilePage === 0
+                className={`h-2.5 w-2.5 shrink-0 aspect-square rounded-full transition-all ${profilePage === 0
                   ? "bg-purple-700 scale-110"
                   : "bg-gray-300 hover:bg-purple-300"
                   }`}
@@ -642,7 +665,7 @@ export function HorseAnalysisView({
                 type="button"
                 onClick={() => goToProfilePage(1)}
                 aria-label="Show horse pedigree"
-                className={`h-2.5 w-2.5 rounded-full transition-all ${profilePage === 1
+                className={`h-2.5 w-2.5 shrink-0 aspect-square rounded-full transition-all ${profilePage === 1
                   ? "bg-purple-700 scale-110"
                   : "bg-gray-300 hover:bg-purple-300"
                   }`}
@@ -651,17 +674,19 @@ export function HorseAnalysisView({
           </SectionCard>
 
           <SectionCard icon={Palette} title="Jockey Colours">
-            <div className="flex flex-col items-center justify-between h-full space-y-3">
-              <div className="flex justify-center py-1 shrink-0">
+            <div className="flex flex-col items-center justify-center h-full gap-3 min-w-0 w-full text-center py-1">
+              <div className="flex justify-center shrink-0 aspect-square">
                 <SilksRenderer
                   description={horse?.silks}
-                  className="h-24 w-24 sm:h-28 sm:w-28"
+                  className="h-20 w-20 sm:h-24 sm:w-24 shrink-0 aspect-square"
                 />
               </div>
 
-              <p className="w-full rounded-xl border border-purple-100 bg-purple-50/70 p-3 text-xs sm:text-sm leading-relaxed text-purple-950 font-medium text-center break-words">
-                {valueOrDash(horse?.silks)}
-              </p>
+              <div className="w-full max-w-full flex flex-col items-center justify-center gap-1 text-center px-1">
+                <p className="w-full rounded-xl border border-purple-100 bg-purple-50/70 px-3 py-2 text-xs leading-relaxed text-purple-950 font-medium text-center break-words overflow-hidden">
+                  {horse?.silks?.trim() ? horse.silks : "Colours not available"}
+                </p>
+              </div>
             </div>
           </SectionCard>
         </div>
@@ -687,7 +712,7 @@ export function HorseAnalysisView({
         <SectionCard icon={Trophy} title="Record Breakdown">
           <div className="space-y-5">
             <ChartLegend />
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+            <div className="grid gap-2.5 sm:gap-3 grid-cols-2 sm:grid-cols-3 xl:grid-cols-5">
               {recordCharts.map((chart) => (
                 <RecordPieChart
                   key={chart.label}
@@ -842,7 +867,7 @@ function SectionCard({
   return (
     <section className="rounded-2xl border border-purple-100/70 bg-white p-4 sm:p-5 shadow-xs">
       <div className="mb-4 flex items-center gap-2.5">
-        <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-purple-100 text-purple-700">
+        <div className="flex h-7 w-7 shrink-0 aspect-square items-center justify-center rounded-lg bg-purple-100 text-purple-700">
           <Icon className="h-4 w-4" />
         </div>
         <h2 className="text-base sm:text-lg font-bold text-purple-900">{title}</h2>
@@ -910,28 +935,31 @@ function TeamPerformanceChart({
   const stats = parsePerformanceRecord(record);
 
   return (
-    <div className="rounded-2xl border border-gray-100 bg-gray-50/60 p-4 text-center">
+    <div className="rounded-2xl border border-gray-100 bg-gray-50/60 p-4 text-center relative flex flex-col items-center overflow-hidden w-full min-w-0">
       <p className="text-xs font-semibold uppercase tracking-[0.12em] text-gray-500">
         {role}
       </p>
-      <p className="mt-1 min-h-10 text-sm font-extrabold text-gray-900">
+      <p className="mt-1 min-h-6 text-sm font-extrabold text-gray-900 truncate w-full">
         {name}
       </p>
 
-      <div className="mt-4">
+      <div className="mt-3">
         <ChartLegend />
       </div>
 
-      <div className="mt-5 flex justify-center">
-        <SolidPerformancePie stats={stats} sizeClassName="h-36 w-36" label={`${role} performance`} />
+      <div className="my-4 flex justify-center w-full">
+        <SolidPerformancePie stats={stats} sizeClassName="w-24 h-24 sm:w-28 sm:h-28 shrink-0 aspect-square" label={`${role} performance`} />
       </div>
 
       {stats.isValid ? (
-        <RecordResultLine stats={stats} className="mt-5" />
+        <RecordResultLine stats={stats} className="w-full" />
       ) : (
-        <p className="mt-5 text-sm font-semibold text-gray-500">
-          No record available
-        </p>
+        <div className="w-full flex flex-col items-center justify-center">
+          <p className="text-xs font-black text-gray-400 whitespace-nowrap">0 - 0 - 0</p>
+          <p className="mt-0.5 text-[10px] font-semibold text-slate-500 whitespace-nowrap text-center">
+            {record && record !== "-" && record !== "0:0-0-0" ? `Record: ${record}` : "0 runs recorded"}
+          </p>
+        </div>
       )}
     </div>
   );
@@ -947,21 +975,24 @@ function RecordPieChart({
   const stats = parsePerformanceRecord(record);
 
   return (
-    <div className="rounded-2xl border border-gray-100 bg-gray-50/60 p-4 text-center">
-      <p className="min-h-8 text-xs font-semibold uppercase tracking-[0.12em] text-gray-500">
+    <div className="rounded-2xl border border-gray-100 bg-gray-50/60 p-3 text-center relative flex flex-col items-center justify-between overflow-hidden w-full min-w-0 shadow-xs">
+      <p className="min-h-5 text-[11px] font-bold uppercase tracking-wider text-gray-500 truncate w-full">
         {label}
       </p>
 
-      <div className="mt-4 flex justify-center">
-        <SolidPerformancePie stats={stats} sizeClassName="h-32 w-32" label={`${label} record`} />
+      <div className="my-2.5 flex justify-center w-full">
+        <SolidPerformancePie stats={stats} sizeClassName="w-14 h-14 sm:w-16 sm:h-16 shrink-0 aspect-square" label={`${label} record`} />
       </div>
 
       {stats.isValid ? (
-        <RecordResultLine stats={stats} className="mt-4" />
+        <RecordResultLine stats={stats} className="w-full" />
       ) : (
-        <p className="mt-4 text-sm font-semibold text-gray-500">
-          No record available
-        </p>
+        <div className="w-full flex flex-col items-center justify-center">
+          <p className="text-xs font-black text-gray-400 whitespace-nowrap">0 - 0 - 0</p>
+          <p className="mt-0.5 text-[10px] font-semibold text-slate-500 whitespace-nowrap text-center">
+            {record && record !== "-" && record !== "0:0-0-0" ? `Record: ${record}` : "0 runs recorded"}
+          </p>
+        </div>
       )}
     </div>
   );
@@ -996,7 +1027,7 @@ function SolidPerformancePie({
 
   return (
     <div
-      className={`${sizeClassName} rounded-full border border-white shadow-[0_10px_30px_rgba(88,28,135,0.16)]`}
+      className={`${sizeClassName} shrink-0 aspect-square rounded-full border border-white shadow-[0_10px_30px_rgba(88,28,135,0.16)]`}
       style={{ background: chartBackground }}
       aria-label={`${label} pie chart`}
       role="img"
@@ -1012,15 +1043,15 @@ function RecordResultLine({
   className?: string;
 }) {
   return (
-    <div className={className}>
-      <p className="text-lg font-black">
+    <div className={`w-full flex flex-col items-center justify-center ${className}`}>
+      <div className="flex items-center justify-center gap-1 text-xs font-black whitespace-nowrap">
         <span style={{ color: CHART_COLORS.wins }}>{stats.wins}</span>
-        <span className="px-1.5 text-gray-800">-</span>
+        <span className="text-gray-400">-</span>
         <span style={{ color: CHART_COLORS.seconds }}>{stats.seconds}</span>
-        <span className="px-1.5 text-gray-800">-</span>
+        <span className="text-gray-400">-</span>
         <span style={{ color: CHART_COLORS.thirds }}>{stats.thirds}</span>
-      </p>
-      <p className="mt-1 text-xs font-semibold text-gray-500">
+      </div>
+      <p className="mt-0.5 text-[10px] font-semibold text-slate-500 whitespace-nowrap text-center">
         Last {stats.totalRuns} runs
       </p>
     </div>
@@ -1039,8 +1070,8 @@ function ChartLegend() {
 
 function LegendItem({ color, label }: { color: string; label: string }) {
   return (
-    <span className="inline-flex items-center gap-1.5">
-      <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: color }} />
+    <span className="inline-flex items-center gap-1.5 shrink-0">
+      <span className="h-2.5 w-2.5 shrink-0 aspect-square rounded-full" style={{ backgroundColor: color }} />
       {label}
     </span>
   );
