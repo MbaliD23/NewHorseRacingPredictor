@@ -13,9 +13,9 @@ import {
   Sparkles,
   Trophy,
   Sliders,
-  Home,
   Lock,
 } from "lucide-react";
+import winningFormLogo from "@/assets/winning-form+.png";
 import { usePredictionStore } from "@/store/predictionStore";
 import { useRaces } from "@/hooks/useRaces";
 import { useRace } from "@/hooks/useRace";
@@ -289,7 +289,7 @@ export function Sidebar() {
       {/* ── Top Header: Brand + Collapse/Expand Toggle ─────────── */}
       <div
         className={[
-          "flex items-center border-b border-slate-100 px-3.5 py-4 shrink-0",
+          "flex items-center border-b border-slate-100 px-3.5 py-6 shrink-0",
           expanded ? "justify-between" : "justify-center",
         ].join(" ")}
       >
@@ -299,16 +299,13 @@ export function Sidebar() {
             onClick={handleHomeClick}
             role="button"
             tabIndex={0}
-            title="Reset and go to Home"
+            title="Reset and go to Winning Form+"
           >
-            <div className="flex h-8 w-8 shrink-0 aspect-square items-center justify-center rounded-xl bg-[#6A2DF1] shadow-sm shadow-purple-600/20 group-hover:bg-[#5822d8] transition-colors">
-              <Home className="h-4 w-4 text-white" />
-            </div>
-            <div className="min-w-0">
-              <span className="block truncate text-sm font-black text-slate-900 tracking-tight leading-none group-hover:text-purple-700 transition-colors">
-                winning form +
-              </span>
-            </div>
+            <img
+              src={winningFormLogo}
+              alt="Winning Form+"
+              className="h-20 w-auto max-w-60 object-contain select-none"
+            />
           </div>
         ) : null}
         <button

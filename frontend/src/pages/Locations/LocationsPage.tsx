@@ -7,8 +7,7 @@ import { useRaces } from "@/hooks/useRaces";
 import { usePredictionStore } from "@/store/predictionStore";
 
 import horseBg from "@/assets/whitecornerhorse.png";
-import horseIcon from "@/assets/horseicon.png";
-import wfLogo from "@/assets/wflogo.png";
+import wfLogo from "@/assets/winning-form+.png";
 import greyvilleImg from "@/assets/greyville.png";
 import turfonteinImg from "@/assets/Turffontein.png";
 import kenilworthImg from "@/assets/Kenilworth.png";
