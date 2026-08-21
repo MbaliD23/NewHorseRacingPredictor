@@ -8,6 +8,7 @@ import { usePredictionStore } from "@/store/predictionStore";
 
 import horseBg from "@/assets/whitecornerhorse.png";
 import wfLogo from "@/assets/winning-form+.png";
+import wfLogoDark from "@/assets/winning-form+-dark.png";
 import greyvilleImg from "@/assets/greyville.png";
 import turfonteinImg from "@/assets/Turffontein.png";
 import kenilworthImg from "@/assets/Kenilworth.png";
@@ -114,8 +115,8 @@ export function LocationsPage() {
   return (
     <div className="relative min-h-[calc(100vh-80px)] w-full flex-1 min-w-0 overflow-visible transition-all duration-300 ease-in-out pt-1 pb-10 px-[clamp(1rem,2vw,2.5rem)]">
       {/* Background Horse */}
-      <div className="pointer-events-none absolute right-0 top-[-10px] -z-10 w-[min(40vw,500px)] min-w-[300px] opacity-75 md:right-0 md:top-[-18px] lg:right-2 lg:w-[min(36vw,520px)]">
-        <img src={horseBg} alt="" className="h-auto w-full object-contain" />
+      <div className="pointer-events-none absolute right-0 top-[-10px] -z-10 w-[min(40vw,500px)] min-w-[300px] opacity-100 md:right-0 md:top-[-18px] lg:right-2 lg:w-[min(36vw,520px)] transition-all duration-300">
+        <img src={horseBg} alt="" className="h-auto w-full object-contain opacity-100" />
       </div>
 
       <div
@@ -126,26 +127,31 @@ export function LocationsPage() {
         <img
           src={wfLogo}
           alt="Winning Form"
-          className="mx-auto -mt-2 mb-3 h-20 sm:h-24 md:h-28 w-auto object-contain select-none"
+          className="mx-auto -mt-2 mb-3 h-20 sm:h-24 md:h-28 w-auto object-contain select-none dark:hidden transition-all duration-300"
         />
-        <h1 className="mb-2.5 text-[clamp(1.85rem,3.2vw,3.3rem)] font-extrabold leading-tight tracking-tight text-gray-900">
+        <img
+          src={wfLogoDark}
+          alt="Winning Form"
+          className="mx-auto -mt-2 mb-3 h-20 sm:h-24 md:h-28 w-auto object-contain select-none hidden dark:block transition-all duration-300 drop-shadow-[0_0_12px_rgba(139,92,246,0.25)]"
+        />
+        <h1 className="mb-2.5 text-[clamp(1.85rem,3.2vw,3.3rem)] font-extrabold leading-tight tracking-tight text-gray-900 dark:text-white">
           Select Your <span className="text-purple-600">Event</span>
         </h1>
-        <p className="text-[clamp(0.95rem,1.4vw,1.35rem)] font-medium text-gray-500 max-w-2xl">
+        <p className="text-[clamp(0.95rem,1.4vw,1.35rem)] font-medium text-gray-500 dark:text-slate-400 max-w-2xl">
           Pick an event to see what's racing today
         </p>
       </div>
 
       {/* Controls Row: Left Search Bar, Right Filter Buttons */}
       <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 mb-6 sm:mb-8 mt-2 sm:mt-4 relative z-10 max-w-7xl mx-auto w-full">
-        {/* Left Side: Search Bar Input (100% longer) */}
+        {/* Left Side: Search Bar Input */}
         <div className="relative w-full sm:w-[576px] md:w-[640px] max-w-2xl shrink-0">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 dark:text-slate-500" />
           <input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Search events..."
-            className="w-full h-10 sm:h-11 rounded-xl border border-slate-200 bg-white/80 backdrop-blur-md pl-10 pr-4 text-sm font-medium outline-none transition-all focus:border-purple-400 focus:ring-2 focus:ring-purple-500 shadow-xs text-gray-900 placeholder-gray-400"
+            className="w-full h-10 sm:h-11 rounded-xl border border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md pl-10 pr-4 text-sm font-medium outline-none transition-all focus:border-purple-400 focus:ring-2 focus:ring-purple-500 shadow-xs text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-slate-500"
           />
         </div>
 
@@ -179,11 +185,11 @@ export function LocationsPage() {
                 className={`group relative flex flex-col overflow-hidden rounded-[1.2rem] transition-all duration-300 cursor-pointer 
                   ${
                     isHovered
-                      ? "ring-[3px] ring-purple-600 shadow-[0_12px_40px_rgb(0,0,0,0.15)] -translate-y-1"
-                      : "border border-gray-100 bg-white shadow-xs hover:shadow-md"
+                      ? "ring-[3px] ring-purple-600 shadow-[0_12px_40px_rgb(0,0,0,0.25)] -translate-y-1"
+                      : "border border-gray-100 dark:border-slate-800/80 bg-white dark:bg-slate-900/80 shadow-xs hover:shadow-md"
                   }`}
               >
-                <div className="relative h-44 w-full overflow-hidden bg-gray-100">
+                <div className="relative h-44 w-full overflow-hidden bg-gray-100 dark:bg-slate-800">
                   <img
                     src={getVenueImage(venue.venue)}
                     alt={venue.venue}
@@ -206,30 +212,30 @@ export function LocationsPage() {
 
                 <div
                   className={`flex flex-1 flex-col justify-between p-5 transition-colors duration-300 ${
-                    isHovered ? "bg-slate-900/80 backdrop-blur-md" : "bg-white"
+                    isHovered ? "bg-slate-900/90 backdrop-blur-md" : "bg-white dark:bg-[#131424]/90"
                   }`}
                 >
                   <div className="flex items-center gap-3 mb-4">
                     <MapPin className={`h-5 w-5 shrink-0 ${isHovered ? "text-purple-400" : "text-purple-600"}`} />
-                    <h3 className={`text-lg font-bold leading-tight ${isHovered ? "text-white" : "text-gray-900"}`}>
+                    <h3 className={`text-lg font-bold leading-tight ${isHovered ? "text-white" : "text-gray-900 dark:text-white"}`}>
                       {venue.venue}
                     </h3>
                   </div>
 
                   <div
                     className={`mb-5 flex flex-col space-y-2.5 rounded-xl p-3.5 transition-colors duration-300 ${
-                      isHovered ? "bg-white/5 border border-white/10" : "bg-gray-50/80 border border-gray-100"
+                      isHovered ? "bg-white/5 border border-white/10" : "bg-gray-50/80 dark:bg-slate-900/60 border border-gray-100 dark:border-slate-800/60"
                     }`}
                   >
                     <div className="flex items-center justify-between text-xs">
-                      <span className={isHovered ? "text-gray-300" : "text-gray-600 font-semibold"}>Meeting Date</span>
-                      <span className={`font-extrabold ${isHovered ? "text-white" : "text-gray-900"}`}>
+                      <span className={isHovered ? "text-gray-300" : "text-gray-600 dark:text-slate-400 font-semibold"}>Meeting Date</span>
+                      <span className={`font-extrabold ${isHovered ? "text-white" : "text-gray-900 dark:text-slate-100"}`}>
                         {formatVenueDate(venue.meeting_date)}
                       </span>
                     </div>
-                    <div className={`h-px w-full ${isHovered ? "bg-white/10" : "bg-gray-200/70"}`} />
+                    <div className={`h-px w-full ${isHovered ? "bg-white/10" : "bg-gray-200/70 dark:bg-slate-800/80"}`} />
                     <div className="flex items-center justify-between text-xs">
-                      <span className={isHovered ? "text-gray-300" : "text-gray-600 font-semibold"}>Number of Races</span>
+                      <span className={isHovered ? "text-gray-300" : "text-gray-600 dark:text-slate-400 font-semibold"}>Number of Races</span>
                       <span className={`font-extrabold ${isHovered ? "text-purple-400" : "text-purple-600"}`}>
                         {venue.races.length}
                       </span>
@@ -241,7 +247,7 @@ export function LocationsPage() {
                       className={`w-full py-2 rounded-full font-bold text-xs transition-all duration-300 cursor-pointer ${
                         isHovered
                           ? "bg-purple-600 text-white shadow-[0_4px_14px_0_rgba(147,51,234,0.39)]"
-                          : "bg-purple-50 text-purple-700 group-hover:bg-purple-100"
+                          : "bg-purple-50 dark:bg-purple-950/50 text-purple-700 dark:text-purple-300 group-hover:bg-purple-100 dark:group-hover:bg-purple-900/50"
                       }`}
                     >
                       View Races

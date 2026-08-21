@@ -16,3 +16,22 @@
   --ring: 263 70% 50%;
   --radius: 24px;
 }
+
+.dark {
+  --background: 235 29% 6%;
+  --foreground: 210 40% 98%;
+  --card: 235 28% 9%;
+  --card-foreground: 210 40% 98%;
+  --primary: 263 70% 58%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 235 24% 13%;
+  --secondary-foreground: 210 40% 98%;
+  --muted: 235 24% 13%;
+  --muted-foreground: 240 5% 65%;
+  --accent: 263 70% 58%;
+  --accent-foreground: 0 0% 100%;
+  --border: 263 50% 20%;
+  --input: 263 50% 20%;
+  --ring: 263 70% 58%;
+}
+

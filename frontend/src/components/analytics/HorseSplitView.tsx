@@ -1,7 +1,9 @@
-import React from "react";
+import React, { useState } from "react";
 import type { Horse } from "@/types/race";
-import { HorseAnalysisView } from "@/components/horse/HorseAnalysisView";
+import { HorseAnalysisView, type HorseViewMode } from "@/components/horse/HorseAnalysisView";
 import { RadarAnalyticsView } from "./RadarAnalyticsView";
+
+const VIEW_MODE_STORAGE_KEY = "horse-details-view-mode";
 
 interface HorseSplitViewProps {
   horse: Horse | null;
@@ -12,6 +14,8 @@ interface HorseSplitViewProps {
   horses?: Horse[];
   onSelectHorse?: (horse: Horse) => void;
   footerActions?: React.ReactNode;
+  initialViewMode?: HorseViewMode;
+  onViewModeChange?: (mode: HorseViewMode) => void;
 }
 
 export function HorseSplitView({
@@ -23,15 +27,40 @@ export function HorseSplitView({
   horses,
   onSelectHorse,
   footerActions,
+  initialViewMode = "single",
+  onViewModeChange,
 }: HorseSplitViewProps) {
-  return (
-    <div className="w-full max-w-none h-full min-h-0 flex flex-col p-1.5 sm:p-2.5">
-      {/* Dynamic responsive grid: balanced fractional sizing so neither side is squashed when sidebar is open */}
-      <div className="grid grid-cols-1 xl:grid-cols-[minmax(400px,1.15fr)_minmax(420px,1.25fr)] 2xl:grid-cols-[minmax(480px,1.2fr)_minmax(480px,1.2fr)] gap-3 items-stretch w-full xl:h-full min-h-0">
-        
-        {/* Left Column: Complete Horse Information details with horizontal and vertical scrolling */}
-        <div className="w-full h-full flex flex-col overflow-y-auto overflow-x-auto pb-6 min-h-0 min-w-0 custom-scrollbar">
+  const [viewMode, setViewMode] = useState<HorseViewMode>(() => {
+    if (typeof window !== "undefined") {
+      try {
+        const stored = window.localStorage.getItem(VIEW_MODE_STORAGE_KEY);
+        if (stored === "single" || stored === "split") {
+          return stored;
+        }
+      } catch {
+        // Ignore localStorage error
+      }
+    }
+    return initialViewMode;
+  });
 
+  const handleViewModeChange = (newMode: HorseViewMode) => {
+    setViewMode(newMode);
+    if (typeof window !== "undefined") {
+      try {
+        window.localStorage.setItem(VIEW_MODE_STORAGE_KEY, newMode);
+      } catch {
+        // Ignore localStorage error
+      }
+    }
+    onViewModeChange?.(newMode);
+  };
+
+  return (
+    <div className="w-full max-w-none h-full min-h-0 flex flex-col p-1.5 sm:p-2.5 transition-all duration-300 ease-in-out">
+      {viewMode === "single" ? (
+        /* Full-Width Horse Analysis layout (default) */
+        <div className="w-full max-w-7xl mx-auto h-full flex flex-col overflow-y-auto overflow-x-hidden pb-6 min-h-0 min-w-0 scrollbar-none no-scrollbar [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden transition-all duration-300 ease-in-out">
           <HorseAnalysisView
             horse={horse}
             raceTitle={raceTitle}
@@ -40,22 +69,42 @@ export function HorseSplitView({
             venueName={venueName}
             horses={horses}
             onSelectHorse={onSelectHorse}
+            viewMode="single"
+            onViewModeChange={handleViewModeChange}
           />
           {footerActions && <div className="mt-4 px-2">{footerActions}</div>}
         </div>
+      ) : (
+        /* Seamless 50/50 Split View (Horse Analysis + Radar Chart) */
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-0 items-stretch w-full xl:h-full min-h-0 transition-all duration-300 ease-in-out">
+          {/* Left Column (50%): Complete Horse Information details */}
+          <div className="w-full h-full flex flex-col overflow-y-auto overflow-x-hidden pb-6 min-h-0 min-w-0 scrollbar-none no-scrollbar [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden transition-all duration-300 ease-in-out pr-0 lg:pr-1.5">
+            <HorseAnalysisView
+              horse={horse}
+              raceTitle={raceTitle}
+              raceNumber={raceNumber}
+              raceDistance={raceDistance}
+              venueName={venueName}
+              horses={horses}
+              onSelectHorse={onSelectHorse}
+              viewMode="split"
+              onViewModeChange={handleViewModeChange}
+            />
+            {footerActions && <div className="mt-4 px-2">{footerActions}</div>}
+          </div>
 
-        {/* Right Column (50%): Radar Analytics view with horizontal and vertical scrolling */}
-        <div className="w-full h-full flex flex-col overflow-y-auto overflow-x-auto pb-6 min-h-0 min-w-0 custom-scrollbar">
-          <RadarAnalyticsView
-            selectedHorseId={horse?.id}
-            selectedHorseName={horse?.name}
-            horses={horses}
-            onSelectHorse={onSelectHorse}
-            isEmbedded
-          />
+          {/* Right Column (50%): Radar Analytics view */}
+          <div className="w-full h-full flex flex-col overflow-y-auto overflow-x-hidden pb-6 min-h-0 min-w-0 scrollbar-none no-scrollbar [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden transition-all duration-300 ease-in-out pl-0 lg:pl-1.5">
+            <RadarAnalyticsView
+              selectedHorseId={horse?.id}
+              selectedHorseName={horse?.name}
+              horses={horses}
+              onSelectHorse={onSelectHorse}
+              isEmbedded
+            />
+          </div>
         </div>
-
-      </div>
+      )}
     </div>
   );
 }

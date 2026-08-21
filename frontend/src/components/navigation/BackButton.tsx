@@ -35,13 +35,13 @@ export function BackButton({
 
   const themeClasses: Record<string, string> = {
     light:
-      "bg-white hover:bg-purple-50 text-slate-700 hover:text-purple-700 border border-slate-200 hover:border-purple-300 shadow-xs",
+      "bg-white dark:bg-slate-900/80 hover:bg-purple-50 dark:hover:bg-purple-950/60 text-slate-700 dark:text-slate-200 hover:text-purple-700 dark:hover:text-purple-300 border border-slate-200 dark:border-slate-800 hover:border-purple-300 dark:hover:border-purple-600/60 shadow-xs",
     dark:
       "bg-[#1E293B]/90 hover:bg-purple-950/60 text-slate-300 hover:text-purple-300 border border-slate-700/70 hover:border-purple-500/50 shadow-xs",
     glass:
-      "bg-white/80 backdrop-blur-md hover:bg-purple-50 text-slate-700 hover:text-purple-700 border border-slate-200/90 shadow-xs",
+      "bg-white/80 dark:bg-slate-900/80 backdrop-blur-md hover:bg-purple-50 dark:hover:bg-purple-950/60 text-slate-700 dark:text-slate-200 hover:text-purple-700 dark:hover:text-purple-300 border border-slate-200/90 dark:border-slate-800 shadow-xs",
     subtle:
-      "bg-slate-100 hover:bg-purple-100 text-slate-600 hover:text-purple-700 border border-transparent shadow-none",
+      "bg-slate-100 dark:bg-slate-800 hover:bg-purple-100 dark:hover:bg-purple-950/60 text-slate-600 dark:text-slate-300 hover:text-purple-700 dark:hover:text-purple-300 border border-transparent shadow-none",
   };
 
   return (

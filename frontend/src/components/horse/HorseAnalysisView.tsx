@@ -18,6 +18,7 @@ import {
   Tag,
   Trophy,
   User,
+  Zap,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { SilksRenderer } from "@/components/horse/SilksRenderer";
@@ -26,7 +27,9 @@ import { usePredictionStore } from "@/store/predictionStore";
 import { horseColor } from "@/lib/horseAnalytics";
 import type { Horse, HorseFormEntry } from "@/types/race";
 
-interface HorseAnalysisViewProps {
+export type HorseViewMode = "single" | "split";
+
+export interface HorseAnalysisViewProps {
   horse: Horse | null;
   raceTitle?: string;
   raceNumber?: number;
@@ -34,6 +37,8 @@ interface HorseAnalysisViewProps {
   venueName?: string;
   horses?: Horse[];
   onSelectHorse?: (horse: Horse) => void;
+  viewMode?: HorseViewMode;
+  onViewModeChange?: (mode: HorseViewMode) => void;
 }
 
 type LabelValue = {
@@ -453,6 +458,8 @@ export function HorseAnalysisView({
   venueName,
   horses,
   onSelectHorse,
+  viewMode = "single",
+  onViewModeChange,
 }: HorseAnalysisViewProps) {
   const navigate = useNavigate();
   const { currentRace } = usePredictionStore();
@@ -584,88 +591,113 @@ export function HorseAnalysisView({
   ];
 
   return (
-    <div className="w-full text-gray-800 p-1 sm:p-1.5">
-      <div className="space-y-4 sm:space-y-5 rounded-3xl border border-purple-100/80 bg-white p-3.5 sm:p-5 shadow-[0_10px_40px_rgba(139,92,246,0.06)]">
-        <div className="flex items-center justify-between pb-2">
-          <div className="flex items-center gap-3">
-            <BackButton
-              to={horse?.race_id ? `/races/${horse.race_id}` : currentRace?.id ? `/races/${currentRace.id}` : "/"}
-              fallbackTo={horse?.race_id ? `/races/${horse.race_id}` : currentRace?.id ? `/races/${currentRace.id}` : "/"}
-              label="Back to Horses"
-            />
+    <div className="w-full text-gray-800 dark:text-slate-200 p-1 sm:p-1.5 transition-all duration-300 ease-in-out">
+      <div className="space-y-4 sm:space-y-5 rounded-3xl border border-purple-100/80 dark:border-slate-800/80 bg-white dark:bg-[#131424]/90 p-[clamp(0.875rem,1.8vw,1.5rem)] shadow-[0_10px_40px_rgba(139,92,246,0.06)] dark:shadow-none transition-all duration-300 ease-in-out">
+        {/* Header Control Bar */}
+        <div className="flex items-center justify-between gap-3 pb-3 border-b border-purple-100/70 dark:border-slate-800/70">
+          <BackButton
+            to={horse?.race_id ? `/races/${horse.race_id}` : currentRace?.id ? `/races/${currentRace.id}` : "/"}
+            fallbackTo={horse?.race_id ? `/races/${horse.race_id}` : currentRace?.id ? `/races/${currentRace.id}` : "/"}
+            label="Back to Horses"
+          />
 
-            <div className="flex items-center gap-3">
-              <span
-                className="flex h-10 w-10 shrink-0 aspect-square items-center justify-center rounded-xl text-lg font-bold text-white transition-all duration-300"
-                style={{
-                  backgroundColor: assignedColor,
-                  boxShadow: `0 0 14px ${assignedColor}55`,
-                  border: `1px solid ${assignedColor}88`,
-                }}
+          {/* Right Action Controls: Head to Head Comparison Button */}
+          <div className="flex items-center gap-2 sm:gap-2.5 shrink-0">
+            {onViewModeChange && (
+              <button
+                type="button"
+                onClick={() => onViewModeChange(viewMode === "single" ? "split" : "single")}
+                className={`flex items-center gap-2 rounded-xl px-4 py-2 text-xs sm:text-sm font-bold backdrop-blur-sm transition-all duration-200 cursor-pointer shadow-xs active:scale-95 ${
+                  viewMode === "split"
+                    ? "bg-purple-600 text-white shadow-lg shadow-purple-500/30 border border-purple-400"
+                    : "bg-purple-950/50 border border-purple-800/40 hover:bg-purple-800/50 text-white shadow-xs"
+                }`}
+                title={viewMode === "split" ? "Close Radar Chart (Return to Full Width)" : "Open Head to Head Radar Chart (50/50 Split)"}
+                aria-label="Toggle Head to Head Radar View"
+                aria-pressed={viewMode === "split"}
               >
-                {saddleNo}
-              </span>
-              <div>
-                <h1 className="text-xl font-black uppercase tracking-tight text-gray-900 sm:text-2xl">
-                  {horseName}
-                </h1>
-                {raceTitle ? (
-                  <p className="text-xs font-medium text-purple-600">
-                    {venueName ? `${venueName} • ` : ""}
-                    Race {raceNumber ? `${raceNumber}: ` : ""}
-                    {raceTitle}
-                  </p>
-                ) : null}
-
-                <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm font-semibold text-gray-700">
-                  <span>Draw: {valueOrDash(horse?.draw_number)}</span>
-
-                  <span className="text-gray-300">•</span>
-
-                  <span>Distance: {valueOrDash(raceDistance)}</span>
-                </div>
-
-              </div>
-            </div>
+                <Zap className="h-4 w-4 fill-black text-black shrink-0" />
+                <span>Head to Head Comparison</span>
+              </button>
+            )}
           </div>
-
-          {/* Paired Previous / Next Horse Arrow Navigation */}
-          {horseList.length > 0 && (
-            <div className="flex items-center gap-1.5 shrink-0">
-              <button
-                type="button"
-                onClick={handlePrev}
-                disabled={!hasPrev}
-                aria-label="Previous Horse"
-                title={hasPrev ? `Previous: ${horseList[currentIndex - 1].name}` : "First horse in race"}
-                className={`w-9 h-9 flex items-center justify-center rounded-xl transition-all ${
-                  hasPrev
-                    ? "bg-purple-950/50 border border-purple-800/40 hover:bg-purple-800/50 text-white shadow-xs active:scale-95 cursor-pointer"
-                    : "bg-purple-950/20 border border-purple-900/20 text-purple-300/40 opacity-30 pointer-events-none cursor-not-allowed"
-                }`}
-              >
-                <ChevronLeft className="h-5 w-5" />
-              </button>
-
-              <button
-                type="button"
-                onClick={handleNext}
-                disabled={!hasNext}
-                aria-label="Next Horse"
-                title={hasNext ? `Next: ${horseList[currentIndex + 1].name}` : "Last horse in race"}
-                className={`w-9 h-9 flex items-center justify-center rounded-xl transition-all ${
-                  hasNext
-                    ? "bg-purple-950/50 border border-purple-800/40 hover:bg-purple-800/50 text-white shadow-xs active:scale-95 cursor-pointer"
-                    : "bg-purple-950/20 border border-purple-900/20 text-purple-300/40 opacity-30 pointer-events-none cursor-not-allowed"
-                }`}
-              >
-                <ChevronRight className="h-5 w-5" />
-              </button>
-            </div>
-          )}
         </div>
 
-        <div className="grid gap-4 grid-cols-1 md:grid-cols-2 2xl:grid-cols-2">
+        {/* Horse Identity Banner: Row 2 (Number Badge + Name with Nav Arrows + Metadata) */}
+        <div className="flex items-center gap-3.5 min-w-0 w-full pt-0.5">
+          <span
+            className="flex h-11 w-11 sm:h-12 sm:w-12 shrink-0 aspect-square items-center justify-center rounded-xl text-lg sm:text-xl font-bold text-white transition-all duration-300"
+            style={{
+              backgroundColor: assignedColor,
+              boxShadow: `0 0 14px ${assignedColor}55`,
+              border: `1px solid ${assignedColor}88`,
+            }}
+          >
+            {saddleNo}
+          </span>
+          <div className="min-w-0 flex-1">
+            <div className="flex items-center gap-3 flex-wrap">
+              <h1 className="text-[clamp(1.2rem,2.2vw,1.75rem)] font-black uppercase tracking-tight text-gray-900 dark:text-white break-words leading-tight">
+                {horseName}
+              </h1>
+
+              {/* Paired Previous / Next Horse Arrow Navigation */}
+              {horseList.length > 0 && (
+                <div className="flex items-center gap-1 shrink-0">
+                  <button
+                    type="button"
+                    onClick={handlePrev}
+                    disabled={!hasPrev}
+                    aria-label="Previous Horse"
+                    title={hasPrev ? `Previous: ${horseList[currentIndex - 1].name}` : "First horse in race"}
+                    className={`w-8 h-8 sm:w-8.5 sm:h-8.5 flex items-center justify-center rounded-xl transition-all ${
+                      hasPrev
+                        ? "bg-purple-950/50 border border-purple-800/40 hover:bg-purple-800/50 text-white shadow-xs active:scale-95 cursor-pointer"
+                        : "bg-purple-950/20 border border-purple-900/20 text-purple-300/40 opacity-30 pointer-events-none cursor-not-allowed"
+                    }`}
+                  >
+                    <ChevronLeft className="h-4 w-4 sm:h-4.5 sm:w-4.5" />
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={handleNext}
+                    disabled={!hasNext}
+                    aria-label="Next Horse"
+                    title={hasNext ? `Next: ${horseList[currentIndex + 1].name}` : "Last horse in race"}
+                    className={`w-8 h-8 sm:w-8.5 sm:h-8.5 flex items-center justify-center rounded-xl transition-all ${
+                      hasNext
+                        ? "bg-purple-950/50 border border-purple-800/40 hover:bg-purple-800/50 text-white shadow-xs active:scale-95 cursor-pointer"
+                        : "bg-purple-950/20 border border-purple-900/20 text-purple-300/40 opacity-30 pointer-events-none cursor-not-allowed"
+                    }`}
+                  >
+                    <ChevronRight className="h-4 w-4 sm:h-4.5 sm:w-4.5" />
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {raceTitle ? (
+              <p className="text-xs sm:text-sm font-semibold text-purple-700 dark:text-purple-400 truncate mt-0.5">
+                {venueName ? `${venueName} • ` : ""}
+                Race {raceNumber ? `${raceNumber}: ` : ""}
+                {raceTitle}
+              </p>
+            ) : null}
+
+            <div className="mt-1 flex flex-wrap items-center gap-x-2.5 gap-y-1 text-xs sm:text-sm font-semibold text-gray-700 dark:text-slate-300">
+              <span className="inline-flex items-center rounded-md bg-purple-50 dark:bg-purple-950/50 px-2 py-0.5 text-purple-900 dark:text-purple-300 font-bold border border-purple-100 dark:border-purple-800/60">
+                Draw: {valueOrDash(horse?.draw_number)}
+              </span>
+              <span className="inline-flex items-center rounded-md bg-gray-50 dark:bg-slate-800 px-2 py-0.5 text-gray-700 dark:text-slate-300 font-bold border border-gray-200 dark:border-slate-700">
+                Distance: {valueOrDash(raceDistance)}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {/* Profile & Jockey Colours */}
+        <div className={`grid gap-[clamp(0.75rem,1.5vw,1.25rem)] ${viewMode === "single" ? "grid-cols-1 md:grid-cols-2" : "grid-cols-1 xl:grid-cols-2"}`}>
           <SectionCard icon={User} title="Horse Profile">
             {/* SCROLLABLE PAGES */}
             <div
@@ -701,8 +733,8 @@ export function HorseAnalysisView({
                 onClick={() => goToProfilePage(0)}
                 aria-label="Show horse profile"
                 className={`h-2.5 w-2.5 shrink-0 aspect-square rounded-full transition-all ${profilePage === 0
-                  ? "bg-purple-700 scale-110"
-                  : "bg-gray-300 hover:bg-purple-300"
+                  ? "bg-purple-700 dark:bg-purple-500 scale-110"
+                  : "bg-gray-300 dark:bg-slate-700 hover:bg-purple-300 dark:hover:bg-purple-800"
                   }`}
               />
 
@@ -711,8 +743,8 @@ export function HorseAnalysisView({
                 onClick={() => goToProfilePage(1)}
                 aria-label="Show horse pedigree"
                 className={`h-2.5 w-2.5 shrink-0 aspect-square rounded-full transition-all ${profilePage === 1
-                  ? "bg-purple-700 scale-110"
-                  : "bg-gray-300 hover:bg-purple-300"
+                  ? "bg-purple-700 dark:bg-purple-500 scale-110"
+                  : "bg-gray-300 dark:bg-slate-700 hover:bg-purple-300 dark:hover:bg-purple-800"
                   }`}
               />
             </div>
@@ -728,7 +760,7 @@ export function HorseAnalysisView({
               </div>
 
               <div className="w-full max-w-full flex flex-col items-center justify-center gap-1 text-center px-1">
-                <p className="w-full rounded-xl border border-purple-100 bg-purple-50/70 px-3 py-2 text-xs leading-relaxed text-purple-950 font-medium text-center break-words overflow-hidden">
+                <p className="w-full rounded-xl border border-purple-100 dark:border-purple-900/40 bg-purple-50/70 dark:bg-purple-950/40 px-3 py-2 text-xs leading-relaxed text-purple-950 dark:text-purple-200 font-medium text-center break-words overflow-hidden">
                   {horse?.silks?.trim() ? horse.silks : "Colours not available"}
                 </p>
               </div>
@@ -736,10 +768,10 @@ export function HorseAnalysisView({
           </SectionCard>
         </div>
 
-
-        <div className="grid gap-6">
+        {/* The Team */}
+        <div className="grid gap-4">
           <SectionCard icon={User} title="The Team">
-            <div className="grid gap-5 sm:grid-cols-2">
+            <div className="grid gap-4 sm:grid-cols-2">
               <TeamPerformanceChart
                 role="Jockey"
                 name={jockeyName}
@@ -754,10 +786,11 @@ export function HorseAnalysisView({
           </SectionCard>
         </div>
 
+        {/* Record Breakdown */}
         <SectionCard icon={Trophy} title="Record Breakdown">
-          <div className="space-y-5">
+          <div className="space-y-4 sm:space-y-5">
             <ChartLegend />
-            <div className="grid gap-2.5 sm:gap-3 grid-cols-2 sm:grid-cols-3 xl:grid-cols-5">
+            <div className={`grid gap-[clamp(0.5rem,1vw,0.75rem)] ${viewMode === "single" ? "grid-cols-2 sm:grid-cols-3 xl:grid-cols-5" : "grid-cols-2 sm:grid-cols-3 xl:grid-cols-5"}`}>
               {recordCharts.map((chart) => (
                 <RecordPieChart
                   key={chart.label}
@@ -769,8 +802,9 @@ export function HorseAnalysisView({
           </div>
         </SectionCard>
 
+        {/* Technical Details */}
         <SectionCard icon={Tag} title="Technical Details">
-          <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+          <div className={`grid gap-[clamp(0.5rem,1vw,0.75rem)] ${viewMode === "single" ? "grid-cols-2 sm:grid-cols-3 xl:grid-cols-5" : "grid-cols-2 sm:grid-cols-2 xl:grid-cols-4 2xl:grid-cols-5"}`}>
             <MetricTile icon={Scale} label="Weight" value={technicalRows[0].value} />
             <MetricTile icon={Glasses} label="Blinkers" value={technicalRows[1].value} />
             <MetricTile icon={Footprints} label="Alumites" value={technicalRows[2].value} />
@@ -779,9 +813,10 @@ export function HorseAnalysisView({
           </div>
         </SectionCard>
 
+        {/* Recent Form */}
         <SectionCard icon={Trophy} title="Recent Form">
-          <div className="space-y-5">
-            <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+          <div className="space-y-4 sm:space-y-5">
+            <div className={`grid gap-[clamp(0.5rem,1vw,0.75rem)] ${viewMode === "single" ? "grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-7" : "grid-cols-2 sm:grid-cols-2 xl:grid-cols-3"}`}>
               <MetricTile icon={Medal} label="Merit Rating" value={valueOrDash(horse?.merit_rating)} />
               <MetricTile
                 icon={Medal}
@@ -799,8 +834,8 @@ export function HorseAnalysisView({
               />
             </div>
 
-            <div className="rounded-2xl border border-gray-100 bg-gray-50/60 p-4">
-              <p className="text-xs font-semibold uppercase tracking-[0.12em] text-gray-500">
+            <div className="rounded-2xl border border-gray-100 dark:border-slate-800 bg-gray-50/60 dark:bg-slate-900/60 p-4">
+              <p className="text-xs font-semibold uppercase tracking-[0.12em] text-gray-500 dark:text-slate-400">
                 Form Strip
               </p>
               <div className="mt-3 flex flex-wrap gap-2">
@@ -814,7 +849,7 @@ export function HorseAnalysisView({
                     </span>
                   ))
                 ) : (
-                  <span className="text-sm font-medium text-gray-500">
+                  <span className="text-sm font-medium text-gray-500 dark:text-slate-400">
                     No recent form history available.
                   </span>
                 )}
@@ -822,7 +857,7 @@ export function HorseAnalysisView({
             </div>
 
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-              <p className="text-sm font-semibold text-gray-700">
+              <p className="text-sm font-semibold text-gray-700 dark:text-slate-300">
                 {showFormHistory ? "Full form history" : "Last 5 races"}
               </p>
               <div className="flex flex-wrap items-center gap-2">
@@ -834,7 +869,7 @@ export function HorseAnalysisView({
                   <button
                     type="button"
                     onClick={() => setShowFormHistory((current) => !current)}
-                    className="flex items-center gap-2 rounded-full border border-purple-200 bg-purple-50 px-4 py-2 text-sm font-semibold text-purple-900 transition-colors hover:bg-purple-100"
+                    className="flex items-center gap-2 rounded-full border border-purple-200 dark:border-purple-800 bg-purple-50 dark:bg-purple-950/50 px-4 py-2 text-sm font-semibold text-purple-900 dark:text-purple-300 transition-colors hover:bg-purple-100 dark:hover:bg-purple-900/50"
                     aria-expanded={showFormHistory}
                   >
                     <span>
@@ -850,11 +885,11 @@ export function HorseAnalysisView({
               </div>
             </div>
 
-            <div className="overflow-hidden rounded-2xl border border-gray-100">
+            <div className="overflow-hidden rounded-2xl border border-gray-100 dark:border-slate-800">
               <div className="overflow-x-auto">
-                <table className="min-w-full divide-y divide-gray-200 text-sm">
-                  <thead className="bg-gray-50">
-                    <tr className="text-left text-xs font-semibold uppercase tracking-[0.12em] text-gray-500">
+                <table className="min-w-full divide-y divide-gray-200 dark:divide-slate-800 text-sm">
+                  <thead className="bg-gray-50 dark:bg-slate-900">
+                    <tr className="text-left text-xs font-semibold uppercase tracking-[0.12em] text-gray-500 dark:text-slate-400">
                       {visibleFormColumns.map((column) => (
                         <th
                           key={column.key}
@@ -865,14 +900,14 @@ export function HorseAnalysisView({
                       ))}
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-gray-100 bg-white">
+                  <tbody className="divide-y divide-gray-100 dark:divide-slate-800 bg-white dark:bg-[#0E0F1A]/80">
                     {visibleFormEntries.length > 0 ? (
                       visibleFormEntries.map((entry, index) => (
                         <tr key={`${entry.run_date ?? "unknown"}-${index}`} className="align-top">
                           {visibleFormColumns.map((column) => (
                             <td
                               key={column.key}
-                              className={`px-4 py-3 text-gray-700 ${column.cellClassName ?? ""}`}
+                              className={`px-4 py-3 text-gray-700 dark:text-slate-300 ${column.cellClassName ?? ""}`}
                             >
                               {column.render(entry)}
                             </td>
@@ -883,7 +918,7 @@ export function HorseAnalysisView({
                       <tr>
                         <td
                           colSpan={Math.max(visibleFormColumns.length, 1)}
-                          className="px-4 py-6 text-center text-sm text-gray-500"
+                          className="px-4 py-6 text-center text-sm text-gray-500 dark:text-slate-400"
                         >
                           No historical race results available for this horse yet.
                         </td>
@@ -910,12 +945,12 @@ function SectionCard({
   children: ReactNode;
 }) {
   return (
-    <section className="rounded-2xl border border-purple-100/70 bg-white p-4 sm:p-5 shadow-xs">
-      <div className="mb-4 flex items-center gap-2.5">
-        <div className="flex h-7 w-7 shrink-0 aspect-square items-center justify-center rounded-lg bg-purple-100 text-purple-700">
+    <section className="rounded-2xl border border-purple-100/70 dark:border-slate-800/80 bg-white dark:bg-[#0E0F1A]/80 p-[clamp(0.875rem,1.5vw,1.25rem)] shadow-xs transition-all duration-300 ease-in-out">
+      <div className="mb-3.5 flex items-center gap-2.5">
+        <div className="flex h-7 w-7 shrink-0 aspect-square items-center justify-center rounded-lg bg-purple-100 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300">
           <Icon className="h-4 w-4" />
         </div>
-        <h2 className="text-base sm:text-lg font-bold text-purple-900">{title}</h2>
+        <h2 className="text-[clamp(0.95rem,1.2vw,1.125rem)] font-bold text-purple-900 dark:text-purple-200 leading-tight">{title}</h2>
       </div>
       {children}
     </section>
@@ -924,17 +959,17 @@ function SectionCard({
 
 function DetailsGrid({ rows }: { rows: LabelValue[] }) {
   return (
-    <div className="grid gap-2.5 grid-cols-1 sm:grid-cols-2">
+    <div className="grid gap-2 grid-cols-1 sm:grid-cols-2">
       {rows.map((row) => (
         <div
           key={row.label}
-          className="flex flex-col justify-center rounded-xl border border-gray-100 bg-gray-50/70 px-3.5 py-2.5 min-w-0 transition-colors"
+          className="flex flex-col justify-center rounded-xl border border-gray-100 dark:border-slate-800 bg-gray-50/70 dark:bg-slate-900/60 px-3 py-2 min-w-0 transition-colors"
         >
-          <p className="text-[11px] font-bold uppercase tracking-wider text-gray-500">
+          <p className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-gray-500 dark:text-slate-400 truncate">
             {row.label}
           </p>
           <p
-            className="mt-0.5 text-xs sm:text-sm font-extrabold text-gray-900 break-words leading-snug"
+            className="mt-0.5 text-xs sm:text-sm font-extrabold text-gray-900 dark:text-white break-words leading-snug"
             title={row.value}
           >
             {row.value}
@@ -944,7 +979,6 @@ function DetailsGrid({ rows }: { rows: LabelValue[] }) {
     </div>
   );
 }
-
 
 function MetricTile({
   icon: Icon,
@@ -956,14 +990,14 @@ function MetricTile({
   value: string;
 }) {
   return (
-    <div className="rounded-2xl border border-gray-100 bg-gray-50/60 p-4 text-center">
-      <div className="mb-2 flex justify-center text-purple-700">
-        <Icon className="h-5 w-5" />
+    <div className="rounded-2xl border border-gray-100 dark:border-slate-800/80 bg-gray-50/60 dark:bg-slate-900/60 p-[clamp(0.625rem,1.2vw,1rem)] text-center transition-all duration-300 ease-in-out hover:bg-gray-50 dark:hover:bg-slate-900 flex flex-col items-center justify-center min-w-0">
+      <div className="mb-1.5 flex justify-center text-purple-700 dark:text-purple-400">
+        <Icon className="h-4 w-4 sm:h-5 sm:w-5" />
       </div>
-      <p className="text-xs font-semibold uppercase tracking-[0.12em] text-gray-500">
+      <p className="text-[10px] sm:text-xs font-semibold uppercase tracking-[0.1em] text-gray-500 dark:text-slate-400 truncate w-full">
         {label}
       </p>
-      <p className="mt-1 text-base font-extrabold text-gray-900">{value}</p>
+      <p className="mt-0.5 text-sm sm:text-base font-extrabold text-gray-900 dark:text-white truncate w-full">{value}</p>
     </div>
   );
 }
@@ -980,11 +1014,11 @@ function TeamPerformanceChart({
   const stats = parsePerformanceRecord(record);
 
   return (
-    <div className="rounded-2xl border border-gray-100 bg-gray-50/60 p-4 text-center relative flex flex-col items-center overflow-hidden w-full min-w-0">
-      <p className="text-xs font-semibold uppercase tracking-[0.12em] text-gray-500">
+    <div className="rounded-2xl border border-gray-100 dark:border-slate-800/80 bg-gray-50/60 dark:bg-slate-900/60 p-4 text-center relative flex flex-col items-center overflow-hidden w-full min-w-0">
+      <p className="text-xs font-semibold uppercase tracking-[0.12em] text-gray-500 dark:text-slate-400">
         {role}
       </p>
-      <p className="mt-1 min-h-6 text-sm font-extrabold text-gray-900 truncate w-full">
+      <p className="mt-1 min-h-6 text-sm font-extrabold text-gray-900 dark:text-white truncate w-full">
         {name}
       </p>
 
@@ -1001,7 +1035,7 @@ function TeamPerformanceChart({
       ) : (
         <div className="w-full flex flex-col items-center justify-center">
           <p className="text-xs font-black text-gray-400 whitespace-nowrap">0 - 0 - 0</p>
-          <p className="mt-0.5 text-[10px] font-semibold text-slate-500 whitespace-nowrap text-center">
+          <p className="mt-0.5 text-[10px] font-semibold text-slate-500 dark:text-slate-400 whitespace-nowrap text-center">
             {record && record !== "-" && record !== "0:0-0-0" ? `Record: ${record}` : "0 runs recorded"}
           </p>
         </div>
@@ -1020,8 +1054,8 @@ function RecordPieChart({
   const stats = parsePerformanceRecord(record);
 
   return (
-    <div className="rounded-2xl border border-gray-100 bg-gray-50/60 p-3 text-center relative flex flex-col items-center justify-between overflow-hidden w-full min-w-0 shadow-xs">
-      <p className="min-h-5 text-[11px] font-bold uppercase tracking-wider text-gray-500 truncate w-full">
+    <div className="rounded-2xl border border-gray-100 dark:border-slate-800/80 bg-gray-50/60 dark:bg-slate-900/60 p-3 text-center relative flex flex-col items-center justify-between overflow-hidden w-full min-w-0 shadow-xs">
+      <p className="min-h-5 text-[11px] font-bold uppercase tracking-wider text-gray-500 dark:text-slate-400 truncate w-full">
         {label}
       </p>
 
@@ -1034,7 +1068,7 @@ function RecordPieChart({
       ) : (
         <div className="w-full flex flex-col items-center justify-center">
           <p className="text-xs font-black text-gray-400 whitespace-nowrap">0 - 0 - 0</p>
-          <p className="mt-0.5 text-[10px] font-semibold text-slate-500 whitespace-nowrap text-center">
+          <p className="mt-0.5 text-[10px] font-semibold text-slate-500 dark:text-slate-400 whitespace-nowrap text-center">
             {record && record !== "-" && record !== "0:0-0-0" ? `Record: ${record}` : "0 runs recorded"}
           </p>
         </div>
@@ -1072,7 +1106,7 @@ function SolidPerformancePie({
 
   return (
     <div
-      className={`${sizeClassName} shrink-0 aspect-square rounded-full border border-white shadow-[0_10px_30px_rgba(88,28,135,0.16)]`}
+      className={`${sizeClassName} shrink-0 aspect-square rounded-full border border-white dark:border-slate-800 shadow-[0_10px_30px_rgba(88,28,135,0.16)]`}
       style={{ background: chartBackground }}
       aria-label={`${label} pie chart`}
       role="img"
@@ -1096,7 +1130,7 @@ function RecordResultLine({
         <span className="text-gray-400">-</span>
         <span style={{ color: CHART_COLORS.thirds }}>{stats.thirds}</span>
       </div>
-      <p className="mt-0.5 text-[10px] font-semibold text-slate-500 whitespace-nowrap text-center">
+      <p className="mt-0.5 text-[10px] font-semibold text-slate-500 dark:text-slate-400 whitespace-nowrap text-center">
         Last {stats.totalRuns} runs
       </p>
     </div>
@@ -1105,7 +1139,7 @@ function RecordResultLine({
 
 function ChartLegend() {
   return (
-    <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-[11px] font-bold text-gray-600">
+    <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-[11px] font-bold text-gray-600 dark:text-slate-300">
       <LegendItem color={CHART_COLORS.wins} label="Wins" />
       <LegendItem color={CHART_COLORS.seconds} label="2nd places" />
       <LegendItem color={CHART_COLORS.thirds} label="3rd places" />
@@ -1166,21 +1200,21 @@ function FormColumnSelector({
 
   return (
     <details className="relative">
-      <summary className="flex cursor-pointer list-none items-center gap-2 rounded-full border border-purple-200 bg-white px-4 py-2 text-sm font-semibold text-purple-900 shadow-sm transition-colors hover:bg-purple-50 [&::-webkit-details-marker]:hidden">
+      <summary className="flex cursor-pointer list-none items-center gap-2 rounded-full border border-purple-200 dark:border-purple-800 bg-white dark:bg-slate-900 px-4 py-2 text-sm font-semibold text-purple-900 dark:text-purple-300 shadow-sm transition-colors hover:bg-purple-50 dark:hover:bg-slate-800 [&::-webkit-details-marker]:hidden">
         <ListFilter className="h-4 w-4" />
         Columns
         <ChevronDown className="h-4 w-4" />
       </summary>
 
-      <div className="absolute right-0 z-20 mt-2 w-72 rounded-2xl border border-purple-100 bg-white p-3 text-left shadow-xl shadow-purple-900/10">
-        <div className="mb-2 flex items-center justify-between gap-2 border-b border-gray-100 pb-2">
-          <p className="text-xs font-bold uppercase tracking-[0.12em] text-gray-500">
+      <div className="absolute right-0 z-20 mt-2 w-72 rounded-2xl border border-purple-100 dark:border-slate-800 bg-white dark:bg-slate-900 p-3 text-left shadow-xl shadow-purple-900/10 dark:shadow-none">
+        <div className="mb-2 flex items-center justify-between gap-2 border-b border-gray-100 dark:border-slate-800 pb-2">
+          <p className="text-xs font-bold uppercase tracking-[0.12em] text-gray-500 dark:text-slate-400">
             Form columns
           </p>
           <button
             type="button"
             onClick={() => onVisibleColumnKeysChange(DEFAULT_FORM_COLUMN_KEYS)}
-            className="rounded-full px-2 py-1 text-xs font-semibold text-purple-700 transition-colors hover:bg-purple-50"
+            className="rounded-full px-2 py-1 text-xs font-semibold text-purple-700 dark:text-purple-300 transition-colors hover:bg-purple-50 dark:hover:bg-purple-950/60"
           >
             Reset
           </button>
@@ -1194,15 +1228,15 @@ function FormColumnSelector({
             return (
               <div
                 key={column.key}
-                className="grid grid-cols-[1fr_auto] items-center gap-2 rounded-xl px-2 py-1.5 transition-colors hover:bg-gray-50"
+                className="grid grid-cols-[1fr_auto] items-center gap-2 rounded-xl px-2 py-1.5 transition-colors hover:bg-gray-50 dark:hover:bg-slate-800"
               >
-                <label className="flex min-w-0 cursor-pointer items-center gap-2 text-sm font-semibold text-gray-700">
+                <label className="flex min-w-0 cursor-pointer items-center gap-2 text-sm font-semibold text-gray-700 dark:text-slate-300">
                   <input
                     type="checkbox"
                     checked={isVisible}
                     disabled={isVisible && visibleColumnKeys.length === 1}
                     onChange={() => toggleColumn(column.key)}
-                    className="h-4 w-4 rounded border-gray-300 text-purple-700 focus:ring-purple-600"
+                    className="h-4 w-4 rounded border-gray-300 dark:border-slate-700 text-purple-700 focus:ring-purple-600"
                   />
                   <span className="truncate">{column.label}</span>
                 </label>
@@ -1212,7 +1246,7 @@ function FormColumnSelector({
                     type="button"
                     onClick={() => moveColumn(column.key, -1)}
                     disabled={!isVisible || selectedIndex <= 0}
-                    className="flex h-7 w-7 items-center justify-center rounded-lg text-gray-500 transition-colors hover:bg-purple-50 hover:text-purple-700 disabled:cursor-not-allowed disabled:opacity-30"
+                    className="flex h-7 w-7 items-center justify-center rounded-lg text-gray-500 dark:text-slate-400 transition-colors hover:bg-purple-50 dark:hover:bg-slate-800 hover:text-purple-700 dark:hover:text-purple-300 disabled:cursor-not-allowed disabled:opacity-30"
                     aria-label={`Move ${column.label} earlier`}
                   >
                     <ArrowUp className="h-3.5 w-3.5" />
@@ -1221,7 +1255,7 @@ function FormColumnSelector({
                     type="button"
                     onClick={() => moveColumn(column.key, 1)}
                     disabled={!isVisible || selectedIndex === visibleColumnKeys.length - 1}
-                    className="flex h-7 w-7 items-center justify-center rounded-lg text-gray-500 transition-colors hover:bg-purple-50 hover:text-purple-700 disabled:cursor-not-allowed disabled:opacity-30"
+                    className="flex h-7 w-7 items-center justify-center rounded-lg text-gray-500 dark:text-slate-400 transition-colors hover:bg-purple-50 dark:hover:bg-slate-800 hover:text-purple-700 dark:hover:text-purple-300 disabled:cursor-not-allowed disabled:opacity-30"
                     aria-label={`Move ${column.label} later`}
                   >
                     <ArrowDown className="h-3.5 w-3.5" />

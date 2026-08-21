@@ -1,30 +1,30 @@
 /* Light Theme Redesign Overrides */
-.light-theme {
+html:not(.dark) .light-theme {
   background-color: #ffffff;
   color: #111111;
   position: relative;
   z-index: 20;
 }
 
-/* Force body background white if .light-theme is present */
-body:has(.light-theme) {
+/* Force body background white only in light mode */
+html:not(.dark) body:has(.light-theme) {
   background-color: #ffffff;
 }
 
 /* Hide the neon backgrounds for the light theme */
-body:has(.light-theme) .neon-bg {
+html:not(.dark) body:has(.light-theme) .neon-bg {
   display: none;
 }
 
 /* Top header in light theme */
-.light-theme .status-meta.light-theme {
+html:not(.dark) .light-theme .status-meta.light-theme {
   background: #ffffff;
   border: 1px solid #e5e7eb;
   color: #374151;
   box-shadow: 0 2px 8px rgba(0,0,0,0.05);
 }
 
-.app-header:has(~ .light-theme) .status-meta {
+html:not(.dark) .app-header:has(~ .light-theme) .status-meta {
   background: #ffffff;
   border: 1px solid #e5e7eb;
   color: #374151;
@@ -36,7 +36,7 @@ body:has(.light-theme) .neon-bg {
   justify-content: flex-start;
 }
 
-.light-heading h1 {
+html:not(.dark) .light-heading h1 {
   color: #111111;
   font-weight: 800;
   letter-spacing: -0.03em;
@@ -87,11 +87,11 @@ body:has(.light-theme) .neon-bg {
   opacity: 0.5;
 }
 
-.light-theme .wheel-tick-ring::after {
+html:not(.dark) .light-theme .wheel-tick-ring::after {
   background: #ffffff;
 }
 
-.light-theme .wheel-center {
+html:not(.dark) .light-theme .wheel-center {
   background: #ffffff;
   border-color: rgba(168, 85, 247, 0.2);
   box-shadow: 0 4px 20px rgba(168, 85, 247, 0.15);
@@ -101,12 +101,12 @@ body:has(.light-theme) .neon-bg {
   color: #8b5cf6;
 }
 
-.light-theme .wheel-center span {
+html:not(.dark) .light-theme .wheel-center span {
   color: #374151;
 }
 
 /* Segments */
-.light-theme .factor-segment {
+html:not(.dark) .light-theme .factor-segment {
   color: #111111;
 }
 
@@ -139,14 +139,13 @@ body:has(.light-theme) .neon-bg {
   height: 8px;
   background: #8b5cf6;
   border-radius: 50%;
-  /* To place it on the outer ring, we translate it outward relative to the segment container */
   transform: translate(-50%, -50%) translateY(-145px);
   left: 50%;
   top: 50%;
 }
 
 /* Tooltip card */
-.light-theme .factor-description-card {
+html:not(.dark) .light-theme .factor-description-card {
   background: rgba(255, 255, 255, 0.95);
   border-color: rgba(168, 85, 247, 0.4);
   color: #111111;
@@ -158,8 +157,8 @@ body:has(.light-theme) .neon-bg {
   color: #8b5cf6;
 }
 
-.light-theme .factor-desc-text,
-.light-theme .factor-desc-example {
+html:not(.dark) .light-theme .factor-desc-text,
+html:not(.dark) .light-theme .factor-desc-example {
   color: #4b5563;
 }
 
@@ -177,7 +176,7 @@ body:has(.light-theme) .neon-bg {
   border-color: #9ca3af !important;
 }
 
-.light-pill-container {
+html:not(.dark) .light-pill-container {
   background: #ffffff !important;
   border: 1px solid #d1d5db !important;
   border-radius: 999px !important;
@@ -185,11 +184,11 @@ body:has(.light-theme) .neon-bg {
   padding: 0.5rem 1.5rem !important;
 }
 
-.light-pill-container .selected-container-title {
+html:not(.dark) .light-pill-container .selected-container-title {
   color: #111111 !important;
 }
 
-.light-theme .selected-pill {
+html:not(.dark) .light-theme .selected-pill {
   background: transparent !important;
   border: none !important;
   color: #4b5563 !important;
@@ -214,3 +213,68 @@ body:has(.light-theme) .neon-bg {
   transform: translateY(-1px);
   box-shadow: 0 6px 20px rgba(139, 92, 246, 0.5) !important;
 }
+
+/* Dark Mode Overrides for AnalysisFactors */
+.dark .analysis-page {
+  background-color: transparent !important;
+  color: #f8fafc !important;
+}
+
+.dark .light-heading h1 {
+  color: #f8fafc !important;
+}
+
+.dark .light-heading p {
+  color: #94a3b8 !important;
+}
+
+.dark .light-theme .wheel-tick-ring::after {
+  background: #0b0c14 !important;
+}
+
+.dark .light-theme .wheel-center {
+  background: #0f172a !important;
+  border-color: rgba(168, 85, 247, 0.35) !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5) !important;
+}
+
+.dark .light-theme .wheel-center span {
+  color: #cbd5e1 !important;
+}
+
+.dark .light-theme .factor-segment {
+  color: #e2e8f0 !important;
+}
+
+.dark .light-theme .factor-description-card {
+  background: rgba(15, 23, 42, 0.95) !important;
+  border-color: rgba(168, 85, 247, 0.5) !important;
+  color: #f8fafc !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5) !important;
+}
+
+.dark .light-theme .factor-desc-text,
+.dark .light-theme .factor-desc-example {
+  color: #cbd5e1 !important;
+}
+
+.dark .light-pill-container {
+  background: rgba(15, 23, 42, 0.85) !important;
+  border: 1px solid rgba(139, 92, 246, 0.3) !important;
+  border-radius: 999px !important;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.3) !important;
+  padding: 0.5rem 1.5rem !important;
+}
+
+.dark .light-pill-container .selected-container-title {
+  color: #f8fafc !important;
+}
+
+.dark .light-theme .selected-pill {
+  background: transparent !important;
+  border: none !important;
+  color: #cbd5e1 !important;
+  font-weight: 600;
+  padding: 0 0.5rem;
+}
+
