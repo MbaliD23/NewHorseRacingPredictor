@@ -198,6 +198,8 @@ def test_extracts_recent_form_entries_from_legacy_block():
     assert form_entries[0].raw_date_text == "(5) 26.05.13"
     assert form_entries[0].run_date.isoformat() == "2026-05-13"
     assert form_entries[0].track == "K"
+    assert form_entries[0].going == "Y"
+    assert form_entries[0].race_class == "MJP-F"
     assert form_entries[0].race_number == "520"
     assert form_entries[0].distance == "1200"
     assert form_entries[0].jockey_name == "V.Niekerk G"
@@ -207,7 +209,9 @@ def test_extracts_recent_form_entries_from_legacy_block():
     assert form_entries[0].margin_behind_winner == "3.30"
     assert form_entries[0].winner_name == "Lowveld Lily"
     assert form_entries[0].winner_weight == "60.0"
-    assert form_entries[0].odds == "25/1"
+    assert form_entries[0].opening_bet == "25/1"
+    assert form_entries[0].starting_price == "33/1"
+    assert form_entries[0].merit_rating == "56"
     assert form_entries[0].comment == "Stayed on at finish"
     assert form_entries[0].speed_figure == "87.17"
     assert form_entries[0].rating == "56"
@@ -371,3 +375,168 @@ def test_extracts_multiple_recent_form_entries_from_single_legacy_table():
         "(4) 26.06.21",
         "(5) 26.05.13",
     ]
+
+
+def test_extracts_jockey_and_trainer_performance_records():
+    html = """
+    <html>
+      <body>
+        <table>
+          <tr>
+            <td align="center" valign="top" rowspan="2">
+              <div class="b4">2</div><br><div class="b1">5/1</div><br><span class="b1">75</span>
+            </td>
+            <td>
+              <table cellpadding="0" width="100%">
+                <tr><td class="b1">BAI YULU</td><td align="right" class="b1">(A)</td></tr>
+              </table>
+              <table cellpadding="0" width="100%">
+                <tr><td>3 y.o. b f.</td><td align="right">dob: 15 Oct 2022</td></tr>
+              </table>
+            </td>
+            <td>
+              <table cellpadding="0" width="100%">
+                <tr><td valign="top"><div class="b2">60.0</div></td><td align="right"><div class="b2">2</div></td></tr>
+              </table>
+            </td>
+            <td>
+              <table cellpadding="2" width="100%">
+                <tr>
+                  <td valign="top">
+                    <div class="itbld">Marco<br>V/RENSBURG</div>
+                    <span class="bld">84</span>* 30:<span class="bld">3</span>-2-7
+                  </td>
+                  <td valign="top">
+                    <div class="itbld">Cliffie<br>MILLER</div>
+                    <span class="bld">72</span>* 30:<span class="bld">2</span>-2-7
+                  </td>
+                </tr>
+              </table>
+            </td>
+            <td valign="top" rowspan="2">
+              <table cellpadding="0">
+                <tr class="bld"><td>Wet:</td><td>0:0-0-0</td></tr>
+                <tr class="bld"><td>Crs:</td><td>5:1-1-1</td></tr>
+                <tr class="bld"><td>Dst:</td><td>3:1-0-0</td></tr>
+                <tr class="bld"><td>C&D:</td><td>2:1-0-0</td></tr>
+              </table>
+            </td>
+          </tr>
+          <tr>
+            <td colspan="2" id="small">
+              DANON PLATINA - Celestial Storm by Galileo.<br>
+              Breeder: MAURITZFONTEIN & WILGERBOSDRIFT<br>
+              Mr W G C Miller<br>
+              Light blue, dark green spots, light blue sleeves, dark green cap
+            </td>
+            <td valign="top">
+              <table cellpadding="1">
+                <tr class="bld"><td>Tot Rns:</td><td align="right">8:1-1-1</td></tr>
+                <tr class="bld"><td>Stakes:</td><td align="right">R 75000</td></tr>
+              </table>
+            </td>
+          </tr>
+        </table>
+      </body>
+    </html>
+    """
+    scraper = WinningFormScraper()
+    soup = BeautifulSoup(html, "lxml")
+
+    extended = scraper._extract_extended_horse_data(soup)
+
+    assert "bai yulu" in extended
+    assert extended["bai yulu"]["jockey_record"] == "30:3-2-7"
+    assert extended["bai yulu"]["trainer_record"] == "30:2-2-7"
+
+
+def test_extracts_made_to_measure_formline_fields():
+    html = """
+    <html>
+      <body>
+        <table>
+          <tr>
+            <td align="center" valign="top" rowspan="2">
+              <div class="b4">1</div><br><div class="b1">2/1</div>
+            </td>
+            <td>
+              <table cellpadding="0" width="100%">
+                <tr><td class="b1">MADE TO MEASURE</td><td align="right" class="b1">(A)</td></tr>
+              </table>
+              <table cellpadding="0" width="100%">
+                <tr><td>3 y.o. b g.</td><td align="right">dob: 12 Oct 2022</td></tr>
+              </table>
+            </td>
+          </tr>
+          <tr>
+            <td colspan="2" id="small">
+              ERUPT - Rose Garden by Spectrum.<br>
+              Breeder: MAINE CHANCE FARMS<br>
+            </td>
+          </tr>
+          <tr>
+            <td colspan="3">
+              <table>
+                <tr class="small">
+                  <td>(4) 26.07.31</td>
+                  <td>P</td>
+                  <td>547</td>
+                  <td>G</td>
+                  <td>OM</td>
+                  <td>b</td>
+                  <td>1400</td>
+                  <td>Fourie R</td>
+                  <td>58.5</td>
+                  <td>(73)</td>
+                  <td>A</td>
+                  <td>6-10</td>
+                  <td>2</td>
+                  <td>0.50</td>
+                  <td>Kaleesh Cyborg 61.0</td>
+                  <td>83.55</td>
+                  <td>101.15</td>
+                  <td>2/1</td>
+                  <td>33/10</td>
+                  <td>64</td>
+                  <td>Running on at finish</td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+        </table>
+      </body>
+    </html>
+    """
+    scraper = WinningFormScraper()
+    soup = BeautifulSoup(html, "lxml")
+
+    extended = scraper._extract_extended_horse_data(soup)
+    form_entries = extended["made to measure"]["form_entries"]
+
+    assert len(form_entries) == 1
+    entry = form_entries[0]
+    assert entry.weeks == "4"
+    assert entry.run_date.isoformat() == "2026-07-31"
+    assert entry.track == "P"
+    assert entry.ref_no == "547"
+    assert entry.going == "G"
+    assert entry.race_class == "OM"
+    assert entry.course_desc == "b"
+    assert entry.distance == "1400"
+    assert entry.jockey_name == "Fourie R"
+    assert entry.weight == "58.5"
+    assert entry.merit_rating == "73"
+    assert entry.shoeing == "A"
+    assert entry.draw == "6-10"
+    assert entry.finish_position == 2
+    assert entry.margin_behind_winner == "0.50"
+    assert entry.winner_name == "Kaleesh Cyborg"
+    assert entry.winner_weight == "61.0"
+    assert entry.time == "83.55"
+    assert entry.adjusted_time == "101.15"
+    assert entry.open_odds == "2/1"
+    assert entry.starting_price == "33/10"
+    assert entry.pts == "64"
+    assert entry.comment == "Running on at finish"
+
+

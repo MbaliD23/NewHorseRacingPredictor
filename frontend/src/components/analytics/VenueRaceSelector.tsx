@@ -98,7 +98,7 @@ export function VenueRaceSelector({
             gap: 7,
             padding: "7px 13px",
             borderRadius: 10,
-            background: venueOpen ? "rgba(51, 65, 85, 0.95)" : "rgba(30, 41, 59, 0.85)",
+            background: venueOpen ? "#1e1b4b" : "#121324",
             border: `1px solid ${venueOpen ? "rgba(59, 130, 246, 0.55)" : "rgba(148, 163, 184, 0.22)"}`,
             color: selectedVenue ? "#F8FAFC" : "#94A3B8",
             fontSize: 12,
@@ -113,13 +113,13 @@ export function VenueRaceSelector({
           }}
           onMouseEnter={(e) => {
             if (!venueOpen) {
-              (e.currentTarget as HTMLButtonElement).style.background = "rgba(51, 65, 85, 0.85)";
+              (e.currentTarget as HTMLButtonElement).style.background = "#1c1d36";
               (e.currentTarget as HTMLButtonElement).style.borderColor = "rgba(59, 130, 246, 0.4)";
             }
           }}
           onMouseLeave={(e) => {
             if (!venueOpen) {
-              (e.currentTarget as HTMLButtonElement).style.background = "rgba(30, 41, 59, 0.85)";
+              (e.currentTarget as HTMLButtonElement).style.background = "#121324";
               (e.currentTarget as HTMLButtonElement).style.borderColor = "rgba(148, 163, 184, 0.22)";
             }
           }}
@@ -145,7 +145,7 @@ export function VenueRaceSelector({
               left: 0,
               minWidth: 210,
               maxWidth: 320,
-              background: "#162032",
+              background: "#121324",
               border: "1px solid rgba(59, 130, 246, 0.3)",
               borderRadius: 12,
               padding: "6px",
@@ -227,7 +227,7 @@ export function VenueRaceSelector({
               gap: 7,
               padding: "7px 13px",
               borderRadius: 10,
-              background: raceOpen ? "rgba(51, 65, 85, 0.95)" : "rgba(30, 41, 59, 0.85)",
+              background: raceOpen ? "#1e1b4b" : "#121324",
               border: `1px solid ${raceOpen ? "rgba(139, 92, 246, 0.55)" : "rgba(148, 163, 184, 0.22)"}`,
               color: selectedRace ? "#F8FAFC" : "#94A3B8",
               fontSize: 12,
@@ -243,13 +243,13 @@ export function VenueRaceSelector({
             }}
             onMouseEnter={(e) => {
               if (!raceOpen) {
-                (e.currentTarget as HTMLButtonElement).style.background = "rgba(51, 65, 85, 0.85)";
+                (e.currentTarget as HTMLButtonElement).style.background = "#1c1d36";
                 (e.currentTarget as HTMLButtonElement).style.borderColor = "rgba(139, 92, 246, 0.4)";
               }
             }}
             onMouseLeave={(e) => {
               if (!raceOpen) {
-                (e.currentTarget as HTMLButtonElement).style.background = "rgba(30, 41, 59, 0.85)";
+                (e.currentTarget as HTMLButtonElement).style.background = "#121324";
                 (e.currentTarget as HTMLButtonElement).style.borderColor = "rgba(148, 163, 184, 0.22)";
               }
             }}
@@ -275,7 +275,7 @@ export function VenueRaceSelector({
                 left: 0,
                 minWidth: 260,
                 maxWidth: 380,
-                background: "#162032",
+                background: "#121324",
                 border: "1px solid rgba(139, 92, 246, 0.3)",
                 borderRadius: 12,
                 padding: "6px",

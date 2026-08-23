@@ -136,7 +136,7 @@ export function RadarChart({ activeHorseIds, activeAxes, horses }: RadarChartPro
           return (
             <g key={i} style={{ transition: "all 0.4s cubic-bezier(0.4,0,0.2,1)" }}>
               <circle cx={pt.x} cy={pt.y} r={5} fill={`${color}22`} />
-              <circle cx={pt.x} cy={pt.y} r={3} fill={color} stroke="#0B1220" strokeWidth="1.2">
+              <circle cx={pt.x} cy={pt.y} r={3} fill={color} stroke="#121324" strokeWidth="1.2">
                 <title>
                   {horse.name} – {ax.label}: {String(rawVal)}
                 </title>

@@ -56,12 +56,17 @@ type ParsedPerformanceRecord = {
 };
 
 type FormColumnKey =
+  | "weeks"
   | "date"
   | "track"
   | "ref"
+  | "going"
+  | "class"
+  | "c_desc"
   | "distance"
   | "jockey"
   | "weight"
+  | "mr"
   | "sh"
   | "draw"
   | "position"
@@ -69,9 +74,9 @@ type FormColumnKey =
   | "winnerSecond"
   | "time"
   | "adjTime"
-  | "ob"
-  | "odds"
-  | "ar"
+  | "open_odds"
+  | "sp"
+  | "pts"
   | "comment"
   | "formSummary";
 
@@ -96,21 +101,43 @@ const CHART_COLORS = {
 
 const FORM_COLUMNS: FormColumnDefinition[] = [
   {
+    key: "weeks",
+    label: "WEEKS",
+    render: (entry) =>
+      valueOrDash(
+        entry.weeks
+          ? `(${entry.weeks})`
+          : entry.raw_date_text?.match(/\((\d+)\)/)?.[0] ?? null
+      ),
+  },
+  {
     key: "date",
-    label: "Date",
+    label: "DATE",
     cellClassName: "font-semibold text-gray-900 dark:text-white whitespace-nowrap",
     render: (entry) => formatDate(entry.run_date, entry.raw_date_text),
   },
-  { key: "track", label: "Track", render: (entry) => valueOrDash(entry.track) },
+  { key: "track", label: "TRACK", render: (entry) => valueOrDash(entry.track) },
   { key: "ref", label: "REF", render: (entry) => valueOrDash(entry.ref_no ?? entry.race_number) },
-  { key: "distance", label: "Distance", render: (entry) => valueOrDash(entry.distance) },
-  { key: "jockey", label: "Jockey", cellClassName: "whitespace-nowrap", render: (entry) => valueOrDash(entry.jockey_name) },
-  { key: "weight", label: "Wgt", render: (entry) => valueOrDash(entry.weight) },
+  { key: "going", label: "GOING", render: (entry) => valueOrDash(entry.going ?? entry.track_condition) },
+  { key: "class", label: "CLASS", render: (entry) => valueOrDash(entry.race_class ?? entry.class_of_race) },
+  { key: "c_desc", label: "C_DESC", render: (entry) => valueOrDash(entry.course_desc ?? entry.c_desc) },
+  { key: "distance", label: "DISTANCE", render: (entry) => valueOrDash(entry.distance) },
+  { key: "jockey", label: "JOCKEY", cellClassName: "whitespace-nowrap", render: (entry) => valueOrDash(entry.jockey_name) },
+  { key: "weight", label: "WGT", render: (entry) => valueOrDash(entry.weight) },
+  {
+    key: "mr",
+    label: "MR",
+    render: (entry) => {
+      const mr = entry.merit_rating ?? entry.mr;
+      if (mr) return `(${mr.replace(/[()]/g, "")})`;
+      return valueOrDash(entry.actual_rating ?? entry.rating);
+    },
+  },
   { key: "sh", label: "SH", render: (entry) => valueOrDash(entry.shoeing) },
-  { key: "draw", label: "Draw", render: (entry) => valueOrDash(entry.draw) },
+  { key: "draw", label: "DRAW", render: (entry) => valueOrDash(entry.draw) },
   {
     key: "position",
-    label: "Pos",
+    label: "POS",
     render: (entry) => (
       <span
         className={`inline-flex min-w-9 items-center justify-center rounded-lg border px-2.5 py-1 font-bold ${getFormBadgeTone(entry.finish_position)}`}
@@ -119,10 +146,10 @@ const FORM_COLUMNS: FormColumnDefinition[] = [
       </span>
     ),
   },
-  { key: "margin", label: "Margin", render: (entry) => valueOrDash(entry.margin_behind_winner) },
+  { key: "margin", label: "MARGIN", render: (entry) => valueOrDash(entry.margin_behind_winner) },
   {
     key: "winnerSecond",
-    label: "WINNER/2nd",
+    label: "WINNER/2ND",
     cellClassName: "font-medium whitespace-nowrap",
     render: (entry) => {
       if (!entry.winner_name) return "-";
@@ -133,20 +160,24 @@ const FORM_COLUMNS: FormColumnDefinition[] = [
   },
   { key: "time", label: "TIME", render: (entry) => valueOrDash(entry.time) },
   { key: "adjTime", label: "ADJ/TM", render: (entry) => valueOrDash(entry.adjusted_time ?? entry.speed_figure) },
-  { key: "ob", label: "OB", render: (entry) => valueOrDash(entry.opening_bet) },
-  { key: "odds", label: "Odds", render: (entry) => valueOrDash(entry.odds) },
-  { key: "ar", label: "AR", render: (entry) => valueOrDash(entry.actual_rating ?? entry.rating) },
-  { key: "comment", label: "Comment", render: (entry) => valueOrDash(entry.comment) },
-  { key: "formSummary", label: "Form Summary", render: (entry) => valueOrDash(entry.form_summary) },
+  { key: "open_odds", label: "OPEN_ODDS", render: (entry) => valueOrDash(entry.open_odds ?? entry.opening_bet) },
+  { key: "sp", label: "SP", render: (entry) => valueOrDash(entry.starting_price ?? entry.sp ?? entry.odds) },
+  { key: "pts", label: "PTS", render: (entry) => valueOrDash(entry.pts ?? entry.actual_rating ?? entry.rating) },
+  { key: "comment", label: "COMMENT", render: (entry) => valueOrDash(entry.comment) },
 ];
 
 const DEFAULT_FORM_COLUMN_KEYS: FormColumnKey[] = [
+  "weeks",
   "date",
   "track",
   "ref",
+  "going",
+  "class",
+  "c_desc",
   "distance",
   "jockey",
   "weight",
+  "mr",
   "sh",
   "draw",
   "position",
@@ -154,11 +185,10 @@ const DEFAULT_FORM_COLUMN_KEYS: FormColumnKey[] = [
   "winnerSecond",
   "time",
   "adjTime",
-  "ob",
-  "odds",
-  "ar",
+  "open_odds",
+  "sp",
+  "pts",
   "comment",
-  "formSummary",
 ];
 
 const FORM_COLUMN_KEYS = new Set<FormColumnKey>(FORM_COLUMNS.map((column) => column.key));
@@ -379,9 +409,23 @@ function loadStoredFormColumns(): FormColumnKey[] {
     }
 
     const mapped = parsed.map((k) =>
-      k === "winner" ? "winnerSecond" : k === "raceNumber" ? "ref" : k === "speedFigure" ? "adjTime" : k === "rating" ? "ar" : k
+      k === "winner"
+        ? "winnerSecond"
+        : k === "raceNumber"
+        ? "ref"
+        : k === "speedFigure"
+        ? "adjTime"
+        : k === "rating" || k === "ar"
+        ? "pts"
+        : k === "ob"
+        ? "open_odds"
+        : k
     );
     const validKeys = mapped.filter((key): key is FormColumnKey => FORM_COLUMN_KEYS.has(key));
+    const validKeySet = new Set(validKeys);
+    if (!validKeySet.has("c_desc") || !validKeySet.has("weeks") || !validKeySet.has("open_odds")) {
+      return DEFAULT_FORM_COLUMN_KEYS;
+    }
     return validKeys.length > 0 ? validKeys : DEFAULT_FORM_COLUMN_KEYS;
   } catch {
     return DEFAULT_FORM_COLUMN_KEYS;
@@ -619,7 +663,7 @@ export function HorseAnalysisView({
 
   return (
     <div className="w-full text-gray-800 dark:text-slate-200 p-1 sm:p-1.5 transition-all duration-300 ease-in-out">
-      <div className="space-y-4 sm:space-y-5 rounded-3xl border border-purple-100/80 dark:border-slate-800/80 bg-white dark:bg-[#131424]/90 p-[clamp(0.875rem,1.8vw,1.5rem)] shadow-[0_10px_40px_rgba(139,92,246,0.06)] dark:shadow-none transition-all duration-300 ease-in-out">
+      <div className="space-y-4 sm:space-y-5 rounded-3xl border border-purple-100/80 dark:border-slate-800/80 bg-white dark:bg-[#121324] p-[clamp(0.875rem,1.8vw,1.5rem)] shadow-[0_10px_40px_rgba(139,92,246,0.06)] dark:shadow-none transition-all duration-300 ease-in-out">
         {/* Header Control Bar */}
         <div className="flex items-center justify-between gap-3 pb-3 border-b border-purple-100/70 dark:border-slate-800/70">
           <BackButton
@@ -972,7 +1016,7 @@ function SectionCard({
   children: ReactNode;
 }) {
   return (
-    <section className="rounded-2xl border border-purple-100/70 dark:border-slate-800/80 bg-white dark:bg-[#0E0F1A]/80 p-[clamp(0.875rem,1.5vw,1.25rem)] shadow-xs transition-all duration-300 ease-in-out">
+    <section className="rounded-2xl border border-purple-100/70 dark:border-slate-800/80 bg-white dark:bg-[#121324] p-[clamp(0.875rem,1.5vw,1.25rem)] shadow-xs transition-all duration-300 ease-in-out">
       <div className="mb-3.5 flex items-center gap-2.5">
         <div className="flex h-7 w-7 shrink-0 aspect-square items-center justify-center rounded-lg bg-purple-100 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300">
           <Icon className="h-4 w-4" />
@@ -990,7 +1034,7 @@ function DetailsGrid({ rows }: { rows: LabelValue[] }) {
       {rows.map((row) => (
         <div
           key={row.label}
-          className="flex flex-col justify-center rounded-xl border border-gray-100 dark:border-slate-800 bg-gray-50/70 dark:bg-slate-900/60 px-3 py-2 min-w-0 transition-colors"
+          className="flex flex-col justify-center rounded-xl border border-gray-100 dark:border-slate-800 bg-gray-50/70 dark:bg-[#121324] px-3 py-2 min-w-0 transition-colors"
         >
           <p className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-gray-500 dark:text-slate-400 truncate">
             {row.label}
@@ -1017,7 +1061,7 @@ function MetricTile({
   value: string;
 }) {
   return (
-    <div className="rounded-2xl border border-gray-100 dark:border-slate-800/80 bg-gray-50/60 dark:bg-slate-900/60 p-[clamp(0.625rem,1.2vw,1rem)] text-center transition-all duration-300 ease-in-out hover:bg-gray-50 dark:hover:bg-slate-900 flex flex-col items-center justify-center min-w-0">
+    <div className="rounded-2xl border border-gray-100 dark:border-slate-800/80 bg-gray-50/60 dark:bg-[#121324] p-[clamp(0.625rem,1.2vw,1rem)] text-center transition-all duration-300 ease-in-out hover:bg-gray-50 dark:hover:bg-slate-900 flex flex-col items-center justify-center min-w-0">
       <div className="mb-1.5 flex justify-center text-purple-700 dark:text-purple-400">
         <Icon className="h-4 w-4 sm:h-5 sm:w-5" />
       </div>
@@ -1041,7 +1085,7 @@ function TeamPerformanceChart({
   const stats = parsePerformanceRecord(record);
 
   return (
-    <div className="rounded-2xl border border-gray-100 dark:border-slate-800/80 bg-gray-50/60 dark:bg-slate-900/60 p-4 text-center relative flex flex-col items-center overflow-hidden w-full min-w-0">
+    <div className="rounded-2xl border border-gray-100 dark:border-slate-800/80 bg-gray-50/60 dark:bg-[#121324] p-4 text-center relative flex flex-col items-center overflow-hidden w-full min-w-0">
       <p className="text-xs font-semibold uppercase tracking-[0.12em] text-gray-500 dark:text-slate-400">
         {role}
       </p>
@@ -1081,7 +1125,7 @@ function RecordPieChart({
   const stats = parsePerformanceRecord(record);
 
   return (
-    <div className="rounded-2xl border border-gray-100 dark:border-slate-800/80 bg-gray-50/60 dark:bg-slate-900/60 p-3 text-center relative flex flex-col items-center justify-between overflow-hidden w-full min-w-0 shadow-xs">
+    <div className="rounded-2xl border border-gray-100 dark:border-slate-800/80 bg-gray-50/60 dark:bg-[#121324] p-3 text-center relative flex flex-col items-center justify-between overflow-hidden w-full min-w-0 shadow-xs">
       <p className="min-h-5 text-[11px] font-bold uppercase tracking-wider text-gray-500 dark:text-slate-400 truncate w-full">
         {label}
       </p>
@@ -1170,6 +1214,7 @@ function ChartLegend() {
       <LegendItem color={CHART_COLORS.wins} label="Wins" />
       <LegendItem color={CHART_COLORS.seconds} label="2nd places" />
       <LegendItem color={CHART_COLORS.thirds} label="3rd places" />
+      <LegendItem color={CHART_COLORS.remaining} label="Other places" />
     </div>
   );
 }

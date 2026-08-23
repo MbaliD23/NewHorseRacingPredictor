@@ -1,13 +1,13 @@
-import { useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { ArrowRight, CalendarDays, Clock, MapPin, Sparkles, Trophy, Users } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
 import { GlassCard } from "@/components/common/GlassCard";
-import { FilterPills, type FilterValue } from "@/components/common/FilterPills";
 import { AsyncBoundary } from "@/components/status/AsyncBoundary";
 import { BackButton } from "@/components/navigation/BackButton";
 import { useRaces } from "@/hooks/useRaces";
 import { formatDate, formatTime, valueOrUnavailable } from "@/lib/utils";
 import { usePredictionStore } from "@/store/predictionStore";
+import { getRaceDisplayStatus } from "@/lib/raceStatusUtils";
 import greyvilleImg from "@/assets/greyville.png";
 import turfonteinImg from "@/assets/Turffontein.png";
 import kenilworthImg from "@/assets/Kenilworth.png";
@@ -30,23 +30,20 @@ export function VenueRacesPage() {
   const { venueId } = useParams();
   const navigate = useNavigate();
   const { data, isLoading, isError } = useRaces();
-  const [filter, setFilter] = useState<FilterValue>("all");
+  // Tick every 30 s so badges auto-flip from "Today's Race" → "Live" at post time
+  const [now, setNow] = useState(() => new Date());
+  useEffect(() => {
+    const id = setInterval(() => setNow(new Date()), 30_000);
+    return () => clearInterval(id);
+  }, []);
   const { currentVenue, setCurrentVenue } = usePredictionStore();
   const venue =
     data?.find((item) => String(item.id) === venueId) ?? (String(currentVenue?.id) === venueId ? currentVenue : null);
 
-  const races = useMemo(() => {
-    return (venue?.races ?? []).filter((race) => {
-      return (
-        filter === "all" ||
-        (filter === "today" && (race.is_live || !race.is_upcoming)) ||
-        (filter === "upcoming" && race.is_upcoming)
-      );
-    });
-  }, [filter, venue]);
+  // Always show every race for this event — no filtering
+  const races = venue?.races ?? [];
 
   const liveCount = venue?.races.filter((race) => race.is_live).length ?? 0;
-  const upcomingCount = venue?.races.filter((race) => race.is_upcoming).length ?? 0;
   const totalRaces = venue?.races.length ?? 0;
 
   const rawVenueName = venue?.venue ?? "Selected Event";
@@ -72,9 +69,6 @@ export function VenueRacesPage() {
                 </span>
                 <span className="rounded-full border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 px-3 py-1.5 text-slate-600 dark:text-slate-300">
                   {totalRaces} races
-                </span>
-                <span className="rounded-full border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 px-3 py-1.5 text-slate-600 dark:text-slate-300">
-                  {upcomingCount} upcoming
                 </span>
                 {liveCount > 0 && (
                   <div className="ml-auto flex items-center gap-1.5 rounded-full border border-violet-200 dark:border-purple-900/60 bg-white dark:bg-slate-900 px-2.5 py-1 text-[11px] font-bold tracking-wider text-[#6A2DF1] dark:text-purple-300 uppercase">
@@ -121,21 +115,18 @@ export function VenueRacesPage() {
 
           {/* Filter Bar Card */}
           <div className="rounded-[28px] border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#131424]/90 px-4 py-4 shadow-[0_1px_8px_-4px_rgba(0,0,0,0.08)] sm:px-6">
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-              <div>
-                <p className="text-xs font-bold uppercase tracking-[0.18em] text-slate-400">
-                  Filter Races
-                </p>
-                <p className="mt-1 text-sm font-medium text-slate-500 dark:text-slate-400">
-                  Select a race filter or browse all scheduled races below.
-                </p>
-              </div>
-              <FilterPills value={filter} onChange={setFilter} />
+            <div className="flex items-center justify-between gap-4">
+              <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
+                {venueTitle}
+              </h2>
+              <span className="shrink-0 rounded-xl bg-purple-600 px-4 py-1.5 text-xs font-semibold text-white shadow-md shadow-purple-500/20">
+                All
+              </span>
             </div>
           </div>
 
           {/* Races List */}
-          <AsyncBoundary isEmpty={races.length === 0} emptyMessage="No races available for this filter.">
+          <AsyncBoundary isEmpty={races.length === 0} emptyMessage="No races are scheduled for this event.">
             <div className="flex flex-col gap-4 pb-4">
               {races.map((race) => (
                 <div
@@ -162,21 +153,27 @@ export function VenueRacesPage() {
                       <h2 className="truncate text-[17px] font-black leading-tight text-slate-950 dark:text-white group-hover:text-white transition-colors duration-300 sm:text-[19px]">
                         {valueOrUnavailable(race.title)}
                       </h2>
-                      {race.is_live ? (
-                        <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 dark:bg-emerald-950/40 px-2.5 py-0.5 text-[11px] font-bold text-emerald-700 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-700 shadow-xs group-hover:bg-emerald-950/60 group-hover:text-emerald-300 group-hover:border-emerald-500/40 transition-colors duration-300">
-                          <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_6px_rgba(52,211,153,0.8)]" />
-                          Live
-                        </span>
-                      ) : race.is_upcoming ? (
-                        <span className="inline-flex items-center gap-1 rounded-full bg-purple-50 dark:bg-purple-950/40 px-2.5 py-0.5 text-[11px] font-bold text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800 group-hover:bg-purple-950/60 group-hover:text-purple-300 group-hover:border-purple-500/40 transition-colors duration-300">
-                          <Clock className="h-3 w-3 text-purple-600 dark:text-purple-400 group-hover:text-purple-300" />
-                          Upcoming
-                        </span>
-                      ) : (
-                        <span className="inline-flex items-center gap-1 rounded-full bg-slate-100 dark:bg-slate-800 px-2 py-0.5 text-[11px] font-medium text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 group-hover:bg-white/10 group-hover:text-slate-300 group-hover:border-white/15 transition-colors duration-300">
-                          Scheduled
-                        </span>
-                      )}
+                      {(() => {
+                        const status = getRaceDisplayStatus(race, now);
+                        if (status === "today") return (
+                          <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/10 dark:bg-emerald-500/10 px-2.5 py-0.5 text-[11px] font-bold text-emerald-700 dark:text-emerald-400 border border-emerald-500/30 shadow-xs group-hover:bg-emerald-500/20 group-hover:text-emerald-300 group-hover:border-emerald-500/40 transition-colors duration-300">
+                            <span className="h-2 w-2 rounded-full bg-emerald-400 shadow-[0_0_5px_rgba(52,211,153,0.6)]" />
+                            Today's Race
+                          </span>
+                        );
+                        if (status === "upcoming") return (
+                          <span className="inline-flex items-center gap-1 rounded-full bg-purple-50 dark:bg-purple-950/40 px-2.5 py-0.5 text-[11px] font-bold text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800 group-hover:bg-purple-950/60 group-hover:text-purple-300 group-hover:border-purple-500/40 transition-colors duration-300">
+                            <Clock className="h-3 w-3 text-purple-600 dark:text-purple-400 group-hover:text-purple-300" />
+                            Upcoming
+                          </span>
+                        );
+                        if (status === "scheduled") return (
+                          <span className="inline-flex items-center gap-1 rounded-full bg-slate-100 dark:bg-slate-800 px-2 py-0.5 text-[11px] font-medium text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 group-hover:bg-white/10 group-hover:text-slate-300 group-hover:border-white/15 transition-colors duration-300">
+                            Scheduled
+                          </span>
+                        );
+                        return null;
+                      })()}
                     </div>
                     <div className="mt-1.5 flex flex-wrap items-center gap-2 text-xs font-semibold text-slate-500 dark:text-slate-400 group-hover:text-slate-400 transition-colors duration-300">
                       <span>{valueOrUnavailable(venue?.venue)}</span>

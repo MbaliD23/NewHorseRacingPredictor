@@ -99,7 +99,11 @@ class ScrapedHorse:
 class ScrapedHorseFormEntry:
     run_date: date | None = None
     raw_date_text: str | None = None
+    weeks: str | None = None
     track: str | None = None
+    going: str | None = None
+    race_class: str | None = None
+    course_desc: str | None = None
     ref_no: str | None = None
     race_number: str | None = None
     distance: str | None = None
@@ -114,8 +118,12 @@ class ScrapedHorseFormEntry:
     time: str | None = None
     adjusted_time: str | None = None
     opening_bet: str | None = None
+    open_odds: str | None = None
     odds: str | None = None
+    starting_price: str | None = None
     actual_rating: str | None = None
+    pts: str | None = None
+    merit_rating: str | None = None
     comment: str | None = None
     speed_figure: str | None = None
     rating: str | None = None
@@ -443,6 +451,8 @@ class WinningFormScraper:
             ext = extended_data.get(self._pretty_name(raw_name).lower(), {}) if extended_data else {}
             team_stats = combo_stats.get(runner_number, {}) if combo_stats and runner_number is not None else {}
             team_record = team_stats.get("record")
+            jockey_record = ext.get("jockey_record") or (team_record if isinstance(team_record, str) else None)
+            trainer_record = ext.get("trainer_record") or (team_record if isinstance(team_record, str) else None)
 
             horses.append(
                 ScrapedHorse(
@@ -464,8 +474,8 @@ class WinningFormScraper:
                         if "win_percent" in team_stats
                         else None
                     ),
-                    jockey_record=team_record if isinstance(team_record, str) else None,
-                    trainer_record=team_record if isinstance(team_record, str) else None,
+                    jockey_record=jockey_record,
+                    trainer_record=trainer_record,
                     speed_index=speed_index,
                     predicted_time=predicted_time,
                     scratched=scratched,
@@ -588,6 +598,19 @@ class WinningFormScraper:
                 sibling_rows = list(next_tr.find_next_siblings("tr")) if next_tr else []
                 form_entries = self._extract_form_entries(sibling_rows)
                 
+                itbld_divs = parent_tr.find_all("div", class_="itbld")
+                jockey_record = None
+                trainer_record = None
+                for i, itbld in enumerate(itbld_divs):
+                    parent_cell = itbld.find_parent("td")
+                    cell_text = " ".join(parent_cell.get_text(" ", strip=True).split()) if parent_cell else ""
+                    rec_match = re.search(r"(\d+)\s*:\s*(\d+)\s*-\s*(\d+)\s*-\s*(\d+)", cell_text)
+                    rec = f"{rec_match.group(1)}:{rec_match.group(2)}-{rec_match.group(3)}-{rec_match.group(4)}" if rec_match else None
+                    if i == 0:
+                        jockey_record = rec
+                    elif i == 1:
+                        trainer_record = rec
+
                 horses[name.lower()] = {
                     "odds": odds,
                     "equipment": equipment,
@@ -602,6 +625,8 @@ class WinningFormScraper:
                     "course_record": course_record,
                     "distance_record": distance_record,
                     "course_distance_record": course_distance_record,
+                    "jockey_record": jockey_record,
+                    "trainer_record": trainer_record,
                     "stakes": stakes,
                     "sale_price": sale_price,
                     "form_entries": form_entries,
@@ -614,7 +639,11 @@ class WinningFormScraper:
     def _extract_form_entries(self, rows) -> list[ScrapedHorseFormEntry]:
         nested_rows = []
         for row in rows:
-            nested_rows.extend(row.find_all("tr"))
+            inner_trs = row.find_all("tr")
+            if inner_trs:
+                nested_rows.extend(inner_trs)
+            else:
+                nested_rows.append(row)
 
         entries: list[ScrapedHorseFormEntry] = []
         index = 0
@@ -645,25 +674,55 @@ class WinningFormScraper:
         )
         
         # When 21 cells:
-        # 0: Date, 1: Track, 2: REF, 3: Course, 4: Class, 5: Course type/bend,
-        # 6: Distance, 7: Jockey, 8: Weight, 9: Equipment, 10: Shoeing, 11: Draw,
+        # 0: Date, 1: Track, 2: REF, 3: Going, 4: Class, 5: Course type/bend (course_desc),
+        # 6: Distance, 7: Jockey, 8: Weight, 9: MR in parentheses e.g. (73) or empty, 10: Shoeing, 11: Draw,
         # 12: Position, 13: Margin, 14: Winner/2nd, 15: Time, 16: Adj Time,
-        # 17: Opening Bet, 18: Odds, 19: Actual Rating, 20: Comment
+        # 17: Opening Bet (open_odds), 18: SP/Odds, 19: Points/Rating (pts), 20: Comment
+        weeks_match = re.search(r"\((\d+)\)", cells[0])
+        weeks = weeks_match.group(1) if weeks_match else None
+
+        going = cells[3] if len(cells) > 3 and cells[3].strip() else None
+        race_class = cells[4] if len(cells) > 4 and cells[4].strip() else None
+        course_desc = cells[5] if len(cells) > 5 and cells[5].strip() else None
         ref_no = cells[2] if len(cells) > 2 else None
-        shoeing = cells[10] if len(cells) > 10 and cells[10] in {"A", "H", "B", "C", "N", "S"} or len(cells) > 10 and len(cells[10]) <= 3 else (cells[9] if len(cells) > 9 and len(cells[9]) <= 2 else None)
-        draw = cells[11] if len(cells) > 11 and ("-" in cells[11] or cells[11].isdigit()) else (cells[9] if len(cells) > 9 and ("-" in cells[9] or cells[9].isdigit()) else None)
+        
+        # Historical MR at race (cell 9 e.g. '(73)' or '73', not a draw like '9-10')
+        mr_val = None
+        if len(cells) > 9 and cells[9].strip() and "-" not in cells[9]:
+            mr_match = re.search(r"\(?(\d+)\)?", cells[9].strip())
+            if mr_match:
+                mr_val = mr_match.group(1)
+
+        if len(cells) > 9 and "-" in cells[9] and not cells[9].startswith("("):
+            draw = cells[9]
+        elif len(cells) > 11 and ("-" in cells[11] or cells[11].isdigit()):
+            draw = cells[11]
+        elif len(cells) > 9 and cells[9].isdigit() and int(cells[9]) <= 30:
+            draw = cells[9]
+        else:
+            draw = None
+
+        shoeing = cells[10] if len(cells) > 10 and (cells[10] in {"A", "H", "B", "C", "N", "S"} or len(cells[10]) <= 3) else (cells[9] if len(cells) > 9 and len(cells[9]) <= 2 and not cells[9].isdigit() and "(" not in cells[9] else None)
         
         time_val = cells[15] if len(cells) > 15 and re.search(r"\d+\.\d+", cells[15]) else None
         adj_time = cells[16] if len(cells) > 16 and re.search(r"\d+\.\d+", cells[16]) else None
         opening_bet = cells[17] if len(cells) > 17 and ("/" in cells[17] or cells[17].replace(".", "").isdigit()) else None
-        odds = cells[18] if len(cells) > 18 and ("/" in cells[18] or cells[18].replace(".", "").isdigit()) else (cells[17] if len(cells) > 17 and "/" in cells[17] else None)
-        actual_rating = cells[19] if len(cells) > 19 and cells[19].isdigit() else None
+        open_odds = opening_bet
+        odds = cells[17] if len(cells) > 17 and ("/" in cells[17] or cells[17].replace(".", "").isdigit()) else (cells[18] if len(cells) > 18 and ("/" in cells[18] or cells[18].replace(".", "").isdigit()) else None)
+        starting_price = cells[18] if len(cells) > 18 and ("/" in cells[18] or cells[18].replace(".", "").isdigit()) else odds
+        pts_val = cells[19] if len(cells) > 19 and cells[19].isdigit() else None
+        actual_rating = pts_val
+        merit_rating = mr_val or actual_rating
         comment = cells[20] if len(cells) > 20 else (cells[-1] if len(cells) >= 15 else None)
 
         return ScrapedHorseFormEntry(
             run_date=run_date,
             raw_date_text=raw_date_text,
+            weeks=weeks,
             track=cells[1] if len(cells) > 1 else None,
+            going=going,
+            race_class=race_class,
+            course_desc=course_desc,
             ref_no=ref_no,
             race_number=ref_no,
             distance=cells[6] if len(cells) > 6 else None,
@@ -678,8 +737,12 @@ class WinningFormScraper:
             time=time_val,
             adjusted_time=adj_time,
             opening_bet=opening_bet,
+            open_odds=open_odds,
             odds=odds,
+            starting_price=starting_price,
             actual_rating=actual_rating,
+            pts=pts_val,
+            merit_rating=merit_rating,
             comment=comment,
             speed_figure=adj_time,
             rating=actual_rating,

@@ -189,19 +189,15 @@ export function RadarAnalyticsView({
         comparison = a.name.localeCompare(b.name);
       } else if (sortCol === "meritRating") {
         comparison = (a.meritRating ?? 0) - (b.meritRating ?? 0);
-      } else if (sortCol === "jockeyPerf") {
-        const valA = parseFloat(String(a.jockeyPerf).replace("%", "").trim());
-        const valB = parseFloat(String(b.jockeyPerf).replace("%", "").trim());
-        const numA = isNaN(valA) ? -Infinity : valA;
-        const numB = isNaN(valB) ? -Infinity : valB;
-        comparison = numA - numB;
-      } else if (sortCol === "trainerPerf") {
-        const valA = parseFloat(String(a.trainerPerf).replace("%", "").trim());
-        const valB = parseFloat(String(b.trainerPerf).replace("%", "").trim());
-        const numA = isNaN(valA) ? -Infinity : valA;
-        const numB = isNaN(valB) ? -Infinity : valB;
-        comparison = numA - numB;
-      } else if (sortCol === "totRns" || sortCol === "crs" || sortCol === "dst" || sortCol === "cd" || sortCol === "wet") {
+      } else if (
+        sortCol === "totRns" ||
+        sortCol === "crs" ||
+        sortCol === "dst" ||
+        sortCol === "cd" ||
+        sortCol === "wet" ||
+        sortCol === "jockeyPerf" ||
+        sortCol === "trainerPerf"
+      ) {
         comparison = (a.norm[sortCol as keyof typeof a.norm] ?? 0) - (b.norm[sortCol as keyof typeof b.norm] ?? 0);
       } else if (sortCol === "forecastOdds") {
         comparison = (a.norm.forecastOdds ?? 0) - (b.norm.forecastOdds ?? 0);
@@ -323,6 +319,8 @@ export function RadarAnalyticsView({
       state: {
         venueId,
         raceId: activeRaceId,
+        fromHorseAnalysis: true,
+        horseId: selectedHorseId ?? currentHorse?.id,
       },
     });
   }, [currentVenue, allVenues, activeRaceId, currentRace, fetchedRace, setCurrentVenue, setCurrentRace, navigate]);
@@ -339,7 +337,7 @@ export function RadarAnalyticsView({
       gap: 12,
       flexWrap: "wrap" as const,
       boxSizing: "border-box" as const,
-      background: "#131E2F",
+      background: "#121324",
       borderTopLeftRadius: 18,
       borderTopRightRadius: 18,
       position: "relative" as const,
@@ -482,7 +480,7 @@ export function RadarAnalyticsView({
       }}>
         {/* TOP CARD */}
         <div style={{
-          background: "#131E2F",
+          background: "#121324",
           border: "1px solid rgba(148,163,184,0.10)",
           borderRadius: 18,
           boxShadow: "0 0 0 1px rgba(59,130,246,0.05), 0 20px 60px rgba(0,0,0,0.50), inset 0 1px 0 rgba(255,255,255,0.04)",

@@ -6,7 +6,14 @@ from pydantic import BaseModel, Field
 class HorseFormEntryView(BaseModel):
     run_date: str | None = None
     raw_date_text: str | None = None
+    weeks: str | None = None
     track: str | None = None
+    going: str | None = None
+    track_condition: str | None = None
+    race_class: str | None = None
+    class_of_race: str | None = None
+    course_desc: str | None = None
+    c_desc: str | None = None
     ref_no: str | None = None
     race_number: str | None = None
     distance: str | None = None
@@ -21,8 +28,14 @@ class HorseFormEntryView(BaseModel):
     time: str | None = None
     adjusted_time: str | None = None
     opening_bet: str | None = None
+    open_odds: str | None = None
     odds: str | None = None
+    starting_price: str | None = None
+    sp: str | None = None
     actual_rating: str | None = None
+    pts: str | None = None
+    merit_rating: str | None = None
+    mr: str | None = None
     comment: str | None = None
     speed_figure: str | None = None
     rating: str | None = None
@@ -42,6 +55,8 @@ class HorseView(BaseModel):
     trainer_jockey_win_percent: float | None = None
     jockey_record: str | None = None
     trainer_record: str | None = None
+    jockey_perf: str | None = None
+    trainer_perf: str | None = None
     speed_index: float | None = None
     predicted_time: float | None = None
     scratched: bool

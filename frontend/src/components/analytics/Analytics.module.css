@@ -7,7 +7,7 @@
 .page {
   min-height: 100%;
   width: 100%;
-  background: #0B1220;
+  background: #121324;
   display: flex;
   align-items: flex-start;
   justify-content: center;
@@ -70,7 +70,7 @@
    TOP CARD
    ================================================================ */
 .topCard {
-  background: #131E2F;
+  background: #121324;
   border: 1px solid rgba(148,163,184,0.10);
   border-radius: 18px;
   box-shadow:
@@ -199,7 +199,7 @@
 /* ── Dropdown panel (metrics) ─────────────────────────────────── */
 .dropdownPanel {
   position: absolute; right: 0; top: calc(100% + 8px);
-  background: #1A2840; border: 1px solid rgba(59,130,246,0.20);
+  background: #121324; border: 1px solid rgba(59,130,246,0.20);
   border-radius: 13px; padding: 6px; min-width: 195px;
   box-shadow: 0 0 0 1px rgba(59,130,246,0.06), 0 20px 50px rgba(0,0,0,0.60), 0 4px 16px rgba(0,0,0,0.35);
   z-index: 300; animation: dropIn 0.2s cubic-bezier(0.34,1.2,0.64,1);
@@ -255,7 +255,7 @@
    ================================================================ */
 .chartTooltip {
   position: fixed;
-  background: #1E293B; border: 1px solid rgba(99,102,241,0.30);
+  background: #121324; border: 1px solid rgba(99,102,241,0.30);
   border-radius: 10px; padding: 10px 13px; min-width: 150px;
   z-index: 9999; pointer-events: none;
   box-shadow: 0 12px 40px rgba(0,0,0,0.55), 0 0 0 1px rgba(99,102,241,0.10);
@@ -379,7 +379,7 @@
    BOTTOM CARD – Table
    ================================================================ */
 .bottomCard {
-  background: #131E2F;
+  background: #121324;
   border: 1px solid rgba(148,163,184,0.10);
   border-radius: 18px;
   box-shadow: 0 0 0 1px rgba(59,130,246,0.05), 0 20px 60px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.04);

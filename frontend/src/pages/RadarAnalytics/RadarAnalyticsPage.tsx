@@ -154,19 +154,15 @@ export function RadarAnalyticsPage() {
         comparison = a.name.localeCompare(b.name);
       } else if (sortCol === "meritRating") {
         comparison = (a.meritRating ?? 0) - (b.meritRating ?? 0);
-      } else if (sortCol === "jockeyPerf") {
-        const valA = parseFloat(String(a.jockeyPerf).replace("%", "").trim());
-        const valB = parseFloat(String(b.jockeyPerf).replace("%", "").trim());
-        const numA = isNaN(valA) ? -Infinity : valA;
-        const numB = isNaN(valB) ? -Infinity : valB;
-        comparison = numA - numB;
-      } else if (sortCol === "trainerPerf") {
-        const valA = parseFloat(String(a.trainerPerf).replace("%", "").trim());
-        const valB = parseFloat(String(b.trainerPerf).replace("%", "").trim());
-        const numA = isNaN(valA) ? -Infinity : valA;
-        const numB = isNaN(valB) ? -Infinity : valB;
-        comparison = numA - numB;
-      } else if (sortCol === "totRns" || sortCol === "crs" || sortCol === "dst" || sortCol === "cd" || sortCol === "wet") {
+      } else if (
+        sortCol === "totRns" ||
+        sortCol === "crs" ||
+        sortCol === "dst" ||
+        sortCol === "cd" ||
+        sortCol === "wet" ||
+        sortCol === "jockeyPerf" ||
+        sortCol === "trainerPerf"
+      ) {
         comparison = (a.norm[sortCol as keyof typeof a.norm] ?? 0) - (b.norm[sortCol as keyof typeof b.norm] ?? 0);
       } else if (sortCol === "forecastOdds") {
         comparison = (a.norm.forecastOdds ?? 0) - (b.norm.forecastOdds ?? 0);
@@ -185,7 +181,7 @@ export function RadarAnalyticsPage() {
         borderBottom: "1px solid rgba(148,163,184,0.08)",
         gap: 12,
         boxSizing: "border-box",
-        background: "#131E2F",
+        background: "#121324",
         borderTopLeftRadius: 18,
         borderTopRightRadius: 18,
         position: "relative",

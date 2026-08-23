@@ -28,9 +28,15 @@ export function BarAnalyticsPage() {
   const location = useLocation();
   const stateVenueId = (location.state as { venueId?: string | number } | undefined)?.venueId;
   const stateRaceId = (location.state as { raceId?: string | number } | undefined)?.raceId;
+  const fromHorseAnalysis = (location.state as { fromHorseAnalysis?: boolean } | undefined)?.fromHorseAnalysis;
+  const stateHorseId = (location.state as { horseId?: string | number } | undefined)?.horseId;
 
   const { currentVenue, currentRace, currentHorse, setCurrentVenue, setCurrentRace } = usePredictionStore();
   const { data: allVenues = [] } = useRaces();
+
+  // Compute contextual back destination: Horse Analysis page if navigated from that flow, otherwise Events page
+  const resolvedHorseId = stateHorseId ?? currentHorse?.id;
+  const backTo = fromHorseAnalysis && resolvedHorseId ? `/horses/${resolvedHorseId}` : "/";
 
   const effectiveVenues = useMemo(() => {
     return allVenues && allVenues.length > 0 ? allVenues : FALLBACK_VENUES;
@@ -184,19 +190,15 @@ export function BarAnalyticsPage() {
         comparison = a.name.localeCompare(b.name);
       } else if (sortCol === "meritRating") {
         comparison = (a.meritRating ?? 0) - (b.meritRating ?? 0);
-      } else if (sortCol === "jockeyPerf") {
-        const valA = parseFloat(String(a.jockeyPerf).replace("%", "").trim());
-        const valB = parseFloat(String(b.jockeyPerf).replace("%", "").trim());
-        const numA = isNaN(valA) ? -Infinity : valA;
-        const numB = isNaN(valB) ? -Infinity : valB;
-        comparison = numA - numB;
-      } else if (sortCol === "trainerPerf") {
-        const valA = parseFloat(String(a.trainerPerf).replace("%", "").trim());
-        const valB = parseFloat(String(b.trainerPerf).replace("%", "").trim());
-        const numA = isNaN(valA) ? -Infinity : valA;
-        const numB = isNaN(valB) ? -Infinity : valB;
-        comparison = numA - numB;
-      } else if (sortCol === "totRns" || sortCol === "crs" || sortCol === "dst" || sortCol === "cd" || sortCol === "wet") {
+      } else if (
+        sortCol === "totRns" ||
+        sortCol === "crs" ||
+        sortCol === "dst" ||
+        sortCol === "cd" ||
+        sortCol === "wet" ||
+        sortCol === "jockeyPerf" ||
+        sortCol === "trainerPerf"
+      ) {
         comparison = (a.norm[sortCol as keyof typeof a.norm] ?? 0) - (b.norm[sortCol as keyof typeof b.norm] ?? 0);
       } else if (sortCol === "forecastOdds") {
         comparison = (a.norm.forecastOdds ?? 0) - (b.norm.forecastOdds ?? 0);
@@ -215,7 +217,7 @@ export function BarAnalyticsPage() {
         borderBottom: "1px solid rgba(148,163,184,0.08)",
         gap: 12,
         boxSizing: "border-box",
-        background: "#131E2F",
+        background: "#121324",
         borderTopLeftRadius: 18,
         borderTopRightRadius: 18,
         position: "relative",
@@ -235,7 +237,7 @@ export function BarAnalyticsPage() {
       >
         {/* Left: Back button & On Chart text aligned */}
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <BackButton to="/" fallbackTo="/" theme="dark" label="Go back" className="!h-8 !w-8 sm:!h-8 sm:!w-8" />
+          <BackButton to={backTo} fallbackTo={backTo} theme="dark" label="Go back" className="!h-8 !w-8 sm:!h-8 sm:!w-8" />
 
           <span
             style={{

@@ -37,7 +37,14 @@ export type Race = {
 export type HorseFormEntry = {
   run_date: string | null;
   raw_date_text: string | null;
+  weeks?: string | null;
   track: string | null;
+  going?: string | null;
+  track_condition?: string | null;
+  race_class?: string | null;
+  class_of_race?: string | null;
+  course_desc?: string | null;
+  c_desc?: string | null;
   ref_no?: string | null;
   race_number: string | null;
   distance: string | null;
@@ -52,8 +59,14 @@ export type HorseFormEntry = {
   time?: string | null;
   adjusted_time?: string | null;
   opening_bet?: string | null;
+  open_odds?: string | null;
   odds: string | null;
+  starting_price?: string | null;
+  sp?: string | null;
   actual_rating?: string | null;
+  pts?: string | null;
+  merit_rating?: string | null;
+  mr?: string | null;
   comment: string | null;
   speed_figure: string | null;
   rating: string | null;

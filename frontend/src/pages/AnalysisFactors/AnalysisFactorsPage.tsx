@@ -17,12 +17,48 @@ const factors: Array<{
   explanation: string;
   centerAngle: number;
 }> = [
-  { code: "trainer_jockey_win_percent", Icon: Trophy, centerAngle: 240, explanation: "Uses the trainer and jockey combination win percentage now exposed by the backend." },
-  { code: "speed_index", Icon: Gauge, centerAngle: 300, explanation: "Uses the backend speed index to compare each runner's pace signal." },
-  { code: "draw_advantage", Icon: Goal, centerAngle: 0, explanation: "Brings gate position into the model so favourable draws can lift horses suited to the race setup." },
-  { code: "previous_run", Icon: BarChart3, centerAngle: 60, explanation: "Uses the latest run signal to recognise horses arriving with stronger recency and momentum." },
-  { code: "weight", Icon: Scale, centerAngle: 120, explanation: "Balances the handicap load carried by each runner, helping lighter setups stand out where relevant." },
-  { code: "predicted_time", Icon: Clock, centerAngle: 180, explanation: "Uses the backend predicted time as part of the final prediction mix." },
+  {
+    code: "trainer_jockey_win_percent",
+    Icon: Trophy,
+    centerAngle: 240,
+    explanation:
+      "Evaluates the partnership record, win strike rate, and current synergy between the trainer and jockey for this runner.",
+  },
+  {
+    code: "speed_index",
+    Icon: Gauge,
+    centerAngle: 300,
+    explanation:
+      "Analyzes the horse's ability to produce competitive split times and peak cruising speed adjusted for course and track conditions.",
+  },
+  {
+    code: "draw_advantage",
+    Icon: Goal,
+    centerAngle: 0,
+    explanation:
+      "Considers barrier gate position and its historical statistical advantage/bias over this specific distance and track layout.",
+  },
+  {
+    code: "previous_run",
+    Icon: BarChart3,
+    centerAngle: 60,
+    explanation:
+      "Assesses the horse's most recent form, finishing position, margins, and race fitness from its latest outing.",
+  },
+  {
+    code: "weight",
+    Icon: Scale,
+    centerAngle: 120,
+    explanation:
+      "Evaluates the assigned weight/mass carried and any jockey claiming allowances relative to the rest of the field.",
+  },
+  {
+    code: "predicted_time",
+    Icon: Clock,
+    centerAngle: 180,
+    explanation:
+      "Estimates the projected race finishing time based on past adjusted times, class standards, and track conditions.",
+  },
 ];
 
 const wheelSegments = factors.map((factor) => ({
@@ -73,7 +109,7 @@ export function AnalysisFactorsPage() {
   const navigate = useNavigate();
   const { data: race, isLoading, isError } = useRace(raceId);
   const prediction = usePrediction();
-  const { selectedVariables, setSelectedVariables, currentRace, setCurrentRace, setPredictionResult } = usePredictionStore();
+  const { selectedVariables, setSelectedVariables, currentRace, currentHorse, setCurrentRace, setPredictionResult } = usePredictionStore();
   const [activeInfo, setActiveInfo] = useState<PredictionVariable | null>(null);
 
   const activeFactor = useMemo(() => factors.find((factor) => factor.code === activeInfo), [activeInfo]);
@@ -101,18 +137,24 @@ export function AnalysisFactorsPage() {
 
   return (
     <section className="page-section screen-shell analysis-page light-theme min-h-[calc(100vh-96px)]">
-      <div className="page-heading page-heading-wide analysis-heading light-heading">
-        <div className="flex items-center gap-3">
-          <BackButton
-            to={raceId ? `/races/${raceId}` : currentRace?.id ? `/races/${currentRace.id}` : "/"}
-            fallbackTo={raceId ? `/races/${raceId}` : currentRace?.id ? `/races/${currentRace.id}` : "/"}
-            label="Back to Race"
-          />
-          <h1 className="text-3xl font-black text-slate-950">
-            Choose Your <span className="text-purple-600">Analysis Factors</span>
-          </h1>
+      <div className="relative w-full max-w-6xl mx-auto flex flex-col items-center justify-center text-center px-4 mb-4 sm:mb-6">
+        <div className="w-full flex items-center justify-center relative">
+          <div className="sm:absolute sm:left-0 sm:top-1/2 sm:-translate-y-1/2">
+            <BackButton
+              to={currentHorse?.id ? `/horses/${currentHorse.id}` : raceId ? `/races/${raceId}` : currentRace?.id ? `/races/${currentRace.id}` : "/"}
+              fallbackTo={currentHorse?.id ? `/horses/${currentHorse.id}` : raceId ? `/races/${raceId}` : "/"}
+              label="Back to Horse Analysis"
+            />
+          </div>
+          <div className="flex flex-col items-center justify-center text-center">
+            <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white tracking-tight">
+              Choose Your <span className="text-purple-600 dark:text-purple-400">Analysis Factors</span>
+            </h1>
+            <p className="mt-1 sm:mt-2 text-sm sm:text-base text-slate-500 dark:text-slate-400 font-medium">
+              Select up to 3 factors to weight the prediction algorithm
+            </p>
+          </div>
         </div>
-        <p>Select up to 3 factors to weight the prediction algorithm</p>
       </div>
 
       <AsyncBoundary
@@ -140,21 +182,7 @@ export function AnalysisFactorsPage() {
         <div className="factor-layout">
           <div className="factor-left-col">
             <div className="factor-wheel">
-              <div className="wheel-glow" />
-              <div className="wheel-ring wheel-ring-outer" />
-              <div className="wheel-ring wheel-ring-inner" />
-              <div className="wheel-tick-ring" />
               <svg className="factor-wheel-svg" viewBox="0 0 520 520" role="presentation" aria-hidden="true">
-                <defs>
-                  <radialGradient id="inactiveSegment" cx="50%" cy="50%" r="70%">
-                    <stop offset="0%" stopColor="#ffffff" stopOpacity="1" />
-                    <stop offset="100%" stopColor="#f8f9fa" stopOpacity="1" />
-                  </radialGradient>
-                  <radialGradient id="activeSegment" cx="50%" cy="50%" r="70%">
-                    <stop offset="0%" stopColor="#fbf7ff" stopOpacity="1" />
-                    <stop offset="100%" stopColor="#f3e8ff" stopOpacity="1" />
-                  </radialGradient>
-                </defs>
                 {wheelSegments.map((factor) => {
                   const selected = selectedVariables.includes(factor.code);
                   return (
@@ -162,7 +190,6 @@ export function AnalysisFactorsPage() {
                       key={factor.code}
                       className={`wheel-wedge ${selected ? "selected" : ""}`}
                       d={describeSegment(factor.startAngle, factor.endAngle)}
-                      fill={`url(#${selected ? "activeSegment" : "inactiveSegment"})`}
                       onClick={() => toggleFactor(factor.code)}
                     />
                   );
@@ -181,39 +208,51 @@ export function AnalysisFactorsPage() {
                     key={factor.code}
                     className="factor-segment-container"
                     style={labelPosition(factor.centerAngle)}
-                    onMouseEnter={() => setActiveInfo(factor.code)}
-                    onMouseLeave={() => setActiveInfo(null)}
                   >
                     <button
-                      className={`factor-segment segment-${index} ${selected ? "selected" : ""}`}
+                      className={`factor-segment segment-${index} ${selected ? "selected" : ""} relative flex flex-col items-center justify-center`}
                       type="button"
                       onClick={() => toggleFactor(factor.code)}
+                      onMouseEnter={() => setActiveInfo(factor.code)}
+                      onMouseLeave={() => setActiveInfo(null)}
                     >
-                      <div className="factor-segment-core">
-                        <Icon className="h-8 w-8" />
-                        <span>
+                      {/* Standardized Info Icon in Top-Right */}
+                      <span
+                        className="absolute top-1 right-2 flex h-4 w-4 items-center justify-center rounded-full border border-purple-400/50 text-purple-300 hover:text-white hover:border-purple-300 bg-slate-900/60 transition-colors z-10"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setActiveInfo(activeInfo === factor.code ? null : factor.code);
+                        }}
+                        title="Factor info"
+                      >
+                        <Info className="h-2.5 w-2.5" />
+                      </span>
+
+                      {/* Slice Core Content */}
+                      <div className="flex flex-col items-center justify-center text-center gap-1 w-full px-1">
+                        <Icon className="h-6 w-6 sm:h-7 sm:w-7 shrink-0" />
+                        <span className="text-xs sm:text-[0.8rem] font-bold leading-tight max-w-[105px]">
                           {predictionVariableLabels[factor.code]}
-                          <span className="factor-info-icon"><Info className="h-3.5 w-3.5" /></span>
                         </span>
                       </div>
-                      {selected ? (
-                        <span className="factor-check">
-                          <Check className="h-4 w-4" />
-                        </span>
-                      ) : null}
+
+                      {/* Fixed height checkmark placeholder */}
+                      <div className="h-4 flex items-center justify-center mt-0.5">
+                        {selected ? (
+                          <span className="flex items-center justify-center h-4 w-4 rounded-full bg-purple-600 text-white shadow-sm shadow-purple-500/50">
+                            <Check className="h-2.5 w-2.5 stroke-[3]" />
+                          </span>
+                        ) : null}
+                      </div>
                     </button>
+
                     {isActive && (
                       <div className={`factor-description-card tooltip-angle-${factor.centerAngle}`}>
                         <div className="factor-desc-header">
-                          <Icon className="h-5 w-5" />
+                          <Icon className="h-4 w-4 text-purple-400 shrink-0" />
                           <h3>{predictionVariableLabels[factor.code]}</h3>
                         </div>
                         <p className="factor-desc-text">{factor.explanation}</p>
-                        {factor.code === 'weight' && (
-                          <p className="factor-desc-example">
-                            e.g. A horse dropping 2.5kg from its last run (58kg → 55.5kg) after a narrow loss is often a strong positive.
-                          </p>
-                        )}
                       </div>
                     )}
                   </div>
@@ -228,18 +267,6 @@ export function AnalysisFactorsPage() {
         </div>
 
         <div className="analysis-bottom-section">
-          <div className="bottom-selected-container light-pill-container">
-            <span className="selected-container-title">SELECTED FACTORS <span className="text-purple-600">({selectedVariables.length}/3)</span></span>
-            <div className="bottom-selected-bar">
-              {selectedVariables.map(v => (
-                <div key={v} className="selected-pill light-pill">
-                  {predictionVariableLabels[v]}
-                  <Check className="h-4 w-4" />
-                </div>
-              ))}
-            </div>
-          </div>
-
           <Button size="lg" className="prediction-cta solid-purple-btn" onClick={handleProceed} disabled={selectedVariables.length !== 3 || prediction.isPending}>
             <Sparkles className="h-5 w-5" /> {prediction.isPending ? "Running Prediction" : "Proceed to Predictions"}
           </Button>
