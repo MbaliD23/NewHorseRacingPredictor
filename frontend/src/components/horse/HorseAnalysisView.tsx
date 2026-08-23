@@ -57,19 +57,21 @@ type ParsedPerformanceRecord = {
 
 type FormColumnKey =
   | "date"
-  | "position"
   | "track"
-  | "raceNumber"
+  | "ref"
   | "distance"
   | "jockey"
   | "weight"
+  | "sh"
   | "draw"
+  | "position"
   | "margin"
-  | "winner"
-  | "winnerWeight"
-  | "speedFigure"
-  | "rating"
+  | "winnerSecond"
+  | "time"
+  | "adjTime"
+  | "ob"
   | "odds"
+  | "ar"
   | "comment"
   | "formSummary";
 
@@ -96,9 +98,16 @@ const FORM_COLUMNS: FormColumnDefinition[] = [
   {
     key: "date",
     label: "Date",
-    cellClassName: "font-semibold text-gray-900",
+    cellClassName: "font-semibold text-gray-900 dark:text-white whitespace-nowrap",
     render: (entry) => formatDate(entry.run_date, entry.raw_date_text),
   },
+  { key: "track", label: "Track", render: (entry) => valueOrDash(entry.track) },
+  { key: "ref", label: "REF", render: (entry) => valueOrDash(entry.ref_no ?? entry.race_number) },
+  { key: "distance", label: "Distance", render: (entry) => valueOrDash(entry.distance) },
+  { key: "jockey", label: "Jockey", cellClassName: "whitespace-nowrap", render: (entry) => valueOrDash(entry.jockey_name) },
+  { key: "weight", label: "Wgt", render: (entry) => valueOrDash(entry.weight) },
+  { key: "sh", label: "SH", render: (entry) => valueOrDash(entry.shoeing) },
+  { key: "draw", label: "Draw", render: (entry) => valueOrDash(entry.draw) },
   {
     key: "position",
     label: "Pos",
@@ -110,31 +119,46 @@ const FORM_COLUMNS: FormColumnDefinition[] = [
       </span>
     ),
   },
-  { key: "track", label: "Track", render: (entry) => valueOrDash(entry.track) },
-  { key: "raceNumber", label: "Race No", render: (entry) => valueOrDash(entry.race_number) },
-  { key: "distance", label: "Distance", render: (entry) => valueOrDash(entry.distance) },
-  { key: "jockey", label: "Jockey", render: (entry) => valueOrDash(entry.jockey_name) },
-  { key: "weight", label: "Wgt", render: (entry) => valueOrDash(entry.weight) },
-  { key: "draw", label: "Draw", render: (entry) => valueOrDash(entry.draw) },
   { key: "margin", label: "Margin", render: (entry) => valueOrDash(entry.margin_behind_winner) },
-  { key: "winner", label: "Winner", render: (entry) => valueOrDash(entry.winner_name) },
-  { key: "winnerWeight", label: "Winner Wgt", render: (entry) => valueOrDash(entry.winner_weight) },
-  { key: "speedFigure", label: "Speed Fig", render: (entry) => valueOrDash(entry.speed_figure) },
-  { key: "rating", label: "Rating", render: (entry) => valueOrDash(entry.rating) },
+  {
+    key: "winnerSecond",
+    label: "WINNER/2nd",
+    cellClassName: "font-medium whitespace-nowrap",
+    render: (entry) => {
+      if (!entry.winner_name) return "-";
+      return entry.winner_weight
+        ? `${entry.winner_name} ${entry.winner_weight}`
+        : entry.winner_name;
+    },
+  },
+  { key: "time", label: "TIME", render: (entry) => valueOrDash(entry.time) },
+  { key: "adjTime", label: "ADJ/TM", render: (entry) => valueOrDash(entry.adjusted_time ?? entry.speed_figure) },
+  { key: "ob", label: "OB", render: (entry) => valueOrDash(entry.opening_bet) },
   { key: "odds", label: "Odds", render: (entry) => valueOrDash(entry.odds) },
+  { key: "ar", label: "AR", render: (entry) => valueOrDash(entry.actual_rating ?? entry.rating) },
   { key: "comment", label: "Comment", render: (entry) => valueOrDash(entry.comment) },
   { key: "formSummary", label: "Form Summary", render: (entry) => valueOrDash(entry.form_summary) },
 ];
 
 const DEFAULT_FORM_COLUMN_KEYS: FormColumnKey[] = [
   "date",
-  "position",
   "track",
+  "ref",
   "distance",
   "jockey",
   "weight",
+  "sh",
   "draw",
-  "rating",
+  "position",
+  "margin",
+  "winnerSecond",
+  "time",
+  "adjTime",
+  "ob",
+  "odds",
+  "ar",
+  "comment",
+  "formSummary",
 ];
 
 const FORM_COLUMN_KEYS = new Set<FormColumnKey>(FORM_COLUMNS.map((column) => column.key));
@@ -354,7 +378,10 @@ function loadStoredFormColumns(): FormColumnKey[] {
       return DEFAULT_FORM_COLUMN_KEYS;
     }
 
-    const validKeys = parsed.filter((key): key is FormColumnKey => FORM_COLUMN_KEYS.has(key));
+    const mapped = parsed.map((k) =>
+      k === "winner" ? "winnerSecond" : k === "raceNumber" ? "ref" : k === "speedFigure" ? "adjTime" : k === "rating" ? "ar" : k
+    );
+    const validKeys = mapped.filter((key): key is FormColumnKey => FORM_COLUMN_KEYS.has(key));
     return validKeys.length > 0 ? validKeys : DEFAULT_FORM_COLUMN_KEYS;
   } catch {
     return DEFAULT_FORM_COLUMN_KEYS;
@@ -1174,14 +1201,19 @@ function FormColumnSelector({
 
   const toggleColumn = (key: FormColumnKey) => {
     if (visibleKeySet.has(key)) {
-      if (visibleColumnKeys.length === 1) {
-        return;
-      }
       onVisibleColumnKeysChange(visibleColumnKeys.filter((item) => item !== key));
       return;
     }
 
     onVisibleColumnKeysChange([...visibleColumnKeys, key]);
+  };
+
+  const selectAll = () => {
+    onVisibleColumnKeysChange(DEFAULT_FORM_COLUMN_KEYS);
+  };
+
+  const deselectAll = () => {
+    onVisibleColumnKeysChange([]);
   };
 
   const moveColumn = (key: FormColumnKey, direction: -1 | 1) => {
@@ -1202,22 +1234,41 @@ function FormColumnSelector({
     <details className="relative">
       <summary className="flex cursor-pointer list-none items-center gap-2 rounded-full border border-purple-200 dark:border-purple-800 bg-white dark:bg-slate-900 px-4 py-2 text-sm font-semibold text-purple-900 dark:text-purple-300 shadow-sm transition-colors hover:bg-purple-50 dark:hover:bg-slate-800 [&::-webkit-details-marker]:hidden">
         <ListFilter className="h-4 w-4" />
-        Columns
+        Columns ({visibleColumnKeys.length}/{FORM_COLUMNS.length})
         <ChevronDown className="h-4 w-4" />
       </summary>
 
-      <div className="absolute right-0 z-20 mt-2 w-72 rounded-2xl border border-purple-100 dark:border-slate-800 bg-white dark:bg-slate-900 p-3 text-left shadow-xl shadow-purple-900/10 dark:shadow-none">
-        <div className="mb-2 flex items-center justify-between gap-2 border-b border-gray-100 dark:border-slate-800 pb-2">
-          <p className="text-xs font-bold uppercase tracking-[0.12em] text-gray-500 dark:text-slate-400">
-            Form columns
-          </p>
-          <button
-            type="button"
-            onClick={() => onVisibleColumnKeysChange(DEFAULT_FORM_COLUMN_KEYS)}
-            className="rounded-full px-2 py-1 text-xs font-semibold text-purple-700 dark:text-purple-300 transition-colors hover:bg-purple-50 dark:hover:bg-purple-950/60"
-          >
-            Reset
-          </button>
+      <div className="absolute right-0 z-20 mt-2 w-80 rounded-2xl border border-purple-100 dark:border-slate-800 bg-white dark:bg-slate-900 p-3.5 text-left shadow-xl shadow-purple-900/10 dark:shadow-none">
+        <div className="mb-2.5 flex flex-col gap-2 border-b border-gray-100 dark:border-slate-800 pb-2.5">
+          <div className="flex items-center justify-between gap-2">
+            <p className="text-xs font-bold uppercase tracking-[0.12em] text-gray-500 dark:text-slate-400">
+              Form Columns
+            </p>
+            <button
+              type="button"
+              onClick={selectAll}
+              className="rounded-full px-2.5 py-0.5 text-xs font-semibold text-purple-700 dark:text-purple-300 transition-colors hover:bg-purple-50 dark:hover:bg-purple-950/60 cursor-pointer"
+            >
+              Reset
+            </button>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={selectAll}
+              className="flex-1 rounded-lg border border-purple-200 dark:border-purple-800/60 bg-purple-50/60 dark:bg-purple-950/40 py-1.5 text-center text-xs font-bold text-purple-700 dark:text-purple-300 transition-colors hover:bg-purple-100 dark:hover:bg-purple-900/60 cursor-pointer"
+            >
+              Select All
+            </button>
+            <button
+              type="button"
+              onClick={deselectAll}
+              className="flex-1 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-900/40 py-1.5 text-center text-xs font-bold text-slate-600 dark:text-slate-400 transition-colors hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
+            >
+              Deselect All
+            </button>
+          </div>
         </div>
 
         <div className="max-h-80 space-y-1 overflow-y-auto pr-1">
@@ -1234,9 +1285,8 @@ function FormColumnSelector({
                   <input
                     type="checkbox"
                     checked={isVisible}
-                    disabled={isVisible && visibleColumnKeys.length === 1}
                     onChange={() => toggleColumn(column.key)}
-                    className="h-4 w-4 rounded border-gray-300 dark:border-slate-700 text-purple-700 focus:ring-purple-600"
+                    className="h-4 w-4 rounded border-gray-300 dark:border-slate-700 text-purple-700 focus:ring-purple-600 cursor-pointer"
                   />
                   <span className="truncate">{column.label}</span>
                 </label>

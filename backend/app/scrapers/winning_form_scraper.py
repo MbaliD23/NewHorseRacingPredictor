@@ -100,16 +100,22 @@ class ScrapedHorseFormEntry:
     run_date: date | None = None
     raw_date_text: str | None = None
     track: str | None = None
+    ref_no: str | None = None
     race_number: str | None = None
     distance: str | None = None
     jockey_name: str | None = None
     weight: str | None = None
+    shoeing: str | None = None
     draw: str | None = None
     finish_position: int | None = None
     margin_behind_winner: str | None = None
     winner_name: str | None = None
     winner_weight: str | None = None
+    time: str | None = None
+    adjusted_time: str | None = None
+    opening_bet: str | None = None
     odds: str | None = None
+    actual_rating: str | None = None
     comment: str | None = None
     speed_figure: str | None = None
     rating: str | None = None
@@ -629,7 +635,7 @@ class WinningFormScraper:
 
     def _parse_form_entry_row(self, row) -> ScrapedHorseFormEntry | None:
         cells = self._row_cells(row)
-        if len(cells) < 20 or not re.search(r"\d{2}\.\d{2}\.\d{2}", cells[0]):
+        if len(cells) < 15 or not re.search(r"\d{2}\.\d{2}\.\d{2}", cells[0]):
             return None
 
         raw_date_text = cells[0]
@@ -637,27 +643,46 @@ class WinningFormScraper:
         winner_name, winner_weight = self._split_winner_details(
             cells[14] if len(cells) > 14 else None
         )
-        odds = cells[17] if len(cells) > 17 and "/" in cells[17] else None
-        if not odds and len(cells) > 18 and "/" in cells[18]:
-            odds = cells[18]
+        
+        # When 21 cells:
+        # 0: Date, 1: Track, 2: REF, 3: Course, 4: Class, 5: Course type/bend,
+        # 6: Distance, 7: Jockey, 8: Weight, 9: Equipment, 10: Shoeing, 11: Draw,
+        # 12: Position, 13: Margin, 14: Winner/2nd, 15: Time, 16: Adj Time,
+        # 17: Opening Bet, 18: Odds, 19: Actual Rating, 20: Comment
+        ref_no = cells[2] if len(cells) > 2 else None
+        shoeing = cells[10] if len(cells) > 10 and cells[10] in {"A", "H", "B", "C", "N", "S"} or len(cells) > 10 and len(cells[10]) <= 3 else (cells[9] if len(cells) > 9 and len(cells[9]) <= 2 else None)
+        draw = cells[11] if len(cells) > 11 and ("-" in cells[11] or cells[11].isdigit()) else (cells[9] if len(cells) > 9 and ("-" in cells[9] or cells[9].isdigit()) else None)
+        
+        time_val = cells[15] if len(cells) > 15 and re.search(r"\d+\.\d+", cells[15]) else None
+        adj_time = cells[16] if len(cells) > 16 and re.search(r"\d+\.\d+", cells[16]) else None
+        opening_bet = cells[17] if len(cells) > 17 and ("/" in cells[17] or cells[17].replace(".", "").isdigit()) else None
+        odds = cells[18] if len(cells) > 18 and ("/" in cells[18] or cells[18].replace(".", "").isdigit()) else (cells[17] if len(cells) > 17 and "/" in cells[17] else None)
+        actual_rating = cells[19] if len(cells) > 19 and cells[19].isdigit() else None
+        comment = cells[20] if len(cells) > 20 else (cells[-1] if len(cells) >= 15 else None)
 
         return ScrapedHorseFormEntry(
             run_date=run_date,
             raw_date_text=raw_date_text,
             track=cells[1] if len(cells) > 1 else None,
-            race_number=cells[2] if len(cells) > 2 else None,
+            ref_no=ref_no,
+            race_number=ref_no,
             distance=cells[6] if len(cells) > 6 else None,
             jockey_name=cells[7] if len(cells) > 7 else None,
             weight=cells[8] if len(cells) > 8 else None,
-            draw=cells[9] if len(cells) > 9 else None,
+            shoeing=shoeing,
+            draw=draw,
             finish_position=self._as_int(cells[12] if len(cells) > 12 else None, 1, 30),
             margin_behind_winner=cells[13] if len(cells) > 13 else None,
             winner_name=winner_name,
             winner_weight=winner_weight,
+            time=time_val,
+            adjusted_time=adj_time,
+            opening_bet=opening_bet,
             odds=odds,
-            comment=cells[20] if len(cells) > 20 else None,
-            speed_figure=cells[16] if len(cells) > 16 else None,
-            rating=cells[19] if len(cells) > 19 else None,
+            actual_rating=actual_rating,
+            comment=comment,
+            speed_figure=adj_time,
+            rating=actual_rating,
         )
 
     def _parse_form_summary_row(self, row) -> str | None:
