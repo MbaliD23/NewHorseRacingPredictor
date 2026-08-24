@@ -7,8 +7,8 @@ import { useRaces } from "@/hooks/useRaces";
 import { usePredictionStore } from "@/store/predictionStore";
 
 import horseBg from "@/assets/whitecornerhorse.png";
-import wfLogo from "@/assets/winning-form+.png";
-import wfLogoDark from "@/assets/winning-form+-dark.png";
+import wfLogo from "@/assets/winning_form+_new_logo.png";
+import wfLogoDark from "@/assets/winning_form+_new_logo.png";
 import greyvilleImg from "@/assets/greyville.png";
 import turfonteinImg from "@/assets/Turffontein.png";
 import kenilworthImg from "@/assets/Kenilworth.png";
@@ -116,7 +116,7 @@ export function LocationsPage() {
     <div className="relative min-h-[calc(100vh-80px)] w-full flex-1 min-w-0 overflow-visible transition-all duration-300 ease-in-out pt-1 pb-10 px-[clamp(1rem,2vw,2.5rem)]">
       {/* Background Horse */}
       <div className="pointer-events-none absolute right-0 top-[-10px] -z-10 w-[min(40vw,500px)] min-w-[300px] opacity-100 md:right-0 md:top-[-18px] lg:right-2 lg:w-[min(36vw,520px)] transition-all duration-300">
-        <img src={horseBg} alt="" className="h-auto w-full object-contain opacity-100" />
+        <img src={horseBg} alt="" className="h-auto w-full object-contain opacity-40" />
       </div>
 
       <div

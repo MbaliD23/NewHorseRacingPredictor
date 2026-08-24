@@ -17,8 +17,8 @@ import {
   Sun,
   Moon,
 } from "lucide-react";
-import winningFormLogo from "@/assets/winning-form+.png";
-import winningFormLogoDark from "@/assets/winning-form+-dark.png";
+import winningFormLogo from "@/assets/winning_form+_new_logo.png";
+import winningFormLogoDark from "@/assets/winning_form+_new_logo.png";
 import { usePredictionStore } from "@/store/predictionStore";
 import { useRaces } from "@/hooks/useRaces";
 import { useRace } from "@/hooks/useRace";
