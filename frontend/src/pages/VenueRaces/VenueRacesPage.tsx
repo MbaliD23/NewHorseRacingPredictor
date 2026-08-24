@@ -46,7 +46,7 @@ export function VenueRacesPage() {
   const liveCount = venue?.races.filter((race) => race.is_live).length ?? 0;
   const totalRaces = venue?.races.length ?? 0;
 
-  const rawVenueName = venue?.venue ?? "Selected Event";
+  const rawVenueName = venue?.venue ?? "Selected Location";
   const venueTitle = rawVenueName.toLowerCase().endsWith("races") ? rawVenueName : `${rawVenueName} Races`;
 
   return (
@@ -55,13 +55,13 @@ export function VenueRacesPage() {
         isLoading={isLoading && !venue}
         isError={isError && !venue}
         isEmpty={!venue}
-        emptyMessage="Event unavailable."
+        emptyMessage="Location unavailable."
       >
         <div className="mx-auto flex w-full max-w-[1600px] flex-col gap-6 px-2 sm:px-4 lg:px-6">
           {/* Header Card */}
           <div className="rounded-[32px] border border-slate-200/80 dark:border-slate-800/80 bg-white dark:bg-[#131424]/90 px-4 py-4 shadow-[0_1px_8px_-4px_rgba(0,0,0,0.08)] sm:px-6 lg:px-8">
             <div className="flex flex-wrap items-center gap-3">
-              <BackButton to="/" fallbackTo="/" label="Back to Events" />
+              <BackButton to="/" fallbackTo="/" label="Back to Locations" />
               <div className="flex flex-wrap items-center gap-2 text-[11px] font-bold uppercase tracking-[0.18em] text-[#6A2DF1] dark:text-purple-400 flex-1">
                 <span className="inline-flex items-center gap-1.5 rounded-full border border-violet-200 dark:border-purple-900/60 bg-violet-50 dark:bg-purple-950/40 px-3 py-1.5">
                   <CalendarDays className="h-3.5 w-3.5" />
@@ -70,12 +70,6 @@ export function VenueRacesPage() {
                 <span className="rounded-full border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 px-3 py-1.5 text-slate-600 dark:text-slate-300">
                   {totalRaces} races
                 </span>
-                {liveCount > 0 && (
-                  <div className="ml-auto flex items-center gap-1.5 rounded-full border border-violet-200 dark:border-purple-900/60 bg-white dark:bg-slate-900 px-2.5 py-1 text-[11px] font-bold tracking-wider text-[#6A2DF1] dark:text-purple-300 uppercase">
-                    <div className="h-2 w-2 rounded-full bg-[#6A2DF1] animate-pulse" />
-                    {liveCount} Live
-                  </div>
-                )}
               </div>
             </div>
 
@@ -100,7 +94,7 @@ export function VenueRacesPage() {
               <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/20 to-transparent" />
               <div className="absolute bottom-4 left-5 right-5 sm:left-6 sm:right-6">
                 <p className="text-[11px] font-black uppercase tracking-[0.22em] text-purple-200">
-                  Event Overview
+                  Location Overview
                 </p>
                 <h2 className="mt-1 text-2xl sm:text-3xl font-black tracking-tight text-white">{venueTitle}</h2>
               </div>
@@ -126,7 +120,7 @@ export function VenueRacesPage() {
           </div>
 
           {/* Races List */}
-          <AsyncBoundary isEmpty={races.length === 0} emptyMessage="No races are scheduled for this event.">
+          <AsyncBoundary isEmpty={races.length === 0} emptyMessage="No races are scheduled for this location.">
             <div className="flex flex-col gap-4 pb-4">
               {races.map((race) => (
                 <div

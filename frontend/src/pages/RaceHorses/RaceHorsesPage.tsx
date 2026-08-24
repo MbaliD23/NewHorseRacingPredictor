@@ -1,8 +1,7 @@
 import { useMemo } from "react";
-import { Activity, ArrowRight, Calendar, Clock, Compass, MapPin, Sparkles } from "lucide-react";
+import { Activity, Calendar, Clock, Compass, Flag } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
-import { Button, PredictorButton } from "@/components/common/Button";
-import { GlassCard } from "@/components/common/GlassCard";
+import { PredictorButton } from "@/components/common/Button";
 import { SilksRenderer } from "@/components/horse/SilksRenderer";
 import { sortHorses } from "@/lib/horseOrdering";
 import { horseColor } from "@/lib/horseAnalytics";
@@ -12,13 +11,6 @@ import { useRace } from "@/hooks/useRace";
 import { formatTime, valueOrUnavailable } from "@/lib/utils";
 import { usePredictionStore, type HorseOrderBy } from "@/store/predictionStore";
 import type { Horse } from "@/types/race";
-import greyvilleImg from "@/assets/greyville.png";
-import turfonteinImg from "@/assets/Turffontein.png";
-import kenilworthImg from "@/assets/Kenilworth.png";
-import scotsvilleImg from "@/assets/Scottsville.png";
-import fairviewImg from "@/assets/fairview.png";
-import vaalImg from "@/assets/Vaal.png";
-import trackConditionsImg from "@/assets/track-conditions.png";
 
 const ORDER_OPTIONS: Array<{ value: HorseOrderBy; label: string }> = [
   { value: "draw_number", label: "Draw Number (Default)" },
@@ -49,15 +41,101 @@ const formatRaceDate = (dateStr: string | null | undefined) => {
       });
 };
 
-const getVenueImage = (venueName: string | null | undefined) => {
+interface TrackProfileDetails {
+  courseType: string;
+  circumference: string;
+  straightLength: string;
+  going: string;
+  trackBias: string;
+  elevationNotes: string;
+}
+
+const getVenueTrackProfile = (venueName?: string | null, surface?: string | null): TrackProfileDetails => {
   const name = (venueName ?? "").toLowerCase();
-  if (name.includes("greyville")) return greyvilleImg;
-  if (name.includes("turffontein")) return turfonteinImg;
-  if (name.includes("kenilworth")) return kenilworthImg;
-  if (name.includes("scottsville")) return scotsvilleImg;
-  if (name.includes("fairview")) return fairviewImg;
-  if (name.includes("vaal")) return vaalImg;
-  return greyvilleImg;
+  const surf = surface || "Turf";
+
+  if (name.includes("greyville")) {
+    const isPoly = surf.toLowerCase().includes("poly");
+    return {
+      courseType: isPoly ? "Polytrack (Right-handed)" : "Turf (Right-handed)",
+      circumference: isPoly ? "2,000m" : "2,800m",
+      straightLength: "400m",
+      going: "Good / Standard",
+      trackBias: isPoly ? "Low draws slightly favored" : "Low draw advantage on bend",
+      elevationNotes: "Slight uphill back straight, flat home run",
+    };
+  }
+  if (name.includes("turffontein")) {
+    const isInside = name.includes("inside");
+    return {
+      courseType: isInside ? "Inside Turf (Right-handed)" : "Standside Turf (Right-handed)",
+      circumference: isInside ? "2,500m" : "2,700m",
+      straightLength: isInside ? "500m" : "800m",
+      going: "Good / Fast",
+      trackBias: isInside ? "Low draws favored on turn" : "Outside draws often favored in straight sprints",
+      elevationNotes: "Steep 800m uphill climb to finish line",
+    };
+  }
+  if (name.includes("kenilworth")) {
+    return {
+      courseType: "Turf (Left-handed)",
+      circumference: "2,800m",
+      straightLength: "1,200m",
+      going: "Good / Standard",
+      trackBias: "Rail positioning dictates bias",
+      elevationNotes: "Flat galloping track, long testing straight",
+    };
+  }
+  if (name.includes("scottsville")) {
+    return {
+      courseType: "Turf (Right-handed)",
+      circumference: "2,300m",
+      straightLength: "1,200m",
+      going: "Good / Firm",
+      trackBias: "Speed horses favored in sprints",
+      elevationNotes: "Uphill straight course, testing final 400m",
+    };
+  }
+  if (name.includes("fairview")) {
+    const isPoly = surf.toLowerCase().includes("poly");
+    return {
+      courseType: isPoly ? "Polytrack (Right-handed)" : "Turf (Right-handed)",
+      circumference: isPoly ? "1,800m" : "2,700m",
+      straightLength: isPoly ? "400m" : "800m",
+      going: "Standard / Good",
+      trackBias: isPoly ? "Fair track, rail runs true" : "Strong coastal wind influence",
+      elevationNotes: "Flat circuit with continuous sweeping turn",
+    };
+  }
+  if (name.includes("vaal")) {
+    return {
+      courseType: "Turf (Right-handed)",
+      circumference: "3,000m",
+      straightLength: "1,000m",
+      going: "Good / Standard",
+      trackBias: "High numbers favoured down straight course",
+      elevationNotes: "Flat, wide track with SA's longest straight",
+    };
+  }
+  if (name.includes("durbanville")) {
+    return {
+      courseType: "Turf (Left-handed)",
+      circumference: "2,000m",
+      straightLength: "600m",
+      going: "Good / Standard",
+      trackBias: "Front runners favored due to tight turns",
+      elevationNotes: "Undulating with downhill bend into straight",
+    };
+  }
+
+  return {
+    courseType: `${surf} (Standard Oval)`,
+    circumference: "2,400m",
+    straightLength: "450m",
+    going: "Good / Standard",
+    trackBias: "Standard draw distribution",
+    elevationNotes: "Level racing surface",
+  };
 };
 
 export function RaceHorsesPage() {
@@ -67,6 +145,10 @@ export function RaceHorsesPage() {
   const { currentVenue, setCurrentRace, setCurrentHorse, horseOrderBy, setHorseOrderBy } = usePredictionStore();
   const runnerCount = race?.horses?.length ?? race?.field_size ?? 0;
   const raceStatus = valueOrUnavailable(race?.status);
+  const trackProfile = useMemo(
+    () => getVenueTrackProfile(race?.venue, race?.surface),
+    [race?.venue, race?.surface],
+  );
   const orderedHorses = useMemo(
     () => sortHorses(race?.horses ?? [], horseOrderBy),
     [horseOrderBy, race?.horses],
@@ -105,10 +187,6 @@ export function RaceHorsesPage() {
                 <span className="rounded-full border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 px-3 py-1.5 text-slate-600 dark:text-slate-300">
                   {runnerCount} runners
                 </span>
-                <div className="ml-auto flex items-center gap-1.5 rounded-full border border-violet-200 dark:border-purple-900/60 bg-white dark:bg-slate-900 px-2.5 py-1 text-[11px] font-bold tracking-wider text-[#6A2DF1] dark:text-purple-300 uppercase">
-                  <div className="h-2 w-2 rounded-full bg-[#6A2DF1] animate-pulse" />
-                  Live
-                </div>
               </div>
             </div>
 
@@ -127,48 +205,89 @@ export function RaceHorsesPage() {
             </div>
           </div>
 
-          <div className="grid gap-5 xl:grid-cols-[minmax(0,1.35fr)_minmax(360px,0.65fr)]">
-            <GlassCard className="group overflow-hidden rounded-[1.2rem] border-slate-100 dark:border-slate-800 bg-white dark:bg-[#131424]/90 text-slate-900 dark:text-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:ring-[3px] hover:ring-purple-600 hover:shadow-[0_12px_40px_rgb(0,0,0,0.15)]">
-              <div className="relative h-36 overflow-hidden bg-slate-100 dark:bg-slate-800 sm:h-44">
-                <img
-                  src={getVenueImage(race?.venue)}
-                  alt=""
-                  className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/15 to-transparent" />
-                <div className="absolute bottom-4 left-5 right-5 sm:left-6 sm:right-6">
-                  <p className="text-[11px] font-black uppercase tracking-[0.22em] text-purple-200">
+          {/* Consolidated Single Race Information Panel */}
+          <div className="rounded-2xl border border-slate-200/80 dark:border-purple-900/30 bg-white/90 dark:bg-[#131424]/90 p-4 sm:p-5 shadow-sm transition-all duration-300 w-full">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800/80">
+              <div className="flex items-center gap-2.5 min-w-0">
+                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-purple-50 dark:bg-purple-950/60 text-[#6A2DF1] dark:text-purple-400">
+                  <Flag className="h-4 w-4" />
+                </div>
+                <div>
+                  <h2 className="text-sm sm:text-base font-black tracking-tight text-slate-950 dark:text-white">
                     Race Information
+                  </h2>
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                    Meeting & Track Details
                   </p>
-                  <h2 className="mt-1 text-xl font-black tracking-tight text-white">Meeting details</h2>
                 </div>
               </div>
-              <div className="grid gap-4 bg-white dark:bg-[#131424]/90 p-5 sm:grid-cols-2 sm:p-6">
-                <InfoTile icon={Calendar} label="Meeting date" value={formatRaceDate(race?.meeting_date)} />
-                <InfoTile icon={MapPin} label="Venue" value={valueOrUnavailable(race?.venue)} />
-              </div>
-            </GlassCard>
+              <span className="rounded-full border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-[#6A2DF1] dark:text-purple-300 shrink-0">
+                Race {valueOrUnavailable(race?.race_number)}
+              </span>
+            </div>
 
-            <GlassCard className="group overflow-hidden rounded-[1.2rem] border-slate-100 dark:border-slate-800 bg-white dark:bg-[#131424]/90 text-slate-900 dark:text-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:ring-[3px] hover:ring-purple-600 hover:shadow-[0_12px_40px_rgb(0,0,0,0.15)]">
-              <div className="relative h-36 overflow-hidden bg-slate-100 dark:bg-slate-800 sm:h-44">
-                <img
-                  src={trackConditionsImg}
-                  alt=""
-                  className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#0A0413]/90 via-[#0A0413]/25 to-transparent" />
-                <div className="absolute bottom-4 left-5 right-5 sm:left-6 sm:right-6">
-                  <p className="text-[11px] font-black uppercase tracking-[0.22em] text-purple-200">
-                    Track Profile
-                  </p>
-                  <h2 className="mt-1 text-xl font-black tracking-tight text-white">Conditions</h2>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-7 gap-2.5 pt-3.5">
+              <div className="rounded-xl border border-slate-100 dark:border-slate-800/60 bg-slate-50/70 dark:bg-slate-900/60 p-2.5 flex flex-col justify-center min-w-0">
+                <div className="flex items-center gap-1.5 text-slate-400">
+                  <Calendar className="h-3 w-3 text-[#6A2DF1] dark:text-purple-400 shrink-0" />
+                  <span className="text-[10px] font-bold uppercase tracking-wider truncate">Meeting Date</span>
                 </div>
+                <p className="mt-1 text-xs sm:text-sm font-black text-slate-950 dark:text-white truncate" title={formatRaceDate(race?.meeting_date)}>
+                  {formatRaceDate(race?.meeting_date)}
+                </p>
               </div>
-              <div className="grid gap-4 bg-white dark:bg-[#131424]/90 p-5 sm:grid-cols-2 sm:p-6">
-                <InfoTile icon={Activity} label="Distance" value={valueOrUnavailable(race?.distance)} />
-                <InfoTile icon={Compass} label="Surface" value={valueOrUnavailable(race?.surface)} />
+
+              <div className="rounded-xl border border-slate-100 dark:border-slate-800/60 bg-slate-50/70 dark:bg-slate-900/60 p-2.5 flex flex-col justify-center min-w-0">
+                <div className="flex items-center gap-1.5 text-slate-400">
+                  <Clock className="h-3 w-3 text-[#6A2DF1] dark:text-purple-400 shrink-0" />
+                  <span className="text-[10px] font-bold uppercase tracking-wider truncate">Start Time</span>
+                </div>
+                <p className="mt-1 text-xs sm:text-sm font-black text-slate-950 dark:text-white truncate">
+                  {formatTime(race?.race_time)}
+                </p>
               </div>
-            </GlassCard>
+
+              <div className="rounded-xl border border-slate-100 dark:border-slate-800/60 bg-slate-50/70 dark:bg-slate-900/60 p-2.5 flex flex-col justify-center min-w-0">
+                <div className="flex items-center gap-1.5 text-slate-400">
+                  <Activity className="h-3 w-3 text-[#6A2DF1] dark:text-purple-400 shrink-0" />
+                  <span className="text-[10px] font-bold uppercase tracking-wider truncate">Distance</span>
+                </div>
+                <p className="mt-1 text-xs sm:text-sm font-black text-slate-950 dark:text-white truncate">
+                  {valueOrUnavailable(race?.distance)}
+                </p>
+              </div>
+
+              <div className="rounded-xl border border-slate-100 dark:border-slate-800/60 bg-slate-50/70 dark:bg-slate-900/60 p-2.5 flex flex-col justify-center min-w-0">
+                <div className="flex items-center gap-1.5 text-slate-400">
+                  <Compass className="h-3 w-3 text-[#6A2DF1] dark:text-purple-400 shrink-0" />
+                  <span className="text-[10px] font-bold uppercase tracking-wider truncate">Surface</span>
+                </div>
+                <p className="mt-1 text-xs sm:text-sm font-black text-slate-950 dark:text-white truncate">
+                  {valueOrUnavailable(race?.surface)}
+                </p>
+              </div>
+
+              <div className="rounded-xl border border-slate-100 dark:border-slate-800/60 bg-slate-50/70 dark:bg-slate-900/60 p-2.5 flex flex-col justify-center min-w-0">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 truncate">Course Layout</span>
+                <p className="mt-1 text-xs sm:text-sm font-black text-slate-950 dark:text-white truncate" title={trackProfile.courseType}>
+                  {trackProfile.courseType}
+                </p>
+              </div>
+
+              <div className="rounded-xl border border-slate-100 dark:border-slate-800/60 bg-slate-50/70 dark:bg-slate-900/60 p-2.5 flex flex-col justify-center min-w-0">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 truncate">Circumference</span>
+                <p className="mt-1 text-xs sm:text-sm font-black text-slate-950 dark:text-white truncate">
+                  {trackProfile.circumference}
+                </p>
+              </div>
+
+              <div className="rounded-xl border border-slate-100 dark:border-slate-800/60 bg-slate-50/70 dark:bg-slate-900/60 p-2.5 flex flex-col justify-center min-w-0">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 truncate">Straight Length</span>
+                <p className="mt-1 text-xs sm:text-sm font-black text-slate-950 dark:text-white truncate">
+                  {trackProfile.straightLength}
+                </p>
+              </div>
+            </div>
           </div>
 
           <div className="rounded-[28px] border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#131424]/90 px-4 py-4 shadow-[0_1px_8px_-4px_rgba(0,0,0,0.08)] sm:px-6">
@@ -203,7 +322,7 @@ export function RaceHorsesPage() {
                 return (
                   <div
                     key={horse.id}
-                    className="group grid cursor-pointer gap-4 rounded-[26px] border border-slate-200 dark:border-slate-800/80 bg-white dark:bg-[#131424]/90 p-4 sm:p-5 shadow-[0_1px_8px_-4px_rgba(0,0,0,0.08)] transition-all duration-300 hover:bg-slate-900/90 hover:backdrop-blur-md hover:border-purple-600 hover:ring-[3px] hover:ring-purple-600 hover:shadow-[0_12px_40px_rgb(0,0,0,0.25)] hover:-translate-y-1 xl:grid-cols-[auto_auto_minmax(0,1.8fr)_repeat(4,minmax(108px,0.7fr))_minmax(128px,auto)_auto] xl:items-center"
+                    className="group grid cursor-pointer gap-4 rounded-[26px] border border-slate-200 dark:border-slate-800/80 bg-white dark:bg-[#131424]/90 p-4 sm:p-5 shadow-[0_1px_8px_-4px_rgba(0,0,0,0.08)] transition-all duration-300 hover:bg-slate-900/90 hover:backdrop-blur-md hover:border-purple-600 hover:ring-[3px] hover:ring-purple-600 hover:shadow-[0_12px_40px_rgb(0,0,0,0.25)] hover:-translate-y-1 xl:grid-cols-[auto_auto_minmax(0,1.8fr)_repeat(3,minmax(108px,0.7fr))_minmax(128px,auto)_auto] xl:items-center"
                     onClick={() => {
                       setCurrentRace(race ?? null);
                       setCurrentHorse(horse);
@@ -237,7 +356,6 @@ export function RaceHorsesPage() {
                   </div>
 
                   <InfoColumn label="Draw" value={valueOrUnavailable(horse.draw_number)} />
-                  <InfoColumn label="Horse No" value={valueOrUnavailable(horse.runner_number)} />
                   <InfoColumn label="Weight" value={valueOrUnavailable(horse.weight_value)} />
                   <InfoColumn label="MR" value={valueOrUnavailable(horse.merit_rating)} />
 
@@ -260,7 +378,7 @@ export function RaceHorsesPage() {
                       navigate(`/horses/${horse.id}`);
                     }}
                   >
-                    View Info
+                    View Horse
                   </button>
                   </div>
                 );
@@ -278,23 +396,6 @@ export function RaceHorsesPage() {
         </div>
       </div>
     </section>
-  );
-}
-function InfoTile({
-  icon: Icon,
-  label,
-  value,
-}: {
-  icon: typeof Calendar;
-  label: string;
-  value: string;
-}) {
-  return (
-    <div className="rounded-2xl border border-slate-100 dark:border-slate-800/60 bg-slate-50/80 dark:bg-slate-900/60 p-4">
-      <Icon className="h-5 w-5 text-[#6A2DF1] dark:text-purple-400" />
-      <p className="mt-4 text-[11px] font-bold uppercase tracking-[0.18em] text-slate-400">{label}</p>
-      <p className="mt-1 text-lg font-black text-slate-950 dark:text-white">{value}</p>
-    </div>
   );
 }
 

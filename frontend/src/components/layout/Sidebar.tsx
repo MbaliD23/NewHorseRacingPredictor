@@ -294,40 +294,48 @@ export function Sidebar() {
       ].join(" ")}
     >
       {/* ── Top Header: Brand + Collapse/Expand Toggle ─────────── */}
-      <div
-        className={[
-          "flex items-center border-b border-slate-100 dark:border-slate-800/80 px-3.5 py-6 shrink-0",
-          expanded ? "justify-between" : "justify-center",
-        ].join(" ")}
-      >
+      <div className="relative flex items-center justify-center w-full px-4 py-4 text-center mx-auto border-b border-slate-100 dark:border-slate-800/80 shrink-0">
         {expanded ? (
-          <div
-            className="flex items-center gap-2.5 min-w-0 cursor-pointer group"
-            onClick={handleHomeClick}
-            role="button"
-            tabIndex={0}
-            title="Reset and go to Winning Form+"
-          >
-            <img
-              src={winningFormLogo}
-              alt="Winning Form+"
-              className="h-20 w-auto max-w-60 object-contain select-none dark:hidden transition-all duration-300"
-            />
-            <img
-              src={winningFormLogoDark}
-              alt="Winning Form+"
-              className="h-20 w-auto max-w-60 object-contain select-none hidden dark:block transition-all duration-300 drop-shadow-[0_0_10px_rgba(139,92,246,0.2)]"
-            />
+          <>
+            <div
+              className="flex items-center justify-center w-full cursor-pointer group"
+              onClick={handleHomeClick}
+              role="button"
+              tabIndex={0}
+              title="Reset and go to Winning Form+"
+            >
+              <img
+                src={winningFormLogo}
+                alt="Winning Form+"
+                className="h-16 w-auto max-w-[200px] object-contain select-none dark:hidden transition-all duration-300 mx-auto"
+              />
+              <img
+                src={winningFormLogoDark}
+                alt="Winning Form+"
+                className="h-16 w-auto max-w-[200px] object-contain select-none hidden dark:block transition-all duration-300 drop-shadow-[0_0_10px_rgba(139,92,246,0.2)] mx-auto"
+              />
+            </div>
+            <button
+              onClick={toggleSidebar}
+              className="absolute right-3 top-1/2 -translate-y-1/2 flex h-8 w-8 shrink-0 aspect-square items-center justify-center rounded-lg text-slate-500 dark:text-slate-400 transition-colors hover:bg-purple-50 dark:hover:bg-purple-950/50 hover:text-purple-700 dark:hover:text-purple-300"
+              aria-label="Collapse sidebar"
+              title="Collapse sidebar"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          </>
+        ) : (
+          <div className="w-full flex justify-center items-center">
+            <button
+              onClick={toggleSidebar}
+              className="flex h-8 w-8 shrink-0 aspect-square items-center justify-center rounded-lg text-slate-500 dark:text-slate-400 transition-colors hover:bg-purple-50 dark:hover:bg-purple-950/50 hover:text-purple-700 dark:hover:text-purple-300"
+              aria-label="Expand sidebar"
+              title="Expand sidebar"
+            >
+              <Menu className="h-5 w-5 text-slate-800 dark:text-slate-200" />
+            </button>
           </div>
-        ) : null}
-        <button
-          onClick={toggleSidebar}
-          className="flex h-8 w-8 shrink-0 aspect-square items-center justify-center rounded-lg text-slate-500 dark:text-slate-400 transition-colors hover:bg-purple-50 dark:hover:bg-purple-950/50 hover:text-purple-700 dark:hover:text-purple-300"
-          aria-label={expanded ? "Collapse sidebar" : "Expand sidebar"}
-          title={expanded ? "Collapse sidebar" : "Expand sidebar"}
-        >
-          {expanded ? <X className="h-4 w-4" /> : <Menu className="h-5 w-5 text-slate-800 dark:text-slate-200" />}
-        </button>
+        )}
       </div>
 
       {/* ── Navigation Body ────────────────────────────────────── */}
@@ -347,7 +355,7 @@ export function Sidebar() {
                 <div className="flex items-center gap-2 min-w-0">
                   <MapPin className="h-4 w-4 text-[#8B5CF6] shrink-0" />
                   <span className="text-xs font-bold uppercase tracking-wider text-slate-800 dark:text-slate-200">
-                    Events
+                    Locations
                   </span>
                   <span className="rounded-full bg-slate-200/80 dark:bg-slate-800 px-1.5 py-0.2 text-[10px] font-bold text-slate-600 dark:text-slate-300">
                     {allVenues.length}
@@ -495,7 +503,7 @@ export function Sidebar() {
                         })
                       ) : (
                         <div className="px-3 py-2 text-xs text-slate-500 dark:text-slate-400 italic">
-                          {activeVenue ? "No races found for this event." : "Select an event above to view races."}
+                          {activeVenue ? "No races found for this location." : "Select a location above to view races."}
                         </div>
                       )}
                     </div>
@@ -712,7 +720,7 @@ export function Sidebar() {
              COLLAPSED RAIL VIEW (64px)
              ══════════════════════════════════════════════════════════ */
           <div className="flex flex-col items-center gap-1.5 w-full">
-            <RailTooltip text={activeVenue ? `Events: ${activeVenue.venue}` : "Events"}>
+            <RailTooltip text={activeVenue ? `Locations: ${activeVenue.venue}` : "Locations"}>
               <button
                 onClick={() => {
                   if (activeVenue) navigate(`/venues/${activeVenue.id}`);
