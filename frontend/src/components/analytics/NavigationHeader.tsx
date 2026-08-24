@@ -22,7 +22,7 @@ export function NavigationHeader() {
           }
         >
           <span style={{ fontSize: "14px", lineHeight: 1 }}>▮</span>
-          <span>Bar Analytics</span>
+          <span>5-Horse Comparison</span>
         </NavLink>
       </nav>
     </div>

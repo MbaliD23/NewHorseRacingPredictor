@@ -408,7 +408,7 @@ export function RadarAnalyticsView({
         <button
           type="button"
           onClick={handleGoToCompare}
-          title="Compare 5 horses on Bar Analytics"
+          title="Compare 5 horses in 5-Horse Comparison"
           style={{
             display: "inline-flex",
             alignItems: "center",

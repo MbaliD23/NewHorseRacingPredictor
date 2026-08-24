@@ -703,7 +703,7 @@ export function Sidebar() {
                 ].join(" ")}
               >
                 <BarChart2 className="h-4 w-4 text-[#8B5CF6] shrink-0" />
-                <span className="text-sm">Bar Analytics (5 Horses)</span>
+                <span className="text-sm">5-Horse Comparison</span>
               </button>
             </div>
           </>
@@ -794,7 +794,7 @@ export function Sidebar() {
               </button>
             </RailTooltip>
 
-            <RailTooltip text="Bar Analytics (5 Horses)">
+            <RailTooltip text="5-Horse Comparison">
               <button
                 onClick={() => navigate("/bar-analytics")}
                 className={railBtn(location.pathname === "/bar-analytics")}
