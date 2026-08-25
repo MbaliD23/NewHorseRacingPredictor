@@ -329,13 +329,11 @@ export function RadarAnalyticsView({
   const controlsHeader = (
     <div style={{
       display: "flex",
-      justifyContent: "space-between",
-      alignItems: "center",
+      flexDirection: "column",
       width: "100%",
       padding: "16px 20px 14px",
       borderBottom: "1px solid rgba(148,163,184,0.08)",
       gap: 12,
-      flexWrap: "wrap" as const,
       boxSizing: "border-box" as const,
       background: "#121324",
       borderTopLeftRadius: 18,
@@ -343,7 +341,94 @@ export function RadarAnalyticsView({
       position: "relative" as const,
       zIndex: 10,
     }}>
-      <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" as const, flex: 1, minWidth: 0 }}>
+      {/* ── Top Header Row: Component Title & Action Controls ── */}
+      <div style={{
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+        width: "100%",
+        gap: 12,
+        flexWrap: "wrap" as const,
+      }}>
+        <h2 className="text-lg font-bold text-white tracking-wide" style={{ margin: 0, color: "#FFFFFF" }}>
+          Head to Head Analysis
+        </h2>
+
+        {/* Right Control Group: Compare 5 button stacked alongside Filter Metrics dropdown */}
+        <div style={{
+          display: "flex",
+          alignItems: "center",
+          gap: 8,
+          flexShrink: 0,
+          position: "relative" as const,
+        }}>
+          <button
+            type="button"
+            onClick={handleGoToCompare}
+            title="Compare 5 horses in 5-Horse Comparison"
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 7,
+              background: "rgba(59,130,246,0.08)",
+              border: "1px solid rgba(59,130,246,0.22)",
+              color: "#60A5FA",
+              fontSize: 12,
+              fontWeight: 600,
+              padding: "6px 13px",
+              borderRadius: 9,
+              cursor: "pointer",
+              transition: "all 0.2s cubic-bezier(0.4,0,0.2,1)",
+              fontFamily: "'Outfit','Inter',sans-serif",
+              whiteSpace: "nowrap" as const,
+              boxSizing: "border-box" as const,
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = "rgba(59,130,246,0.14)";
+              e.currentTarget.style.borderColor = "rgba(59,130,246,0.35)";
+              e.currentTarget.style.color = "#93C5FD";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = "rgba(59,130,246,0.08)";
+              e.currentTarget.style.borderColor = "rgba(59,130,246,0.22)";
+              e.currentTarget.style.color = "#60A5FA";
+            }}
+          >
+            <svg width="13" height="13" viewBox="0 0 13 13" fill="none" aria-hidden="true">
+              <rect x="1" y="5" width="2" height="7" rx="1" fill="currentColor" opacity="0.7" />
+              <rect x="4.5" y="3" width="2" height="9" rx="1" fill="currentColor" />
+              <rect x="8" y="1" width="2" height="11" rx="1" fill="currentColor" opacity="0.7" />
+              <rect x="11.5" y="4" width="1.5" height="8" rx="0.75" fill="currentColor" opacity="0.5" />
+            </svg>
+            Compare 5
+            <span
+              style={{
+                background: "rgba(59,130,246,0.20)",
+                color: "#93C5FD",
+                fontSize: 10,
+                fontWeight: 700,
+                padding: "1px 6px",
+                borderRadius: 10,
+                marginLeft: 2,
+              }}
+            >
+              5
+            </span>
+          </button>
+
+          <div style={{ position: "relative" as const }}>
+            <MetricsDropdown
+              activeKeys={activeMetricKeys}
+              onToggle={toggleMetric}
+              onBatchChange={setActiveMetricKeys}
+              minSelected={2}
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* ── Bottom Row: On Chart horse chips ── */}
+      <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" as const, width: "100%" }}>
         <span style={{ fontSize: 11, fontWeight: 700, color: "#94A3B8", letterSpacing: "0.08em", textTransform: "uppercase" as const, whiteSpace: "nowrap" as const, flexShrink: 0 }}>
           On Chart <span style={{ fontWeight: 400, color: "#475569" }}>(Max 2)</span>
         </span>
@@ -393,74 +478,6 @@ export function RadarAnalyticsView({
               </button>
             );
           })}
-        </div>
-      </div>
-
-      {/* Right Control Group: Compare 5 button stacked vertically above Filter Metrics dropdown */}
-      <div style={{
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "flex-end",
-        gap: 8,
-        flexShrink: 0,
-        position: "relative" as const,
-      }}>
-        <button
-          type="button"
-          onClick={handleGoToCompare}
-          title="Compare 5 horses in 5-Horse Comparison"
-          style={{
-            display: "inline-flex",
-            alignItems: "center",
-            gap: 7,
-            background: "rgba(59,130,246,0.08)",
-            border: "1px solid rgba(59,130,246,0.22)",
-            color: "#60A5FA",
-            fontSize: 12,
-            fontWeight: 600,
-            padding: "6px 13px",
-            borderRadius: 9,
-            cursor: "pointer",
-            transition: "all 0.2s cubic-bezier(0.4,0,0.2,1)",
-            fontFamily: "'Outfit','Inter',sans-serif",
-            whiteSpace: "nowrap" as const,
-            boxSizing: "border-box" as const,
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.background = "rgba(59,130,246,0.14)";
-            e.currentTarget.style.borderColor = "rgba(59,130,246,0.35)";
-            e.currentTarget.style.color = "#93C5FD";
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.background = "rgba(59,130,246,0.08)";
-            e.currentTarget.style.borderColor = "rgba(59,130,246,0.22)";
-            e.currentTarget.style.color = "#60A5FA";
-          }}
-        >
-          <svg width="13" height="13" viewBox="0 0 13 13" fill="none" aria-hidden="true">
-            <rect x="1" y="5" width="2" height="7" rx="1" fill="currentColor" opacity="0.7" />
-            <rect x="4.5" y="3" width="2" height="9" rx="1" fill="currentColor" />
-            <rect x="8" y="1" width="2" height="11" rx="1" fill="currentColor" opacity="0.7" />
-            <rect x="11.5" y="4" width="1.5" height="8" rx="0.75" fill="currentColor" opacity="0.5" />
-          </svg>
-          Compare 5
-          <span
-            style={{
-              background: "rgba(59,130,246,0.20)",
-              color: "#93C5FD",
-              fontSize: 10,
-              fontWeight: 700,
-              padding: "1px 6px",
-              borderRadius: 10,
-              marginLeft: 2,
-            }}
-          >
-            5
-          </span>
-        </button>
-
-        <div style={{ position: "relative" as const }}>
-          <MetricsDropdown activeKeys={activeMetricKeys} onToggle={toggleMetric} />
         </div>
       </div>
     </div>

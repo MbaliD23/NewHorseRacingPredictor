@@ -178,6 +178,10 @@ export function PredictionResultsPage() {
             })}
           </div>
         </AsyncBoundary>
+
+        <p className="text-[11px] text-slate-400 dark:text-slate-500 text-center max-w-2xl mx-auto mt-6 px-4 py-2 border-t border-slate-200/50 dark:border-slate-800/50">
+          Disclaimer: Algorithmic predictions and ratings are provided for informational and entertainment purposes only and are not guaranteed to be 100% accurate. Winning Form and its affiliates accept no liability for any financial losses or betting decisions incurred.
+        </p>
       </div>
     </section>
   );

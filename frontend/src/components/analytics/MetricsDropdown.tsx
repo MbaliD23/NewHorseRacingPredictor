@@ -5,12 +5,18 @@ import { ALL_AXES } from "@/lib/horseAnalytics";
 interface MetricsDropdownProps {
   activeKeys: Set<string>;
   onToggle: (key: string) => void;
+  onBatchChange?: (keys: Set<string>) => void;
+  minSelected?: number;
 }
 
-export function MetricsDropdown({ activeKeys, onToggle }: MetricsDropdownProps) {
+export function MetricsDropdown({
+  activeKeys,
+  onToggle,
+  onBatchChange,
+  minSelected = 2,
+}: MetricsDropdownProps) {
   const [open, setOpen] = useState(false);
   const wrapRef = useRef<HTMLDivElement>(null);
-  const MIN_AXES = 2;
 
   useEffect(() => {
     if (!open) return;
@@ -24,6 +30,35 @@ export function MetricsDropdown({ activeKeys, onToggle }: MetricsDropdownProps) 
   }, [open]);
 
   const activeCount = activeKeys.size;
+
+  const handleSelectAll = () => {
+    const allSet = new Set(ALL_AXES.map((ax) => ax.key));
+    if (onBatchChange) {
+      onBatchChange(allSet);
+    } else {
+      ALL_AXES.forEach((ax) => {
+        if (!activeKeys.has(ax.key)) onToggle(ax.key);
+      });
+    }
+  };
+
+  const handleClearAll = () => {
+    const defaultKeys = ALL_AXES.slice(0, minSelected).map((ax) => ax.key);
+    const newSet = new Set(defaultKeys);
+    if (onBatchChange) {
+      onBatchChange(newSet);
+    } else {
+      ALL_AXES.forEach((ax) => {
+        const shouldBeActive = defaultKeys.includes(ax.key);
+        const isCurrentlyActive = activeKeys.has(ax.key);
+        if (shouldBeActive && !isCurrentlyActive) {
+          onToggle(ax.key);
+        } else if (!shouldBeActive && isCurrentlyActive) {
+          onToggle(ax.key);
+        }
+      });
+    }
+  };
 
   return (
     <div className={styles.dropdownWrap} ref={wrapRef}>
@@ -62,56 +97,62 @@ export function MetricsDropdown({ activeKeys, onToggle }: MetricsDropdownProps) 
         >
           <div className={styles.dropdownHeader}>
             <span className={styles.dropdownTitle}>Active Metrics</span>
-            <span className={styles.dropdownSubtitle}>Min 2 required</span>
+            <span className={styles.dropdownSubtitle}>Min {minSelected} required</span>
           </div>
-          <div className={styles.dropdownDivider} />
-          {ALL_AXES.map((ax) => {
-            const isActive = activeKeys.has(ax.key);
-            const isDisabled = isActive && activeCount <= MIN_AXES;
-            return (
-              <button
-                key={ax.key}
-                role="option"
-                aria-selected={isActive}
-                className={`${styles.dropdownItem} ${isActive ? styles.dropdownItemActive : ""} ${
-                  isDisabled ? styles.dropdownItemDisabled : ""
-                }`}
-                onClick={() => !isDisabled && onToggle(ax.key)}
-                tabIndex={0}
-                type="button"
-                title={isDisabled ? "At least 2 metrics required" : ""}
-              >
-                <span className={`${styles.dropdownCheck} ${isActive ? styles.dropdownCheckActive : ""}`}>
-                  {isActive && (
-                    <svg width="8" height="7" viewBox="0 0 8 7" fill="none" aria-hidden="true">
-                      <path
-                        d="M1 3.5L3 5.5L7 1"
-                        stroke="#3B82F6"
-                        strokeWidth="1.6"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
-                  )}
-                </span>
-                <span className={styles.dropdownItemLabel}>{ax.label}</span>
-                {isActive && <span className={styles.dropdownActivePip} />}
-              </button>
-            );
-          })}
-          <div className={styles.dropdownDivider} />
-          <div className={styles.dropdownFooter}>
+
+          {/* Quick-action batch controls placed side-by-side above the metric checkbox list */}
+          <div className="flex items-center justify-between px-2.5 py-1.5 border-b border-slate-700/40">
             <button
-              className={styles.dropdownFooterBtn}
-              onClick={() =>
-                ALL_AXES.forEach((ax) => {
-                  if (!activeKeys.has(ax.key)) onToggle(ax.key);
-                })
-              }
               type="button"
+              className="text-xs font-semibold text-blue-400 hover:text-blue-300 transition-colors px-2 py-1 rounded hover:bg-blue-950/40 cursor-pointer"
+              onClick={handleSelectAll}
             >
               Select All
             </button>
+            <button
+              type="button"
+              className="text-xs font-semibold text-blue-400 hover:text-blue-300 transition-colors px-2 py-1 rounded hover:bg-blue-950/40 cursor-pointer"
+              onClick={handleClearAll}
+            >
+              Clear All
+            </button>
+          </div>
+
+          <div className="pt-1">
+            {ALL_AXES.map((ax) => {
+              const isActive = activeKeys.has(ax.key);
+              const isDisabled = isActive && activeCount <= minSelected;
+              return (
+                <button
+                  key={ax.key}
+                  role="option"
+                  aria-selected={isActive}
+                  className={`${styles.dropdownItem} ${isActive ? styles.dropdownItemActive : ""} ${
+                    isDisabled ? styles.dropdownItemDisabled : ""
+                  }`}
+                  onClick={() => !isDisabled && onToggle(ax.key)}
+                  tabIndex={0}
+                  type="button"
+                  title={isDisabled ? `At least ${minSelected} metric${minSelected > 1 ? "s" : ""} required` : ""}
+                >
+                  <span className={`${styles.dropdownCheck} ${isActive ? styles.dropdownCheckActive : ""}`}>
+                    {isActive && (
+                      <svg width="8" height="7" viewBox="0 0 8 7" fill="none" aria-hidden="true">
+                        <path
+                          d="M1 3.5L3 5.5L7 1"
+                          stroke="#3B82F6"
+                          strokeWidth="1.6"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                      </svg>
+                    )}
+                  </span>
+                  <span className={styles.dropdownItemLabel}>{ax.label}</span>
+                  {isActive && <span className={styles.dropdownActivePip} />}
+                </button>
+              );
+            })}
           </div>
         </div>
       )}

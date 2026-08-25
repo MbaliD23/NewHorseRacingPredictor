@@ -211,7 +211,8 @@ def test_extracts_recent_form_entries_from_legacy_block():
     assert form_entries[0].winner_weight == "60.0"
     assert form_entries[0].opening_bet == "25/1"
     assert form_entries[0].starting_price == "33/1"
-    assert form_entries[0].merit_rating == "56"
+    assert form_entries[0].merit_rating is None
+    assert form_entries[0].pts == "56"
     assert form_entries[0].comment == "Stayed on at finish"
     assert form_entries[0].speed_figure == "87.17"
     assert form_entries[0].rating == "56"
@@ -538,5 +539,79 @@ def test_extracts_made_to_measure_formline_fields():
     assert entry.starting_price == "33/10"
     assert entry.pts == "64"
     assert entry.comment == "Running on at finish"
+
+
+def test_sparse_unraced_runner_no_fake_data():
+    html = """
+    <html>
+      <body>
+        <table>
+          <tr>
+            <td align="center" valign="top" rowspan="2">
+              <div class="b4">5</div>
+            </td>
+            <td>
+              <table cellpadding="0" width="100%">
+                <tr><td class="b1">FIRST TIMER</td></tr>
+              </table>
+              <table cellpadding="0" width="100%">
+                <tr><td>2 y.o. b c.</td><td align="right">dob: 10 Nov 2023</td></tr>
+              </table>
+            </td>
+          </tr>
+          <tr>
+            <td colspan="2" id="small">
+              GIMMETHEGREENLIGHT - Starry Night by Western Winter.<br>
+              Breeder: DRAKENSTEIN STUD<br>
+            </td>
+          </tr>
+          <tr>
+            <td colspan="3">
+              <table>
+                <tr class="small">
+                  <td>(0) 26.08.01</td>
+                  <td>K</td>
+                  <td>101</td>
+                  <td>G</td>
+                  <td>MJP</td>
+                  <td>b</td>
+                  <td>1000</td>
+                  <td>Domeyer A</td>
+                  <td>58.0</td>
+                  <td></td>
+                  <td>A</td>
+                  <td>1-8</td>
+                  <td>4</td>
+                  <td>4.20</td>
+                  <td>Captain Fast 58.0</td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td>Green, ran on</td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+        </table>
+      </body>
+    </html>
+    """
+    scraper = WinningFormScraper()
+    soup = BeautifulSoup(html, "lxml")
+
+    extended = scraper._extract_extended_horse_data(soup)
+    assert "first timer" in extended
+    first_timer = extended["first timer"]
+    assert first_timer["odds"] is None
+    assert first_timer["form_entries"][0].time is None
+    assert first_timer["form_entries"][0].adjusted_time is None
+    assert first_timer["form_entries"][0].opening_bet is None
+    assert first_timer["form_entries"][0].starting_price is None
+    assert first_timer["form_entries"][0].merit_rating is None
+    assert first_timer["form_entries"][0].pts is None
+    assert first_timer["form_entries"][0].comment == "Green, ran on"
+
 
 

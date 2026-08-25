@@ -188,7 +188,7 @@ export function RadarAnalyticsPage() {
         zIndex: 10,
       }}
     >
-      {/* ── Top Row: [Back Button + "ON CHART (MAX 2)"] on the left | [Venue & Race Selectors + Metrics Dropdown] on the right ── */}
+      {/* ── Top Row: [Back Button + Title "Head to Head Analysis"] on the left | [Venue & Race Selectors + Metrics Dropdown] on the right ── */}
       <div
         style={{
           display: "flex",
@@ -199,22 +199,13 @@ export function RadarAnalyticsPage() {
           flexWrap: "wrap",
         }}
       >
-        {/* Left: Back button & On Chart text aligned */}
+        {/* Left: Back button & Title */}
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
           <BackButton to="/" fallbackTo="/" theme="dark" label="Go back" className="!h-8 !w-8 sm:!h-8 sm:!w-8" />
 
-          <span
-            style={{
-              fontSize: 11,
-              fontWeight: 700,
-              color: "#94A3B8",
-              letterSpacing: "0.08em",
-              textTransform: "uppercase",
-              whiteSpace: "nowrap",
-            }}
-          >
-            On Chart <span style={{ fontWeight: 400, color: "#475569" }}>(Max 2)</span>
-          </span>
+          <h2 className="text-lg font-bold text-white tracking-wide" style={{ margin: 0, color: "#FFFFFF" }}>
+            Head to Head Analysis
+          </h2>
         </div>
 
         {/* Right: Two-Stage Selection Blocks + Metrics Dropdown */}
@@ -227,22 +218,40 @@ export function RadarAnalyticsPage() {
             onSelectRace={handleSelectRace}
           />
           <div style={{ position: "relative" }}>
-            <MetricsDropdown activeKeys={activeMetricKeys} onToggle={toggleMetric} />
+            <MetricsDropdown
+              activeKeys={activeMetricKeys}
+              onToggle={toggleMetric}
+              onBatchChange={setActiveMetricKeys}
+              minSelected={2}
+            />
           </div>
         </div>
       </div>
 
-      {/* ── Bottom Row: Horse selection chips or placeholder prompt ── */}
+      {/* ── Bottom Row: On Chart (Max 2) label + Horse selection chips or placeholder prompt ── */}
       <div
         style={{
           display: "flex",
-          flexWrap: "wrap",
-          gap: 6,
           alignItems: "center",
+          gap: 8,
+          flexWrap: "wrap",
           paddingLeft: 42,
           minHeight: 28,
         }}
       >
+        <span
+          style={{
+            fontSize: 11,
+            fontWeight: 700,
+            color: "#94A3B8",
+            letterSpacing: "0.08em",
+            textTransform: "uppercase",
+            whiteSpace: "nowrap",
+            flexShrink: 0,
+          }}
+        >
+          On Chart <span style={{ fontWeight: 400, color: "#475569" }}>(Max 2)</span>
+        </span>
         {!selectedVenueId ? (
           <span style={{ fontSize: 11.5, color: "#64748B", fontStyle: "italic", fontFamily: "'Outfit','Inter',sans-serif" }}>
             Please select an event venue above to load races
