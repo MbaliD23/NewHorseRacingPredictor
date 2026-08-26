@@ -2101,3 +2101,366 @@ input {
   }
 }
 
+
+/* --------------------------------------------------------------------------
+   App-wide dark-mode atmosphere
+   Matches the supplied location mockup while leaving all page content/cards
+   untouched. The decorative layers sit behind every route in AppShell.
+   -------------------------------------------------------------------------- */
+.app-dark-background {
+  display: none;
+}
+
+.dark .app-dark-background {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  display: block;
+  overflow: hidden;
+  background:
+    radial-gradient(ellipse 58% 50% at 50% 42%, rgba(91, 20, 177, 0.30) 0%, rgba(55, 8, 113, 0.18) 43%, transparent 74%),
+    radial-gradient(ellipse 38% 46% at 87% 25%, rgba(139, 25, 255, 0.17) 0%, transparent 70%),
+    radial-gradient(ellipse 34% 38% at 15% 76%, rgba(93, 15, 178, 0.12) 0%, transparent 72%),
+    linear-gradient(135deg, #0b011f 0%, #12012f 42%, #17013b 68%, #0b011f 100%);
+}
+
+.app-dark-background::before {
+  content: "";
+  position: absolute;
+  inset: -18%;
+  background: radial-gradient(circle at center, rgba(121, 28, 230, 0.12), transparent 56%);
+  animation: wf-background-breathe 11s ease-in-out infinite alternate;
+  will-change: transform, opacity;
+}
+
+.app-dark-background__glow {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 48% 48%, rgba(117, 27, 224, 0.11), transparent 29%),
+    radial-gradient(circle at 82% 74%, rgba(85, 11, 171, 0.09), transparent 31%);
+  animation: wf-glow-drift 18s ease-in-out infinite alternate;
+  will-change: transform;
+}
+
+.app-dark-background__lines {
+  position: absolute;
+  width: min(52vw, 760px);
+  height: min(76vh, 760px);
+  opacity: 0.52;
+  background-image: repeating-linear-gradient(
+    135deg,
+    transparent 0 29px,
+    rgba(162, 32, 255, 0.34) 29.5px 30.5px,
+    transparent 31px 58px
+  );
+  -webkit-mask-image: linear-gradient(to bottom right, transparent 4%, #000 36%, #000 72%, transparent 96%);
+  mask-image: linear-gradient(to bottom right, transparent 4%, #000 36%, #000 72%, transparent 96%);
+  will-change: transform, background-position;
+}
+
+.app-dark-background__lines--left {
+  left: -24vw;
+  bottom: -19vh;
+  transform: rotate(1deg);
+  animation: wf-lines-left 20s linear infinite alternate;
+}
+
+.app-dark-background__lines--right {
+  right: -25vw;
+  bottom: -24vh;
+  transform: rotate(180deg);
+  animation: wf-lines-right 24s linear infinite alternate;
+}
+
+.app-dark-background__dots {
+  position: absolute;
+  inset: 0;
+  opacity: 0.78;
+  background-image:
+    radial-gradient(circle, rgba(218, 52, 255, 0.95) 0 1.1px, transparent 1.7px),
+    radial-gradient(circle, rgba(139, 42, 255, 0.82) 0 0.8px, transparent 1.5px);
+  background-size: 173px 137px, 241px 193px;
+  background-position: 17px 29px, 83px 71px;
+  will-change: transform, background-position, opacity;
+}
+
+.app-dark-background__dots--one {
+  -webkit-mask-image: radial-gradient(ellipse at center, #000 0 62%, transparent 88%);
+  mask-image: radial-gradient(ellipse at center, #000 0 62%, transparent 88%);
+  animation: wf-dots-drift 26s linear infinite alternate, wf-dots-twinkle 4.8s ease-in-out infinite alternate;
+}
+
+.app-dark-background__dots--two {
+  opacity: 0.42;
+  transform: scale(1.12);
+  background-size: 311px 227px, 389px 293px;
+  background-position: 131px 19px, 43px 151px;
+  animation: wf-dots-drift-reverse 32s linear infinite alternate, wf-dots-twinkle 6.5s ease-in-out 1.2s infinite alternate;
+}
+
+@keyframes wf-background-breathe {
+  from { transform: translate3d(-1.5%, -1%, 0) scale(1); opacity: 0.72; }
+  to { transform: translate3d(1.5%, 1.2%, 0) scale(1.07); opacity: 1; }
+}
+
+@keyframes wf-glow-drift {
+  from { transform: translate3d(-2%, 0, 0) scale(1); }
+  to { transform: translate3d(3%, -2%, 0) scale(1.06); }
+}
+
+@keyframes wf-lines-left {
+  from { transform: translate3d(-2%, 2%, 0) rotate(1deg); background-position: 0 0; }
+  to { transform: translate3d(7%, -5%, 0) rotate(1deg); background-position: 90px -70px; }
+}
+
+@keyframes wf-lines-right {
+  from { transform: translate3d(2%, 3%, 0) rotate(180deg); background-position: 0 0; }
+  to { transform: translate3d(-7%, -5%, 0) rotate(180deg); background-position: -100px 80px; }
+}
+
+@keyframes wf-dots-drift {
+  from { transform: translate3d(-1%, 0, 0); background-position: 17px 29px, 83px 71px; }
+  to { transform: translate3d(2.5%, -2%, 0); background-position: 61px -13px, 29px 118px; }
+}
+
+@keyframes wf-dots-drift-reverse {
+  from { transform: scale(1.12) translate3d(1%, -1%, 0); }
+  to { transform: scale(1.12) translate3d(-2%, 2%, 0); }
+}
+
+@keyframes wf-dots-twinkle {
+  from { opacity: 0.38; }
+  to { opacity: 0.82; }
+}
+
+@media (max-width: 768px) {
+  .app-dark-background__lines {
+    width: 86vw;
+    height: 62vh;
+    opacity: 0.38;
+  }
+  .app-dark-background__lines--left { left: -52vw; }
+  .app-dark-background__lines--right { right: -58vw; }
+  .app-dark-background__dots { opacity: 0.58; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .app-dark-background *,
+  .app-dark-background::before {
+    animation: none !important;
+  }
+}
+
+/* =========================================================
+   GLOBAL DARK MODE BACKGROUND
+   Reference: Winning Form+ purple mockup
+   ========================================================= */
+
+.app-shell {
+  position: relative;
+  isolation: isolate;
+  background:
+    radial-gradient(
+      circle at 72% 18%,
+      rgba(128, 0, 255, 0.18),
+      transparent 30%
+    ),
+    radial-gradient(
+      circle at 20% 72%,
+      rgba(102, 0, 255, 0.12),
+      transparent 32%
+    ),
+    linear-gradient(
+      135deg,
+      #100130 0%,
+      #160044 42%,
+      #100130 100%
+    );
+}
+
+/* Main animated canvas */
+.app-dark-background {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 0;
+  background:
+    radial-gradient(
+      ellipse at 78% 22%,
+      rgba(145, 34, 255, 0.16),
+      transparent 28%
+    ),
+    radial-gradient(
+      ellipse at 18% 74%,
+      rgba(94, 24, 255, 0.12),
+      transparent 30%
+    );
+}
+
+/* Purple atmospheric glow */
+.app-dark-background__glow {
+  position: absolute;
+  inset: -20%;
+  background:
+    radial-gradient(
+      circle at 75% 22%,
+      rgba(176, 48, 255, 0.12),
+      transparent 24%
+    ),
+    radial-gradient(
+      circle at 28% 70%,
+      rgba(102, 0, 255, 0.09),
+      transparent 26%
+    );
+  filter: blur(30px);
+  animation: wf-purple-drift 14s ease-in-out infinite alternate;
+}
+
+/* Diagonal line system */
+.app-dark-background__lines {
+  position: absolute;
+  width: 140%;
+  height: 220px;
+  left: -20%;
+  background:
+    repeating-linear-gradient(
+      -45deg,
+      transparent 0,
+      transparent 42px,
+      rgba(170, 45, 255, 0.15) 43px,
+      rgba(170, 45, 255, 0.15) 44px,
+      transparent 45px,
+      transparent 86px
+    );
+  mask-image: linear-gradient(
+    to right,
+    transparent,
+    black 18%,
+    black 82%,
+    transparent
+  );
+  filter: drop-shadow(0 0 10px rgba(145, 40, 255, 0.25));
+}
+
+.app-dark-background__lines--left {
+  top: 35%;
+  transform: rotate(-10deg);
+  animation: wf-lines-left 18s linear infinite;
+}
+
+.app-dark-background__lines--right {
+  bottom: 8%;
+  transform: rotate(-10deg);
+  animation: wf-lines-right 22s linear infinite;
+}
+
+/* Animated dot fields */
+.app-dark-background__dots {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  opacity: 0.7;
+  background-image:
+    radial-gradient(
+      circle,
+      rgba(198, 81, 255, 0.65) 1px,
+      transparent 1.5px
+    );
+  background-size: 72px 72px;
+  animation: wf-dots-drift 18s linear infinite;
+}
+
+.app-dark-background__dots--one {
+  top: 0;
+  left: 0;
+  transform: translate(0, 0);
+}
+
+.app-dark-background__dots--two {
+  top: 20px;
+  left: 30px;
+  opacity: 0.35;
+  background-size: 110px 110px;
+  animation-duration: 26s;
+  animation-direction: reverse;
+}
+
+/* Small moving light particles */
+.app-dark-background__particles {
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(circle at 18% 22%, rgba(221, 98, 255, 0.75) 0 1px, transparent 2px),
+    radial-gradient(circle at 82% 32%, rgba(188, 53, 255, 0.7) 0 1px, transparent 2px),
+    radial-gradient(circle at 36% 78%, rgba(174, 53, 255, 0.55) 0 1px, transparent 2px),
+    radial-gradient(circle at 92% 70%, rgba(212, 81, 255, 0.55) 0 1px, transparent 2px),
+    radial-gradient(circle at 58% 16%, rgba(183, 49, 255, 0.45) 0 1px, transparent 2px);
+  animation: wf-particles 10s ease-in-out infinite alternate;
+}
+
+/* Keep every route on the global canvas */
+.app-shell main,
+.app-shell main > div:last-child {
+  background-color: transparent !important;
+}
+
+/* Animations */
+@keyframes wf-lines-left {
+  from {
+    transform: translate3d(-2%, 0, 0) rotate(-10deg);
+  }
+  to {
+    transform: translate3d(5%, 8px, 0) rotate(-10deg);
+  }
+}
+
+@keyframes wf-lines-right {
+  from {
+    transform: translate3d(3%, 0, 0) rotate(-10deg);
+  }
+  to {
+    transform: translate3d(-5%, -10px, 0) rotate(-10deg);
+  }
+}
+
+@keyframes wf-dots-drift {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(35px, -20px, 0);
+  }
+}
+
+@keyframes wf-particles {
+  from {
+    transform: translate3d(0, 0, 0) scale(1);
+    opacity: 0.45;
+  }
+  to {
+    transform: translate3d(-18px, 15px, 0) scale(1.04);
+    opacity: 0.9;
+  }
+}
+
+@keyframes wf-purple-drift {
+  from {
+    transform: translate3d(-2%, -1%, 0) scale(1);
+  }
+  to {
+    transform: translate3d(2%, 2%, 0) scale(1.06);
+  }
+}
+
+/* Reduce motion for users who request it */
+@media (prefers-reduced-motion: reduce) {
+  .app-dark-background__glow,
+  .app-dark-background__lines,
+  .app-dark-background__dots,
+  .app-dark-background__particles {
+    animation: none !important;
+  }
+}

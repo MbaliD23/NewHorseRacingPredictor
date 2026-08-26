@@ -3,15 +3,26 @@ import { Sidebar } from "./Sidebar";
 
 export function AppShell({ children }: PropsWithChildren) {
   return (
-    <div className="flex flex-row h-screen w-screen overflow-hidden bg-slate-50 dark:bg-[#0B0C14] text-gray-900 dark:text-slate-100 transition-colors duration-300">
+    <div className="app-shell flex flex-row h-screen w-screen overflow-hidden bg-[#100130] text-gray-900 dark:bg-[#100130] dark:text-slate-100">
       <Sidebar />
-      <main className="flex-1 h-full overflow-hidden min-w-0 relative bg-white dark:bg-[#0B0C14] text-gray-900 dark:text-slate-100 transition-colors duration-300">
-        <div className="relative z-10 w-full h-full min-h-0 overflow-y-auto no-scrollbar">
+
+      <main className="relative flex-1 h-full min-w-0 overflow-hidden bg-transparent text-gray-900 dark:bg-transparent dark:text-slate-100">
+        <div className="app-dark-background" aria-hidden="true">
+          <div className="app-dark-background__glow" />
+
+          <div className="app-dark-background__lines app-dark-background__lines--left" />
+          <div className="app-dark-background__lines app-dark-background__lines--right" />
+
+          <div className="app-dark-background__dots app-dark-background__dots--one" />
+          <div className="app-dark-background__dots app-dark-background__dots--two" />
+
+          <div className="app-dark-background__particles" />
+        </div>
+
+        <div className="relative z-10 w-full h-full min-h-0 overflow-y-auto no-scrollbar bg-transparent">
           {children}
         </div>
       </main>
     </div>
   );
 }
-
-
