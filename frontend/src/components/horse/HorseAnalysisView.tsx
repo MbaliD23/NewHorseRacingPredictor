@@ -13,6 +13,7 @@ import {
   Layers,
   ListFilter,
   Medal,
+  MessageSquareText,
   Palette,
   Scale,
   Tag,
@@ -412,14 +413,14 @@ function loadStoredFormColumns(): FormColumnKey[] {
       k === "winner"
         ? "winnerSecond"
         : k === "raceNumber"
-        ? "ref"
-        : k === "speedFigure"
-        ? "adjTime"
-        : k === "rating" || k === "ar"
-        ? "pts"
-        : k === "ob"
-        ? "open_odds"
-        : k
+          ? "ref"
+          : k === "speedFigure"
+            ? "adjTime"
+            : k === "rating" || k === "ar"
+              ? "pts"
+              : k === "ob"
+                ? "open_odds"
+                : k
     );
     const validKeys = mapped.filter((key): key is FormColumnKey => FORM_COLUMN_KEYS.has(key));
     const validKeySet = new Set(validKeys);
@@ -605,6 +606,69 @@ export function HorseAnalysisView({
   );
   const runStats = useMemo(() => parseRunsRecord(horse?.total_runs), [horse?.total_runs]);
   const formSummary = useMemo(() => buildFormSummary(horse), [horse]);
+  // Winning Form supplies the summary as source data. Never synthesize a comment:
+  // use the newest non-empty scraped summary, otherwise show an explicit unavailable state.
+  const winningFormSummary = useMemo(
+    () =>
+      formSummary.entries
+        .map((entry) => entry.form_summary?.trim())
+        .find((summary): summary is string => Boolean(summary)),
+    [formSummary.entries],
+  );
+  const parsedWinningFormSummary = useMemo(() => {
+    if (!winningFormSummary) return null;
+
+    let remaining = winningFormSummary.trim();
+
+    // Extract "Placed: G14,G14,D12(35 wks)"
+    const placedMatch = remaining.match(
+      /Placed:\s*([^.(]+(?:,[^.(]+)*)\s*(?:\((\d+)\s*wks?\))?\.?/i,
+    );
+
+    const recentPlacings = placedMatch?.[1]
+      ?.split(",")
+      .map((item) => item.trim())
+      .filter(Boolean);
+
+    const weeksSinceRun = placedMatch?.[2];
+
+    if (placedMatch) {
+      remaining = remaining.replace(placedMatch[0], "").trim();
+    }
+
+    // Extract "Ex Smith D-2026.06.08"
+    const exTrainerMatch = remaining.match(
+      /Ex\s+(.+?)-\d{4}\.\d{2}\.\d{2}\.?/i,
+    );
+
+    const previousTrainer = exTrainerMatch?.[1]?.trim();
+
+    if (exTrainerMatch) {
+      remaining = remaining.replace(exTrainerMatch[0], "").trim();
+    }
+
+    // Extract "Best MR:75"
+    const meritMatch = remaining.match(/Best MR:\s*(\d+)/i);
+    const bestMR = meritMatch?.[1];
+
+    if (meritMatch) {
+      remaining = remaining.replace(meritMatch[0], "").trim();
+    }
+
+    // Clean punctuation left behind after extracting factual fields.
+    const comment = remaining
+      .replace(/^\s*[.,;:-]+\s*/, "")
+      .replace(/\s+/g, " ")
+      .trim();
+
+    return {
+      recentPlacings,
+      weeksSinceRun,
+      previousTrainer,
+      bestMR,
+      comment: comment || undefined,
+    };
+  }, [winningFormSummary]);
   const visibleFormEntries = showFormHistory
     ? formSummary.entries
     : formSummary.entries.slice(0, 5);
@@ -678,11 +742,10 @@ export function HorseAnalysisView({
               <button
                 type="button"
                 onClick={() => onViewModeChange(viewMode === "single" ? "split" : "single")}
-                className={`flex items-center gap-2 rounded-xl px-4 py-2 text-xs sm:text-sm font-bold backdrop-blur-sm transition-all duration-200 cursor-pointer shadow-xs active:scale-95 ${
-                  viewMode === "split"
-                    ? "bg-purple-600 text-white shadow-lg shadow-purple-500/30 border border-purple-400"
-                    : "bg-purple-950/50 border border-purple-800/40 hover:bg-purple-800/50 text-white shadow-xs"
-                }`}
+                className={`flex items-center gap-2 rounded-xl px-4 py-2 text-xs sm:text-sm font-bold backdrop-blur-sm transition-all duration-200 cursor-pointer shadow-xs active:scale-95 ${viewMode === "split"
+                  ? "bg-purple-600 text-white shadow-lg shadow-purple-500/30 border border-purple-400"
+                  : "bg-purple-950/50 border border-purple-800/40 hover:bg-purple-800/50 text-white shadow-xs"
+                  }`}
                 title={viewMode === "split" ? "Close Radar Chart (Return to Full Width)" : "Open Head to Head Radar Chart (50/50 Split)"}
                 aria-label="Toggle Head to Head Radar View"
                 aria-pressed={viewMode === "split"}
@@ -721,11 +784,10 @@ export function HorseAnalysisView({
                     disabled={!hasPrev}
                     aria-label="Previous Horse"
                     title={hasPrev ? `Previous: ${horseList[currentIndex - 1].name}` : "First horse in race"}
-                    className={`w-8 h-8 sm:w-8.5 sm:h-8.5 flex items-center justify-center rounded-xl transition-all ${
-                      hasPrev
-                        ? "bg-purple-950/50 border border-purple-800/40 hover:bg-purple-800/50 text-white shadow-xs active:scale-95 cursor-pointer"
-                        : "bg-purple-950/20 border border-purple-900/20 text-purple-300/40 opacity-30 pointer-events-none cursor-not-allowed"
-                    }`}
+                    className={`w-8 h-8 sm:w-8.5 sm:h-8.5 flex items-center justify-center rounded-xl transition-all ${hasPrev
+                      ? "bg-purple-950/50 border border-purple-800/40 hover:bg-purple-800/50 text-white shadow-xs active:scale-95 cursor-pointer"
+                      : "bg-purple-950/20 border border-purple-900/20 text-purple-300/40 opacity-30 pointer-events-none cursor-not-allowed"
+                      }`}
                   >
                     <ChevronLeft className="h-4 w-4 sm:h-4.5 sm:w-4.5" />
                   </button>
@@ -736,11 +798,10 @@ export function HorseAnalysisView({
                     disabled={!hasNext}
                     aria-label="Next Horse"
                     title={hasNext ? `Next: ${horseList[currentIndex + 1].name}` : "Last horse in race"}
-                    className={`w-8 h-8 sm:w-8.5 sm:h-8.5 flex items-center justify-center rounded-xl transition-all ${
-                      hasNext
-                        ? "bg-purple-950/50 border border-purple-800/40 hover:bg-purple-800/50 text-white shadow-xs active:scale-95 cursor-pointer"
-                        : "bg-purple-950/20 border border-purple-900/20 text-purple-300/40 opacity-30 pointer-events-none cursor-not-allowed"
-                    }`}
+                    className={`w-8 h-8 sm:w-8.5 sm:h-8.5 flex items-center justify-center rounded-xl transition-all ${hasNext
+                      ? "bg-purple-950/50 border border-purple-800/40 hover:bg-purple-800/50 text-white shadow-xs active:scale-95 cursor-pointer"
+                      : "bg-purple-950/20 border border-purple-900/20 text-purple-300/40 opacity-30 pointer-events-none cursor-not-allowed"
+                      }`}
                   >
                     <ChevronRight className="h-4 w-4 sm:h-4.5 sm:w-4.5" />
                   </button>
@@ -838,6 +899,67 @@ export function HorseAnalysisView({
             </div>
           </SectionCard>
         </div>
+
+        {/* Winning Form Summary - source data only; never generated or inferred */}
+        <SectionCard icon={MessageSquareText} title="Form Summary">
+          {parsedWinningFormSummary ? (
+            <div className="rounded-2xl border border-purple-100 dark:border-purple-900/40 bg-purple-50/70 dark:bg-purple-950/30 px-4 py-4 sm:px-5 sm:py-5">
+
+              {parsedWinningFormSummary.comment && (
+                <p className="text-sm sm:text-base font-semibold leading-relaxed text-gray-900 dark:text-slate-100">
+                  {parsedWinningFormSummary.comment}
+                </p>
+              )}
+
+              {(parsedWinningFormSummary.recentPlacings?.length ||
+                parsedWinningFormSummary.weeksSinceRun ||
+                parsedWinningFormSummary.previousTrainer) && (
+                  <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-3 text-xs sm:text-sm">
+
+                    {parsedWinningFormSummary.recentPlacings?.length ? (
+                      <div>
+                        <span className="text-gray-500 dark:text-slate-400">
+                          Recent:
+                        </span>{" "}
+                        <span className="font-semibold text-gray-900 dark:text-slate-100">
+                          {parsedWinningFormSummary.recentPlacings.join(" • ")}
+                        </span>
+                      </div>
+                    ) : null}
+
+                    {parsedWinningFormSummary.weeksSinceRun ? (
+                      <div>
+                        <span className="text-gray-500 dark:text-slate-400">
+                          Last raced:
+                        </span>{" "}
+                        <span className="font-semibold text-gray-900 dark:text-slate-100">
+                          {parsedWinningFormSummary.weeksSinceRun} weeks ago
+                        </span>
+                      </div>
+                    ) : null}
+
+                    {parsedWinningFormSummary.previousTrainer ? (
+                      <div>
+                        <span className="text-gray-500 dark:text-slate-400">
+                          Previous trainer:
+                        </span>{" "}
+                        <span className="font-semibold text-gray-900 dark:text-slate-100">
+                          {parsedWinningFormSummary.previousTrainer}
+                        </span>
+                      </div>
+                    ) : null}
+
+                  </div>
+                )}
+            </div>
+          ) : (
+            <div className="rounded-2xl border border-dashed border-gray-200 dark:border-slate-700 bg-gray-50/60 dark:bg-slate-900/40 px-4 py-4 sm:px-5">
+              <p className="text-sm font-medium text-gray-500 dark:text-slate-400">
+                Form summary not available.
+              </p>
+            </div>
+          )}
+        </SectionCard>
 
         {/* The Team */}
         <div className="grid gap-4">
