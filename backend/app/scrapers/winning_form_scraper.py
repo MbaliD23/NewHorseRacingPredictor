@@ -708,30 +708,30 @@ class WinningFormScraper:
         adj_time = cells[16] if len(cells) > 16 and re.search(r"\d+\.\d+", cells[16]) else None
         opening_bet = cells[17] if len(cells) > 17 and ("/" in cells[17] or cells[17].replace(".", "").isdigit()) else None
         open_odds = opening_bet
-        odds = cells[17] if len(cells) > 17 and ("/" in cells[17] or cells[17].replace(".", "").isdigit()) else (cells[18] if len(cells) > 18 and ("/" in cells[18] or cells[18].replace(".", "").isdigit()) else None)
-        starting_price = cells[18] if len(cells) > 18 and ("/" in cells[18] or cells[18].replace(".", "").isdigit()) else odds
+        starting_price = cells[18] if len(cells) > 18 and ("/" in cells[18] or cells[18].replace(".", "").isdigit()) else None
+        odds = starting_price or opening_bet
         pts_val = cells[19] if len(cells) > 19 and cells[19].isdigit() else None
         actual_rating = pts_val
-        merit_rating = mr_val or actual_rating
-        comment = cells[20] if len(cells) > 20 else (cells[-1] if len(cells) >= 15 else None)
+        merit_rating = mr_val
+        comment = cells[20] if len(cells) > 20 and cells[20].strip() else (cells[-1] if len(cells) >= 15 and cells[-1].strip() else None)
 
         return ScrapedHorseFormEntry(
             run_date=run_date,
             raw_date_text=raw_date_text,
             weeks=weeks,
-            track=cells[1] if len(cells) > 1 else None,
+            track=cells[1] if len(cells) > 1 and cells[1].strip() else None,
             going=going,
             race_class=race_class,
             course_desc=course_desc,
             ref_no=ref_no,
             race_number=ref_no,
-            distance=cells[6] if len(cells) > 6 else None,
-            jockey_name=cells[7] if len(cells) > 7 else None,
-            weight=cells[8] if len(cells) > 8 else None,
+            distance=cells[6] if len(cells) > 6 and cells[6].strip() else None,
+            jockey_name=cells[7] if len(cells) > 7 and cells[7].strip() else None,
+            weight=cells[8] if len(cells) > 8 and cells[8].strip() else None,
             shoeing=shoeing,
             draw=draw,
             finish_position=self._as_int(cells[12] if len(cells) > 12 else None, 1, 30),
-            margin_behind_winner=cells[13] if len(cells) > 13 else None,
+            margin_behind_winner=cells[13] if len(cells) > 13 and cells[13].strip() else None,
             winner_name=winner_name,
             winner_weight=winner_weight,
             time=time_val,

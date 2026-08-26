@@ -156,7 +156,7 @@ export function BarAnalyticsPage() {
     setActiveMetricKeys((prev) => {
       const next = new Set(prev);
       if (next.has(key)) {
-        if (next.size <= 2) return prev;
+        if (next.size <= 1) return prev;
         next.delete(key);
       } else {
         next.add(key);
@@ -224,7 +224,7 @@ export function BarAnalyticsPage() {
         zIndex: 10,
       }}
     >
-      {/* ── Top Row: [Back Button + "ON CHART (MAX 5)"] on the left | [Venue & Race Selectors + Metrics Dropdown] on the right ── */}
+      {/* ── Top Row: [Back Button + Title "5 Horse Comparison"] on the left | [Venue & Race Selectors + Metrics Dropdown] on the right ── */}
       <div
         style={{
           display: "flex",
@@ -235,22 +235,13 @@ export function BarAnalyticsPage() {
           flexWrap: "wrap",
         }}
       >
-        {/* Left: Back button & On Chart text aligned */}
+        {/* Left: Back button & Title */}
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
           <BackButton to={backTo} fallbackTo={backTo} theme="dark" label="Go back" className="!h-8 !w-8 sm:!h-8 sm:!w-8" />
 
-          <span
-            style={{
-              fontSize: 11,
-              fontWeight: 700,
-              color: "#94A3B8",
-              letterSpacing: "0.08em",
-              textTransform: "uppercase",
-              whiteSpace: "nowrap",
-            }}
-          >
-            On Chart <span style={{ fontWeight: 400, color: "#475569" }}>(Max 5)</span>
-          </span>
+          <h2 className="text-lg font-bold text-white tracking-wide" style={{ margin: 0, color: "#FFFFFF" }}>
+            5 Horse Comparison
+          </h2>
         </div>
 
         {/* Right: Two-Stage Selection Blocks + Metrics Dropdown */}
@@ -263,22 +254,40 @@ export function BarAnalyticsPage() {
             onSelectRace={handleSelectRace}
           />
           <div style={{ position: "relative" }}>
-            <MetricsDropdown activeKeys={activeMetricKeys} onToggle={toggleMetric} />
+            <MetricsDropdown
+              activeKeys={activeMetricKeys}
+              onToggle={toggleMetric}
+              onBatchChange={setActiveMetricKeys}
+              minSelected={1}
+            />
           </div>
         </div>
       </div>
 
-      {/* ── Bottom Row: Horse selection chips or placeholder prompt ── */}
+      {/* ── Bottom Row: On Chart (Max 5) label + Horse selection chips or placeholder prompt ── */}
       <div
         style={{
           display: "flex",
-          flexWrap: "wrap",
-          gap: 6,
           alignItems: "center",
+          gap: 8,
+          flexWrap: "wrap",
           paddingLeft: 42,
           minHeight: 28,
         }}
       >
+        <span
+          style={{
+            fontSize: 11,
+            fontWeight: 700,
+            color: "#94A3B8",
+            letterSpacing: "0.08em",
+            textTransform: "uppercase",
+            whiteSpace: "nowrap",
+            flexShrink: 0,
+          }}
+        >
+          On Chart <span style={{ fontWeight: 400, color: "#475569" }}>(Max 5)</span>
+        </span>
         {!selectedVenueId ? (
           <span style={{ fontSize: 11.5, color: "#64748B", fontStyle: "italic", fontFamily: "'Outfit','Inter',sans-serif" }}>
             Please select an event venue above to load races

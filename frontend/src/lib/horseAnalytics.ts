@@ -159,9 +159,7 @@ export function mapBackendHorseToRaw(horse: Horse, index?: number): RawHorse {
     horse.candd_stat ||
     horse.course_and_distance ||
     "-";
-  const meritRating =
-    horse.merit_rating ??
-    (horse.previous_run_rating ? Math.round(horse.previous_run_rating * 10) : 0);
+  const meritRating = horse.merit_rating ?? 0;
 
   const jockeyPerf = extractRawRecord(
     horse.jockey_record,

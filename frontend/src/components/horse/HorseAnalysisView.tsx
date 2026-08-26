@@ -15,13 +15,14 @@ import {
   Medal,
   MessageSquareText,
   Palette,
+  PlayCircle,
   Scale,
   Tag,
   Trophy,
   User,
   Zap,
 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { SilksRenderer } from "@/components/horse/SilksRenderer";
 import { BackButton } from "@/components/navigation/BackButton";
 import { usePredictionStore } from "@/store/predictionStore";
@@ -130,8 +131,11 @@ const FORM_COLUMNS: FormColumnDefinition[] = [
     label: "MR",
     render: (entry) => {
       const mr = entry.merit_rating ?? entry.mr;
-      if (mr) return `(${mr.replace(/[()]/g, "")})`;
-      return valueOrDash(entry.actual_rating ?? entry.rating);
+      if (mr && String(mr).trim() !== "" && String(mr).trim() !== "-") {
+        const clean = String(mr).replace(/[()]/g, "").trim();
+        return clean ? `(${clean})` : "-";
+      }
+      return "-";
     },
   },
   { key: "sh", label: "SH", render: (entry) => valueOrDash(entry.shoeing) },
@@ -139,13 +143,23 @@ const FORM_COLUMNS: FormColumnDefinition[] = [
   {
     key: "position",
     label: "POS",
-    render: (entry) => (
-      <span
-        className={`inline-flex min-w-9 items-center justify-center rounded-lg border px-2.5 py-1 font-bold ${getFormBadgeTone(entry.finish_position)}`}
-      >
-        {valueOrDash(entry.finish_position)}
-      </span>
-    ),
+    render: (entry) => {
+      if (
+        entry.finish_position === null ||
+        entry.finish_position === undefined ||
+        isNaN(Number(entry.finish_position)) ||
+        Number(entry.finish_position) <= 0
+      ) {
+        return "-";
+      }
+      return (
+        <span
+          className={`inline-flex min-w-9 items-center justify-center rounded-lg border px-2.5 py-1 font-bold ${getFormBadgeTone(entry.finish_position)}`}
+        >
+          {entry.finish_position}
+        </span>
+      );
+    },
   },
   { key: "margin", label: "MARGIN", render: (entry) => valueOrDash(entry.margin_behind_winner) },
   {
@@ -153,16 +167,16 @@ const FORM_COLUMNS: FormColumnDefinition[] = [
     label: "WINNER/2ND",
     cellClassName: "font-medium whitespace-nowrap",
     render: (entry) => {
-      if (!entry.winner_name) return "-";
-      return entry.winner_weight
-        ? `${entry.winner_name} ${entry.winner_weight}`
-        : entry.winner_name;
+      if (!entry.winner_name || String(entry.winner_name).trim() === "" || entry.winner_name === "-") return "-";
+      const w = entry.winner_name.trim();
+      const wt = entry.winner_weight ? String(entry.winner_weight).trim() : "";
+      return wt && wt !== "-" ? `${w} ${wt}` : w;
     },
   },
   { key: "time", label: "TIME", render: (entry) => valueOrDash(entry.time) },
   { key: "adjTime", label: "ADJ/TM", render: (entry) => valueOrDash(entry.adjusted_time ?? entry.speed_figure) },
   { key: "open_odds", label: "OPEN_ODDS", render: (entry) => valueOrDash(entry.open_odds ?? entry.opening_bet) },
-  { key: "sp", label: "SP", render: (entry) => valueOrDash(entry.starting_price ?? entry.sp ?? entry.odds) },
+  { key: "sp", label: "SP", render: (entry) => valueOrDash(entry.starting_price ?? entry.sp) },
   { key: "pts", label: "PTS", render: (entry) => valueOrDash(entry.pts ?? entry.actual_rating ?? entry.rating) },
   { key: "comment", label: "COMMENT", render: (entry) => valueOrDash(entry.comment) },
 ];
@@ -220,13 +234,27 @@ const SEX_LABELS: Record<string, string> = {
   grf: "gr.f.",
 };
 
-function valueOrDash(value: string | number | null | undefined) {
+function valueOrDash(value: string | number | null | undefined): string {
   if (value === null || value === undefined) {
     return "-";
   }
 
-  if (typeof value === "string" && value.trim().length === 0) {
-    return "-";
+  if (typeof value === "number") {
+    if (isNaN(value)) return "-";
+    return String(value);
+  }
+
+  if (typeof value === "string") {
+    const trimmed = value.trim();
+    if (
+      trimmed.length === 0 ||
+      trimmed === "null" ||
+      trimmed === "undefined" ||
+      trimmed === "NaN"
+    ) {
+      return "-";
+    }
+    return trimmed;
   }
 
   return String(value);
@@ -453,7 +481,13 @@ function formatDate(value: string | null | undefined, fallback?: string | null) 
 
 function getBestMeritRating(entries: HorseFormEntry[], fallback: number | null | undefined) {
   const ratings = entries
-    .map((entry) => Number(entry.rating))
+    .map((entry) => {
+      const mr = entry.merit_rating ?? entry.mr;
+      if (!mr || mr === "-") return NaN;
+      const clean = String(mr).replace(/[()]/g, "").trim();
+      const num = Number(clean);
+      return Number.isFinite(num) && num > 0 ? num : NaN;
+    })
     .filter((value) => Number.isFinite(value));
 
   if (ratings.length > 0) {
@@ -534,11 +568,21 @@ export function HorseAnalysisView({
   onViewModeChange,
 }: HorseAnalysisViewProps) {
   const navigate = useNavigate();
-  const { currentRace } = usePredictionStore();
+  const location = useLocation();
+  const { currentRace, setCurrentHorse } = usePredictionStore();
   const [showFormHistory, setShowFormHistory] = useState(false);
   const [visibleFormColumnKeys, setVisibleFormColumnKeys] = useState<FormColumnKey[]>(
     loadStoredFormColumns,
   );
+
+  const handleWatchVideo = () => {
+    if (horse) setCurrentHorse(horse);
+    const isPredictionFlow = location.pathname.startsWith("/predictions");
+    const targetPath = isPredictionFlow
+      ? `/predictions/horses/${horse?.id ?? ""}/replay`
+      : `/horses/${horse?.id ?? ""}/replay`;
+    navigate(targetPath);
+  };
 
   const [profilePage, setProfilePage] = useState(0);
   const profileScrollRef = useRef<HTMLDivElement>(null);
@@ -736,8 +780,19 @@ export function HorseAnalysisView({
             label="Back to Horses"
           />
 
-          {/* Right Action Controls: Head to Head Comparison Button */}
-          <div className="flex items-center gap-2 sm:gap-2.5 shrink-0">
+          {/* Right Action Controls: Horse Display & Head to Head Comparison */}
+          <div className="flex items-center gap-2 sm:gap-2.5 shrink-0 flex-wrap">
+            <button
+              type="button"
+              onClick={handleWatchVideo}
+              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-purple-600/20 hover:bg-purple-600 text-purple-300 hover:text-white border border-purple-500/40 transition-all font-semibold text-xs sm:text-sm shadow-md cursor-pointer active:scale-95"
+              title="Horse display"
+              aria-label="Horse display"
+            >
+              <PlayCircle className="h-4 w-4 shrink-0 text-purple-300 group-hover:text-white" />
+              <span>Horse display</span>
+            </button>
+
             {onViewModeChange && (
               <button
                 type="button"
@@ -750,7 +805,7 @@ export function HorseAnalysisView({
                 aria-label="Toggle Head to Head Radar View"
                 aria-pressed={viewMode === "split"}
               >
-                <Zap className="h-4 w-4 fill-black text-black shrink-0" />
+                <Zap className={`h-4 w-4 shrink-0 ${viewMode === "split" ? "text-white" : "text-purple-300 group-hover:text-white"}`} />
                 <span>Head to Head Comparison</span>
               </button>
             )}
@@ -1086,7 +1141,7 @@ export function HorseAnalysisView({
                       {visibleFormColumns.map((column) => (
                         <th
                           key={column.key}
-                          className={`px-4 py-3 ${column.headerClassName ?? ""}`}
+                          className={`px-4 py-3 whitespace-nowrap ${column.headerClassName ?? ""}`}
                         >
                           {column.label}
                         </th>
@@ -1096,11 +1151,14 @@ export function HorseAnalysisView({
                   <tbody className="divide-y divide-gray-100 dark:divide-slate-800 bg-white dark:bg-[#0E0F1A]/80">
                     {visibleFormEntries.length > 0 ? (
                       visibleFormEntries.map((entry, index) => (
-                        <tr key={`${entry.run_date ?? "unknown"}-${index}`} className="align-top">
+                        <tr
+                          key={`${entry.run_date ?? "unknown"}-${index}`}
+                          className="align-middle transition-colors hover:bg-purple-50/20 dark:hover:bg-slate-800/40"
+                        >
                           {visibleFormColumns.map((column) => (
                             <td
                               key={column.key}
-                              className={`px-4 py-3 text-gray-700 dark:text-slate-300 ${column.cellClassName ?? ""}`}
+                              className={`px-4 py-3 text-gray-700 dark:text-slate-300 font-medium whitespace-nowrap ${column.cellClassName ?? ""}`}
                             >
                               {column.render(entry)}
                             </td>
@@ -1111,7 +1169,7 @@ export function HorseAnalysisView({
                       <tr>
                         <td
                           colSpan={Math.max(visibleFormColumns.length, 1)}
-                          className="px-4 py-6 text-center text-sm text-gray-500 dark:text-slate-400"
+                          className="px-4 py-6 text-center text-sm font-medium text-gray-500 dark:text-slate-400"
                         >
                           No historical race results available for this horse yet.
                         </td>
