@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Film } from "lucide-react";
 import { BackButton } from "@/components/navigation/BackButton";
-import animationHorseVideo from "@/assets/animation horse video.mp4";
+import animationHorseVideo from "@/assets/Horse_animation.mp4";
 
 interface HorseVideoViewProps {
   horseId?: string | number | null;
