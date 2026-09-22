@@ -27,7 +27,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
         // Ignore localStorage access errors
       }
     }
-    return "light";
+    return "dark";
   });
 
   useEffect(() => {

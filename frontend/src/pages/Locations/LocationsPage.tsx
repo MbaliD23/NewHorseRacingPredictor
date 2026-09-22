@@ -121,44 +121,44 @@ export function LocationsPage() {
 
   return (
     <div className="relative min-h-[calc(100vh-80px)] w-full flex-1 min-w-0 overflow-visible transition-all duration-300 ease-in-out pt-1 pb-10 px-[clamp(1rem,2vw,2.5rem)]">
-      {/* Top Right Live Clock & Date Badge */}
-      <div className="absolute right-4 sm:right-6 lg:right-8 top-3 sm:top-4 z-20 flex items-center gap-2 rounded-full border border-slate-200/80 dark:border-purple-900/40 bg-white/80 dark:bg-slate-900/80 px-3.5 py-1.5 shadow-sm backdrop-blur-md text-xs font-semibold text-slate-700 dark:text-slate-200">
+      {/* Top Right Live Clock & Date Badge (hidden on mobile, shown on tablet/desktop) */}
+      <div className="hidden sm:flex absolute right-4 sm:right-6 lg:right-8 top-3 sm:top-4 z-20 items-center gap-2 rounded-full border border-slate-200/80 dark:border-purple-900/40 bg-white/80 dark:bg-slate-900/80 px-3.5 py-1.5 shadow-sm backdrop-blur-md text-xs font-semibold text-slate-700 dark:text-slate-200">
         <Clock className="h-3.5 w-3.5 text-[#6A2DF1] dark:text-purple-400 shrink-0" />
         <span>{formatDate(liveClock)}</span>
         <span className="text-slate-300 dark:text-slate-700 font-normal">|</span>
         <span className="tabular-nums font-bold text-[#6A2DF1] dark:text-purple-300">{formatTime(liveClock)}</span>
       </div>
 
-      {/* Background Horse */}
-      <div className="pointer-events-none absolute right-8 top-[-30px] -z-10 w-[min(40vw,650px)] min-w-[300px] opacity-100 md:right-8 md:top-[50px] lg:right-12 lg:w-[min(36vw,650px)] transition-all duration-300">
-        <img src={horseBg} alt="" className="h-auto w-full object-contain opacity-65" />
+      {/* Background Horse Graphic */}
+      <div className="pointer-events-none absolute right-0 sm:right-8 top-0 sm:top-[50px] -z-10 w-[min(50vw,650px)] max-w-full opacity-20 sm:opacity-65 transition-all duration-300 overflow-hidden">
+        <img src={horseBg} alt="" className="h-auto w-full object-contain" />
       </div>
 
       <div
         className={`relative z-10 mb-6 sm:mb-8 text-center max-w-4xl mx-auto flex flex-col items-center transition-all duration-300 ease-in-out ${
-          isSidebarOpen ? "-translate-x-2 sm:-translate-x-6 md:-translate-x-10 lg:-translate-x-12" : "translate-x-0"
+          isSidebarOpen ? "translate-x-0 md:-translate-x-10 lg:-translate-x-12" : "translate-x-0"
         }`}
       >
         <img
           src={wfLogo}
           alt="Winning Form"
-          className="mx-auto -mt-2 mb-3 h-20 sm:h-24 md:h-28 w-auto object-contain select-none dark:hidden transition-all duration-300"
+          className="mx-auto -mt-2 mb-3 h-16 sm:h-24 md:h-28 w-auto object-contain select-none dark:hidden transition-all duration-300"
         />
         <img
           src={wfLogoDark}
           alt="Winning Form"
-          className="mx-auto -mt-2 mb-3 h-20 sm:h-24 md:h-28 w-auto object-contain select-none hidden dark:block transition-all duration-300 drop-shadow-[0_0_12px_rgba(139,92,246,0.25)]"
+          className="mx-auto -mt-2 mb-3 h-16 sm:h-24 md:h-28 w-auto object-contain select-none hidden dark:block transition-all duration-300 drop-shadow-[0_0_12px_rgba(139,92,246,0.25)]"
         />
-        <h1 className="mb-2.5 text-[clamp(1.85rem,3.2vw,3.3rem)] font-extrabold leading-tight tracking-tight text-gray-900 dark:text-white">
+        <h1 className="mb-2 text-[clamp(1.65rem,3.2vw,3.3rem)] font-extrabold leading-tight tracking-tight text-gray-900 dark:text-white">
           Select Your <span className="text-purple-600">Location</span>
         </h1>
-        <p className="text-[clamp(0.95rem,1.4vw,1.35rem)] font-medium text-gray-500 dark:text-slate-400 max-w-2xl">
+        <p className="text-[clamp(0.88rem,1.4vw,1.35rem)] font-medium text-gray-500 dark:text-slate-400 max-w-2xl px-2">
           Pick a location to see what's racing today
         </p>
       </div>
 
       {/* Controls Row: Left Search Bar, Right Filter Buttons */}
-      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 mb-6 sm:mb-8 mt-2 sm:mt-4 relative z-10 max-w-7xl mx-auto w-full">
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 sm:gap-4 mb-6 sm:mb-8 mt-2 sm:mt-4 relative z-10 max-w-7xl mx-auto w-full">
         {/* Left Side: Search Bar Input */}
         <div className="relative w-full sm:w-[576px] md:w-[640px] max-w-2xl shrink-0">
           <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 dark:text-slate-500" />
@@ -171,7 +171,7 @@ export function LocationsPage() {
         </div>
 
         {/* Right Side: Filter Buttons Group */}
-        <div className="flex items-center justify-start sm:justify-end shrink-0">
+        <div className="flex items-center justify-start sm:justify-end shrink-0 overflow-x-auto no-scrollbar pb-1 sm:pb-0">
           <FilterPills value={filter} onChange={setFilter} />
         </div>
       </div>

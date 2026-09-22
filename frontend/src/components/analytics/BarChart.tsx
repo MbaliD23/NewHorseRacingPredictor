@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import styles from "./Analytics.module.css";
 import type { MetricAxis, NormalizedHorse } from "@/types/horseAnalytics";
 import { HORSES, horseColor, computeScale } from "@/lib/horseAnalytics";
@@ -27,6 +28,12 @@ export function BarChart({ activeHorseIds, activeAxes, horses }: BarChartProps) 
     .map((id) => allHorses.find((h) => h.id === id))
     .filter((h): h is NonNullable<typeof h> => Boolean(h));
 
+  useEffect(() => {
+    const handleScroll = () => setTooltip(null);
+    window.addEventListener("scroll", handleScroll, true);
+    return () => window.removeEventListener("scroll", handleScroll, true);
+  }, []);
+
   if (activeHorses.length === 0 || activeAxes.length === 0) {
     return (
       <div className={styles.chartPlaceholder}>Select at least one horse from the table below</div>
@@ -37,6 +44,25 @@ export function BarChart({ activeHorseIds, activeAxes, horses }: BarChartProps) 
 
   // Y-axis tick labels (0 + scale.ticks)
   const yLabels = [0, ...scale.ticks];
+
+  const handleBarHover = (
+    e: React.MouseEvent<HTMLDivElement>,
+    horse: NormalizedHorse,
+    axLabel: string,
+    rawVal: string,
+    value: number,
+    color: string
+  ) => {
+    setTooltip({
+      x: e.clientX,
+      y: e.clientY,
+      name: horse.name,
+      metric: axLabel,
+      raw: rawVal,
+      pct: Math.round(value),
+      color,
+    });
+  };
 
   return (
     <div
@@ -93,17 +119,8 @@ export function BarChart({ activeHorseIds, activeAxes, horses }: BarChartProps) 
                           key={horse.id}
                           className={styles.barWrapper}
                           style={fixedMode ? { flex: "0 0 auto", width: FIXED_BAR_W } : {}}
-                          onMouseEnter={(e) =>
-                            setTooltip({
-                              x: e.clientX,
-                              y: e.clientY,
-                              name: horse.name,
-                              metric: ax.label,
-                              raw: rawVal,
-                              pct: Math.round(value),
-                              color,
-                            })
-                          }
+                          onMouseEnter={(e) => handleBarHover(e, horse, ax.label, rawVal, value, color)}
+                          onMouseMove={(e) => handleBarHover(e, horse, ax.label, rawVal, value, color)}
                           onMouseLeave={() => setTooltip(null)}
                         >
                           <div
@@ -127,21 +144,41 @@ export function BarChart({ activeHorseIds, activeAxes, horses }: BarChartProps) 
         </div>
       </div>
 
-      {tooltip && (
-        <div
-          className={styles.chartTooltip}
-          style={{ left: tooltip.x + 14, top: tooltip.y - 10 }}
-        >
-          <div className={styles.chartTooltipHeader}>
-            <span className={styles.chartTooltipSwatch} style={{ background: tooltip.color }} />
-            <span className={styles.chartTooltipName}>{tooltip.name}</span>
-          </div>
-          <div className={styles.chartTooltipMetric}>{tooltip.metric}</div>
-          <div className={styles.chartTooltipValue}>{tooltip.raw}</div>
-          <div className={styles.chartTooltipPct}>
-            {tooltip.pct} / {Math.round(scale.max)} (scaled)
-          </div>
-        </div>
+      {tooltip && typeof document !== "undefined" && createPortal(
+        (() => {
+          const TOOLTIP_HALF_WIDTH = 95;
+          const margin = 12;
+          const clampedX = Math.max(
+            TOOLTIP_HALF_WIDTH + margin,
+            Math.min(window.innerWidth - TOOLTIP_HALF_WIDTH - margin, tooltip.x)
+          );
+
+          const isFlipped = tooltip.y < 120;
+          const topPos = isFlipped ? tooltip.y + 16 : tooltip.y - 12;
+          const transform = isFlipped ? "translate(-50%, 0)" : "translate(-50%, -100%)";
+
+          return (
+            <div
+              className={styles.chartTooltip}
+              style={{
+                left: clampedX,
+                top: topPos,
+                transform,
+              }}
+            >
+              <div className={styles.chartTooltipHeader}>
+                <span className={styles.chartTooltipSwatch} style={{ background: tooltip.color }} />
+                <span className={styles.chartTooltipName}>{tooltip.name}</span>
+              </div>
+              <div className={styles.chartTooltipMetric}>{tooltip.metric}</div>
+              <div className={styles.chartTooltipValue}>{tooltip.raw}</div>
+              <div className={styles.chartTooltipPct}>
+                {tooltip.pct} / {Math.round(scale.max)} (scaled)
+              </div>
+            </div>
+          );
+        })(),
+        document.body
       )}
     </div>
   );

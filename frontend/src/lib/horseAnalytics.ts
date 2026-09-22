@@ -360,3 +360,58 @@ export const TABLE_COLS: TableColumn[] = [
   { key: "meritRating", label: "Merit Rating" },
 ];
 
+/* ================================================================
+   ADAPTIVE RADAR METRICS
+   Auto-toggles metrics based on active horse data and user manual overrides.
+   ================================================================ */
+export function computeAdaptiveRadarMetrics(
+  activeHorses: NormalizedHorse[],
+  manuallyEnabledKeys: Set<string>,
+  manuallyDisabledKeys: Set<string>,
+  allAxes: MetricAxis[] = ALL_AXES,
+  minRequired: number = 2
+): Set<string> {
+  if (activeHorses.length === 0) {
+    return new Set(allAxes.map((a) => a.key));
+  }
+
+  // 1. Gather all metric keys where at least one active horse has a non-zero value
+  const horseNonZeroKeys = new Set<string>();
+  for (const horse of activeHorses) {
+    for (const ax of allAxes) {
+      const val = horse.norm[ax.key] ?? 0;
+      if (val > 0) {
+        horseNonZeroKeys.add(ax.key);
+      }
+    }
+  }
+
+  // 2. Active keys = (horseNonZeroKeys + manuallyEnabledKeys) - manuallyDisabledKeys
+  const result = new Set<string>();
+  for (const ax of allAxes) {
+    if (manuallyDisabledKeys.has(ax.key)) continue;
+    if (manuallyEnabledKeys.has(ax.key) || horseNonZeroKeys.has(ax.key)) {
+      result.add(ax.key);
+    }
+  }
+
+  // 3. Fallback: ensure at least minRequired metrics are active so radar polygon can render
+  if (result.size < minRequired) {
+    for (const ax of allAxes) {
+      if (!manuallyDisabledKeys.has(ax.key)) {
+        result.add(ax.key);
+        if (result.size >= minRequired) break;
+      }
+    }
+    if (result.size < minRequired) {
+      for (const ax of allAxes) {
+        result.add(ax.key);
+        if (result.size >= minRequired) break;
+      }
+    }
+  }
+
+  return result;
+}
+
+

@@ -33,34 +33,36 @@ export function PredictionResultsPage() {
     <section className="page-section screen-shell w-full gap-6 py-4">
       <div className="mx-auto flex w-full max-w-[1600px] flex-col gap-6 px-2 sm:px-4 lg:px-6">
         {/* Centered Header Card */}
-        <div className="relative rounded-[32px] border border-slate-200/80 dark:border-slate-800/80 bg-white dark:bg-[#131424]/90 px-4 py-6 shadow-[0_1px_8px_-4px_rgba(0,0,0,0.08)] sm:px-6 lg:px-8">
-          <div className="absolute left-4 top-4 sm:left-6 sm:top-6">
-            <BackButton
-              to={currentRace?.id ? `/analysis/${currentRace.id}` : "/"}
-              fallbackTo={currentRace?.id ? `/analysis/${currentRace.id}` : "/"}
-              label="Back to Factors"
-            />
-          </div>
+        <div className="relative rounded-[24px] sm:rounded-[32px] border border-slate-200/80 dark:border-slate-800/80 bg-white dark:bg-[#131424]/90 p-4 sm:px-6 sm:py-6 lg:px-8 shadow-[0_1px_8px_-4px_rgba(0,0,0,0.08)]">
+          <div className="flex flex-col sm:flex-row items-center justify-between relative gap-3 sm:gap-0">
+            <div className="self-start sm:self-auto sm:absolute sm:left-0 sm:top-0">
+              <BackButton
+                to={currentRace?.id ? `/analysis/${currentRace.id}` : "/"}
+                fallbackTo={currentRace?.id ? `/analysis/${currentRace.id}` : "/"}
+                label="Back to Factors"
+              />
+            </div>
 
-          <div className="flex flex-col items-center justify-center text-center w-full max-w-3xl mx-auto pt-2 sm:pt-0">
-            <h1 className="text-[clamp(2rem,3.4vw,3.4rem)] font-black leading-[1.05] tracking-tight text-slate-950 dark:text-white">
-              Top <span className="text-[#6A2DF1]">Predictions</span>
-            </h1>
-            <p className="mt-2 text-sm font-medium text-slate-500 dark:text-slate-400 max-w-2xl">
-              {currentRace?.title
-                ? `${currentRace.title} ranked through your selected factor weighting.`
-                : "Algorithmic ranking based on your selected factors."}
-            </p>
-            <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
-              {weightedBy.map((variable) => (
-                <span
-                  className="inline-flex items-center gap-1.5 rounded-full border border-purple-200/90 dark:border-purple-800 bg-purple-50 dark:bg-purple-950/50 px-3.5 py-1 text-xs font-bold text-purple-700 dark:text-purple-300 shadow-2xs"
-                  key={variable}
-                >
-                  <Sparkles className="h-3 w-3 text-purple-600 dark:text-purple-400" />
-                  {predictionVariableLabels[variable]}
-                </span>
-              ))}
+            <div className="flex flex-col items-center justify-center text-center w-full max-w-3xl mx-auto">
+              <h1 className="text-[clamp(1.75rem,3.4vw,3.4rem)] font-black leading-[1.05] tracking-tight text-slate-950 dark:text-white">
+                Top <span className="text-[#6A2DF1]">Predictions</span>
+              </h1>
+              <p className="mt-2 text-xs sm:text-sm font-medium text-slate-500 dark:text-slate-400 max-w-2xl px-2">
+                {currentRace?.title
+                  ? `${currentRace.title} ranked through your selected factor weighting.`
+                  : "Algorithmic ranking based on your selected factors."}
+              </p>
+              <div className="mt-3 sm:mt-4 flex flex-wrap items-center justify-center gap-1.5 sm:gap-2">
+                {weightedBy.map((variable) => (
+                  <span
+                    className="inline-flex items-center gap-1 sm:gap-1.5 rounded-full border border-purple-200/90 dark:border-purple-800 bg-purple-50 dark:bg-purple-950/50 px-2.5 sm:px-3.5 py-1 text-[11px] sm:text-xs font-bold text-purple-700 dark:text-purple-300 shadow-2xs"
+                    key={variable}
+                  >
+                    <Sparkles className="h-3 w-3 text-purple-600 dark:text-purple-400" />
+                    {predictionVariableLabels[variable]}
+                  </span>
+                ))}
+              </div>
             </div>
           </div>
         </div>

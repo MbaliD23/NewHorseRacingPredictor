@@ -162,23 +162,20 @@ html:not(.dark) .light-theme .wheel-wedge.selected {
 /* ── Wheel center badge ──────────────────────────────────── */
 /* Light */
 html:not(.dark) .light-theme .wheel-center {
-  background:
-    radial-gradient(circle at top, rgba(250, 245, 255, 0.98), rgba(255, 255, 255, 0.99) 72%),
-    #ffffff !important;
-  border-color: rgba(139, 92, 246, 0.28) !important;
+  background: #ffffff !important;
+  border: 2px solid #8b5cf6 !important;
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.9),
-    0 0 0 1px rgba(139, 92, 246, 0.12),
-    0 8px 28px rgba(109, 40, 217, 0.1) !important;
+    0 8px 28px rgba(109, 40, 217, 0.15) !important;
 }
 
 html:not(.dark) .light-theme .wheel-center strong {
-  color: #6d28d9 !important;
+  color: #7c3aed !important;
   text-shadow: none;
 }
 
 html:not(.dark) .light-theme .wheel-center span {
-  color: #64748b !important;
+  color: #334155 !important;
 }
 
 /* Dark */
@@ -247,14 +244,12 @@ html:not(.dark) .light-theme .factor-segment.selected {
 
 /* ── Tooltip / hover info card ───────────────────────────── */
 html:not(.dark) .light-theme .factor-description-card {
-  background: rgba(255, 255, 255, 0.97);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(139, 92, 246, 0.3);
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
   border-radius: 16px;
-  color: #0f172a;
+  color: #1e293b;
   box-shadow:
-    0 8px 32px rgba(91, 33, 182, 0.12),
+    0 10px 32px rgba(0, 0, 0, 0.12),
     0 2px 8px rgba(0, 0, 0, 0.06);
 }
 
@@ -262,7 +257,7 @@ html:not(.dark) .light-theme .factor-desc-header {
   color: #7c3aed;
   padding-bottom: 0.6rem;
   margin-bottom: 0.7rem;
-  border-bottom: 1px solid rgba(139, 92, 246, 0.14);
+  border-bottom: 1px solid #f1f5f9;
 }
 
 html:not(.dark) .light-theme .factor-desc-text {
@@ -348,3 +343,128 @@ html:not(.dark) .light-theme .state-panel span {
 html:not(.dark) .light-theme .state-panel svg {
   color: #7c3aed;
 }
+
+/* ================================================================
+   ADDITIONAL LIGHT MODE PAGE OVERRIDES
+   Extended rules for all page canvases, typography, buttons, pills
+   and selected row highlights outside the Analysis Factors page.
+   ================================================================ */
+
+/* ── LocationsPage / VenueRacesPage / RaceHorsesPage canvases ── */
+html:not(.dark) .page-section,
+html:not(.dark) .screen-shell {
+  background-color: #f8fafc;
+}
+
+/* ── Page heading typography in light mode ─────────────────────── */
+html:not(.dark) h1.text-gray-900 {
+  color: #0f172a;
+}
+
+html:not(.dark) p.text-gray-500 {
+  color: #64748b;
+}
+
+/* ── LocationsPage card bottom button: "View Races" ─────────────
+   The button already has correct light classes (bg-purple-50 /
+   text-purple-700) in the JSX — this reinforces for fallback.    */
+html:not(.dark) button.bg-purple-50 {
+  background-color: rgb(245 243 255) !important;
+  color: #6d28d9 !important;
+  border: 1px solid rgba(139, 92, 246, 0.22);
+}
+
+html:not(.dark) button.bg-purple-50:hover {
+  background-color: rgb(237 233 254) !important;
+}
+
+/* ── VenueRacesPage / RaceHorsesPage: "Explore Race" / "View Horse" ──
+   These buttons have correct dark: classes already in JSX.
+   Reinforce the light-mode side here to guarantee correct contrast. */
+html:not(.dark) .inline-flex.bg-purple-50 {
+  background-color: rgb(245 243 255) !important;
+  border-color: rgba(139, 92, 246, 0.22) !important;
+  color: #6d28d9 !important;
+}
+
+/* ── PredictionResultsPage: score/confidence cells ─────────────── */
+html:not(.dark) .bg-purple-50\/60 {
+  background-color: rgba(245, 243, 255, 0.75) !important;
+}
+
+/* ── FilterPills: unselected pill light mode ────────────────────── */
+html:not(.dark) .border-slate-200.bg-white\/80 {
+  background-color: rgba(255, 255, 255, 0.95) !important;
+  border-color: rgb(226 232 240) !important;
+  color: #374151 !important;
+}
+
+html:not(.dark) .border-slate-200.bg-white\/80:hover {
+  background-color: #ffffff !important;
+  border-color: rgba(139, 92, 246, 0.38) !important;
+  color: #6d28d9 !important;
+}
+
+/* ── VenueRacesPage hero card: lock to white surface ───────────── */
+html:not(.dark) .races-hero-card {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(248, 244, 255, 0.98)),
+    radial-gradient(circle at top left, rgba(168, 85, 247, 0.09), transparent 34%);
+}
+
+/* ── Race row active / selected highlight in light ─────────────── */
+html:not(.dark) .race-row-light,
+html:not(.dark) .race-row-premium {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(248, 244, 255, 0.97)),
+    radial-gradient(circle at top left, rgba(168, 85, 247, 0.08), transparent 30%);
+}
+
+/* ── Selected row border accent ─────────────────────────────────── */
+html:not(.dark) .horse-row-premium.selected,
+html:not(.dark) .prediction-card-selectable.selected {
+  border-color: rgba(109, 40, 217, 0.55) !important;
+  background: rgba(245, 243, 255, 0.6) !important;
+}
+
+/* ── Breadcrumb / eyebrow pills ─────────────────────────────────── */
+html:not(.dark) .eyebrow {
+  background: rgba(245, 243, 255, 0.94);
+  border-color: rgba(139, 92, 246, 0.14);
+  color: #6d28d9;
+}
+
+/* ── Search box in light mode ───────────────────────────────────── */
+html:not(.dark) .search-box {
+  background: rgba(255, 255, 255, 0.92);
+  border-color: rgba(226, 232, 240, 0.9);
+  box-shadow: inset 0 0 18px rgba(168, 85, 247, 0.04);
+}
+
+html:not(.dark) .search-box input {
+  color: #0f172a;
+}
+
+html:not(.dark) .search-box input::placeholder {
+  color: rgba(100, 116, 139, 0.7);
+}
+
+/* ── Status strip in light mode ─────────────────────────────────── */
+html:not(.dark) .status-strip {
+  background: rgba(255, 255, 255, 0.95);
+  border-color: rgba(139, 92, 246, 0.12);
+  color: #4b3c7a;
+  box-shadow: 0 8px 24px rgba(91, 33, 182, 0.06);
+}
+
+/* ── Venue card in light mode ───────────────────────────────────── */
+html:not(.dark) .venue-card {
+  background: rgba(255, 255, 255, 0.98);
+  border-color: rgba(139, 92, 246, 0.1);
+}
+
+html:not(.dark) .venue-card:hover {
+  border-color: rgba(139, 92, 246, 0.35);
+  box-shadow: 0 22px 58px rgba(91, 33, 182, 0.12);
+}
+

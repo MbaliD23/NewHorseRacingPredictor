@@ -6,6 +6,7 @@ import App from "@/App";
 import "@/styles/globals.css";
 import "@/styles/theme.css";
 import "@/styles/animations.css";
+import "@/styles/light-theme.css";
 
 const queryClient = new QueryClient({
   defaultOptions: {

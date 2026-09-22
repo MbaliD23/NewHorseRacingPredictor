@@ -316,70 +316,78 @@ export function RaceHorsesPage() {
           </div>
 
           <AsyncBoundary isEmpty={orderedHorses.length === 0} emptyMessage="No horses available.">
-            <div className="flex flex-col gap-4 pb-2">
+            <div className="flex flex-col gap-3 sm:gap-4 pb-2">
               {orderedHorses.map((horse) => {
                 const assignedColor = getHorseBadgeColor(horse);
                 return (
                   <div
                     key={horse.id}
-                    className="group grid cursor-pointer gap-4 rounded-[26px] border border-slate-200 dark:border-slate-800/80 bg-white dark:bg-[#131424]/90 p-4 sm:p-5 shadow-[0_1px_8px_-4px_rgba(0,0,0,0.08)] transition-all duration-300 hover:bg-slate-900/90 hover:backdrop-blur-md hover:border-purple-600 hover:ring-[3px] hover:ring-purple-600 hover:shadow-[0_12px_40px_rgb(0,0,0,0.25)] hover:-translate-y-1 xl:grid-cols-[auto_auto_minmax(0,1.8fr)_repeat(3,minmax(108px,0.7fr))_minmax(128px,auto)_auto] xl:items-center"
+                    className="group flex flex-col xl:grid xl:grid-cols-[auto_auto_minmax(0,1.8fr)_repeat(3,minmax(108px,0.7fr))_minmax(128px,auto)_auto] xl:items-center cursor-pointer gap-3 sm:gap-4 rounded-[22px] sm:rounded-[26px] border border-slate-200 dark:border-slate-800/80 bg-white dark:bg-[#131424]/90 p-3.5 sm:p-5 shadow-[0_1px_8px_-4px_rgba(0,0,0,0.08)] transition-all duration-300 hover:bg-slate-900/90 hover:backdrop-blur-md hover:border-purple-600 hover:ring-[3px] hover:ring-purple-600 hover:shadow-[0_12px_40px_rgb(0,0,0,0.25)] hover:-translate-y-1"
                     onClick={() => {
                       setCurrentRace(race ?? null);
                       setCurrentHorse(horse);
                       navigate(`/horses/${horse.id}`);
                     }}
                   >
-                    <div
-                      className="flex h-12 w-12 shrink-0 aspect-square items-center justify-center rounded-xl font-bold text-xl text-white transition-all duration-300 group-hover:scale-105"
-                      style={{
-                        backgroundColor: assignedColor,
-                        boxShadow: `0 0 12px ${assignedColor}55`,
-                        border: `1px solid ${assignedColor}88`,
+                    {/* Header Group: Number, Silks, Name (Row on mobile, inline columns on desktop) */}
+                    <div className="flex items-center gap-3 min-w-0 xl:contents">
+                      <div
+                        className="flex h-11 w-11 sm:h-12 sm:w-12 shrink-0 aspect-square items-center justify-center rounded-xl font-bold text-lg sm:text-xl text-white transition-all duration-300 group-hover:scale-105"
+                        style={{
+                          backgroundColor: assignedColor,
+                          boxShadow: `0 0 12px ${assignedColor}55`,
+                          border: `1px solid ${assignedColor}88`,
+                        }}
+                      >
+                        {valueOrUnavailable(horse.runner_number)}
+                      </div>
+
+                      <div className="h-13 w-13 sm:h-16 sm:w-16 shrink-0 overflow-hidden rounded-2xl border border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 group-hover:border-white/10 group-hover:bg-white/5 transition-colors duration-300">
+                        <div className="flex h-full w-full items-center justify-center">
+                          <SilksRenderer description={horse.silks} className="h-11 w-11 sm:h-14 sm:w-14" />
+                        </div>
+                      </div>
+
+                      <div className="min-w-0 flex-1">
+                        <h2 className="truncate text-[16px] sm:text-[18px] font-black leading-tight text-slate-950 dark:text-white group-hover:text-white transition-colors duration-300">
+                          {horse.name}
+                        </h2>
+                        <p className="mt-0.5 text-xs sm:text-sm text-slate-500 dark:text-slate-400 group-hover:text-slate-400 transition-colors duration-300">
+                          {valueOrUnavailable(race?.venue)} · Race {valueOrUnavailable(race?.race_number)}
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Stats Sub-Grid: 3 columns on mobile, inline on desktop */}
+                    <div className="grid grid-cols-3 gap-2 pt-1 xl:contents">
+                      <InfoColumn label="Draw" value={valueOrUnavailable(horse.draw_number)} />
+                      <InfoColumn label="Weight" value={valueOrUnavailable(horse.weight_value)} />
+                      <InfoColumn label="MR" value={valueOrUnavailable(horse.merit_rating)} />
+                    </div>
+
+                    {/* Jockey and Trainer info */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-1 gap-1 text-xs sm:text-sm text-slate-500 dark:text-slate-400 group-hover:text-slate-400 transition-colors duration-300">
+                      <p className="truncate">
+                        <span className="font-semibold text-slate-600 dark:text-purple-300 group-hover:text-purple-300">J:</span> {valueOrUnavailable(horse.jockey_name)}
+                      </p>
+                      <p className="truncate">
+                        <span className="font-semibold text-slate-600 dark:text-purple-300 group-hover:text-purple-300">T:</span> {valueOrUnavailable(horse.trainer_name)}
+                      </p>
+                    </div>
+
+                    {/* View Horse Action Button */}
+                    <button
+                      type="button"
+                      className="w-full xl:w-auto inline-flex items-center justify-center whitespace-nowrap rounded-xl border border-purple-200 dark:border-purple-800 bg-purple-50 dark:bg-purple-950/40 group-hover:bg-purple-600 group-hover:text-white group-hover:border-purple-500 group-hover:shadow-[0_4px_14px_0_rgba(147,51,234,0.39)] px-4 py-2.5 text-[13px] font-bold text-purple-700 dark:text-purple-300 transition-all duration-300 active:scale-[0.99] cursor-pointer shadow-xs mt-1 xl:mt-0"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setCurrentRace(race ?? null);
+                        setCurrentHorse(horse);
+                        navigate(`/horses/${horse.id}`);
                       }}
                     >
-                      {valueOrUnavailable(horse.runner_number)}
-                    </div>
-
-                  <div className="h-16 w-16 overflow-hidden rounded-2xl border border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 group-hover:border-white/10 group-hover:bg-white/5 transition-colors duration-300">
-                    <div className="flex h-full w-full items-center justify-center">
-                      <SilksRenderer description={horse.silks} className="h-14 w-14" />
-                    </div>
-                  </div>
-
-                  <div className="min-w-0">
-                    <h2 className="truncate text-[17px] font-black leading-tight text-slate-950 dark:text-white group-hover:text-white transition-colors duration-300 sm:text-[18px]">
-                      {horse.name}
-                    </h2>
-                    <p className="mt-1 text-sm text-slate-500 dark:text-slate-400 group-hover:text-slate-400 transition-colors duration-300">
-                      {valueOrUnavailable(race?.venue)} · Race {valueOrUnavailable(race?.race_number)}
-                    </p>
-                  </div>
-
-                  <InfoColumn label="Draw" value={valueOrUnavailable(horse.draw_number)} />
-                  <InfoColumn label="Weight" value={valueOrUnavailable(horse.weight_value)} />
-                  <InfoColumn label="MR" value={valueOrUnavailable(horse.merit_rating)} />
-
-                  <div className="grid gap-1 text-sm text-slate-500 dark:text-slate-400 group-hover:text-slate-400 transition-colors duration-300">
-                    <p className="truncate">
-                      <span className="font-semibold text-slate-600 dark:text-purple-300 group-hover:text-purple-300">J:</span> {valueOrUnavailable(horse.jockey_name)}
-                    </p>
-                    <p className="truncate">
-                      <span className="font-semibold text-slate-600 dark:text-purple-300 group-hover:text-purple-300">T:</span> {valueOrUnavailable(horse.trainer_name)}
-                    </p>
-                  </div>
-
-                  <button
-                    type="button"
-                    className="justify-self-start whitespace-nowrap rounded-xl border-[1.5px] border-[#6A2DF1] dark:border-purple-800 bg-white dark:bg-purple-950/40 group-hover:bg-purple-600 group-hover:text-white group-hover:border-purple-500 group-hover:shadow-[0_4px_14px_0_rgba(147,51,234,0.39)] px-4 py-2 text-[13px] font-bold text-[#6A2DF1] dark:text-purple-300 transition-all duration-300 active:scale-[0.99] cursor-pointer"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setCurrentRace(race ?? null);
-                      setCurrentHorse(horse);
-                      navigate(`/horses/${horse.id}`);
-                    }}
-                  >
-                    View Horse
-                  </button>
+                      View Horse
+                    </button>
                   </div>
                 );
               })}
@@ -388,10 +396,10 @@ export function RaceHorsesPage() {
         </div>
       </AsyncBoundary>
       <div className="mx-auto w-full max-w-[1600px] px-2 pb-6 sm:px-4 lg:px-6">
-        <div className="flex justify-end">
+        <div className="flex items-center justify-center">
           <PredictorButton
             raceId={race?.id}
-            className="w-full sm:w-auto min-w-[280px]"
+            className="w-full sm:w-auto min-w-0 sm:min-w-[280px]"
           />
         </div>
       </div>

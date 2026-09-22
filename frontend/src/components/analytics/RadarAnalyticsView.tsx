@@ -8,6 +8,7 @@ import {
   normMerit,
   TABLE_COLS,
   mapBackendHorsesToNormalized,
+  computeAdaptiveRadarMetrics,
 } from "@/lib/horseAnalytics";
 import type { NormalizedHorse } from "@/types/horseAnalytics";
 import type { Horse } from "@/types/race";
@@ -89,8 +90,24 @@ export function RadarAnalyticsView({
   }, [selectedHorseId, selectedHorseName, currentHorse, dynamicHorses]);
 
   const [activeHorseIds, setActiveHorseIds] = useState<number[]>([primaryHorseId]);
-  const [activeMetricKeys, setActiveMetricKeys] = useState<Set<string>>(
-    () => new Set(ALL_AXES.map((a) => a.key))
+  const [manuallyEnabledKeys, setManuallyEnabledKeys] = useState<Set<string>>(() => new Set());
+  const [manuallyDisabledKeys, setManuallyDisabledKeys] = useState<Set<string>>(() => new Set());
+
+  // Reset manual overrides when race changes to allow fresh adaptive calculation
+  useEffect(() => {
+    setManuallyEnabledKeys(new Set());
+    setManuallyDisabledKeys(new Set());
+  }, [activeRaceId]);
+
+  const activeHorses = useMemo(() => {
+    const list = dynamicHorses.length > 0 ? dynamicHorses : HORSES;
+    return list.filter((h) => activeHorseIds.includes(h.id));
+  }, [dynamicHorses, activeHorseIds]);
+
+  // Adaptively compute active metric keys based on horse values and manual overrides
+  const activeMetricKeys = useMemo(
+    () => computeAdaptiveRadarMetrics(activeHorses, manuallyEnabledKeys, manuallyDisabledKeys, ALL_AXES, 2),
+    [activeHorses, manuallyEnabledKeys, manuallyDisabledKeys]
   );
   const [mounted, setMounted] = useState(false);
 
@@ -151,17 +168,36 @@ export function RadarAnalyticsView({
     [explicitHorses, fetchedRace?.horses, currentRace?.horses, primaryHorseId, onSelectHorse]
   );
 
-  const toggleMetric = useCallback((key: string) => {
-    setActiveMetricKeys((prev) => {
-      const next = new Set(prev);
-      if (next.has(key)) {
-        if (next.size <= 2) return prev;
-        next.delete(key);
+  const toggleMetric = useCallback(
+    (key: string) => {
+      if (activeMetricKeys.has(key)) {
+        if (activeMetricKeys.size <= 2) return;
+        setManuallyDisabledKeys((prev) => new Set([...prev, key]));
+        setManuallyEnabledKeys((prev) => {
+          const next = new Set(prev);
+          next.delete(key);
+          return next;
+        });
       } else {
-        next.add(key);
+        setManuallyEnabledKeys((prev) => new Set([...prev, key]));
+        setManuallyDisabledKeys((prev) => {
+          const next = new Set(prev);
+          next.delete(key);
+          return next;
+        });
       }
-      return next;
-    });
+    },
+    [activeMetricKeys]
+  );
+
+  const handleBatchMetricsChange = useCallback((newKeys: Set<string>) => {
+    if (newKeys.size === ALL_AXES.length) {
+      setManuallyEnabledKeys(new Set(ALL_AXES.map((a) => a.key)));
+      setManuallyDisabledKeys(new Set());
+    } else {
+      setManuallyEnabledKeys(new Set(newKeys));
+      setManuallyDisabledKeys(new Set(ALL_AXES.filter((a) => !newKeys.has(a.key)).map((a) => a.key)));
+    }
   }, []);
 
   const activeAxes = ALL_AXES.filter((ax) => activeMetricKeys.has(ax.key));
@@ -420,7 +456,7 @@ export function RadarAnalyticsView({
             <MetricsDropdown
               activeKeys={activeMetricKeys}
               onToggle={toggleMetric}
-              onBatchChange={setActiveMetricKeys}
+              onBatchChange={handleBatchMetricsChange}
               minSelected={2}
             />
           </div>

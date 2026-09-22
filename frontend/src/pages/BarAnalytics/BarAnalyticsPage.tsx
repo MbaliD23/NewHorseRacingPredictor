@@ -360,7 +360,10 @@ export function BarAnalyticsPage() {
   );
 
   return (
-    <div className={`${styles.page} ${mounted ? styles.pageVisible : ""}`}>
+    <div
+      className={`${styles.page} ${mounted ? styles.pageVisible : ""} analytics-dark-lock`}
+      style={{ background: "#121324", color: "#f8fafc" }}
+    >
       <div className={styles.orb1} />
       <div className={styles.orb2} />
 

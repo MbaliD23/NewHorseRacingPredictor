@@ -121,74 +121,79 @@ export function VenueRacesPage() {
 
           {/* Races List */}
           <AsyncBoundary isEmpty={races.length === 0} emptyMessage="No races are scheduled for this location.">
-            <div className="flex flex-col gap-4 pb-4">
+            <div className="flex flex-col gap-3 sm:gap-4 pb-4">
               {races.map((race) => (
                 <div
                   key={race.id}
-                  className="group grid cursor-pointer gap-4 rounded-[26px] border border-slate-200 dark:border-slate-800/80 bg-white dark:bg-[#131424]/90 p-4 sm:p-5 shadow-[0_1px_8px_-4px_rgba(0,0,0,0.08)] transition-all duration-300 hover:bg-slate-900/90 hover:backdrop-blur-md hover:border-purple-600 hover:ring-[3px] hover:ring-purple-600 hover:shadow-[0_12px_40px_rgb(0,0,0,0.25)] hover:-translate-y-1 xl:grid-cols-[auto_minmax(0,1.8fr)_repeat(4,minmax(100px,0.7fr))_auto] xl:items-center"
+                  className="group flex flex-col xl:grid xl:grid-cols-[auto_minmax(0,1.8fr)_repeat(4,minmax(100px,0.7fr))_auto] xl:items-center cursor-pointer gap-3 sm:gap-4 rounded-[22px] sm:rounded-[26px] border border-slate-200 dark:border-slate-800/80 bg-white dark:bg-[#131424]/90 p-3.5 sm:p-5 shadow-[0_1px_8px_-4px_rgba(0,0,0,0.08)] transition-all duration-300 hover:bg-slate-900/90 hover:backdrop-blur-md hover:border-purple-600 hover:ring-[3px] hover:ring-purple-600 hover:shadow-[0_12px_40px_rgb(0,0,0,0.25)] hover:-translate-y-1"
                   onClick={() => {
                     setCurrentVenue(venue ?? null);
                     navigate(`/races/${race.id}`);
                   }}
                 >
-                  {/* Race Index Badge */}
-                  <div className="flex flex-col items-center justify-center min-w-[76px] sm:min-w-[88px] px-3 py-2 rounded-2xl bg-purple-600 text-white shadow-md shadow-purple-600/30 border border-purple-500/40 shrink-0 group-hover:shadow-[0_0_18px_rgba(147,51,234,0.6)] group-hover:border-purple-400 transition-all duration-300">
-                    <span className="text-[10px] font-black tracking-widest uppercase text-purple-100/90 leading-none">
-                      RACE
-                    </span>
-                    <span className="text-2xl sm:text-3xl font-black leading-tight tracking-tight text-white">
-                      {String(race.race_number ?? 0).padStart(2, "0")}
-                    </span>
-                  </div>
-
-                  {/* Race Title & Status Indicators */}
-                  <div className="min-w-0">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <h2 className="truncate text-[17px] font-black leading-tight text-slate-950 dark:text-white group-hover:text-white transition-colors duration-300 sm:text-[19px]">
-                        {valueOrUnavailable(race.title)}
-                      </h2>
-                      {(() => {
-                        const status = getRaceDisplayStatus(race, now);
-                        if (status === "today") return (
-                          <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/10 dark:bg-emerald-500/10 px-2.5 py-0.5 text-[11px] font-bold text-emerald-700 dark:text-emerald-400 border border-emerald-500/30 shadow-xs group-hover:bg-emerald-500/20 group-hover:text-emerald-300 group-hover:border-emerald-500/40 transition-colors duration-300">
-                            <span className="h-2 w-2 rounded-full bg-emerald-400 shadow-[0_0_5px_rgba(52,211,153,0.6)]" />
-                            Today's Race
-                          </span>
-                        );
-                        if (status === "upcoming") return (
-                          <span className="inline-flex items-center gap-1 rounded-full bg-purple-50 dark:bg-purple-950/40 px-2.5 py-0.5 text-[11px] font-bold text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800 group-hover:bg-purple-950/60 group-hover:text-purple-300 group-hover:border-purple-500/40 transition-colors duration-300">
-                            <Clock className="h-3 w-3 text-purple-600 dark:text-purple-400 group-hover:text-purple-300" />
-                            Upcoming
-                          </span>
-                        );
-                        if (status === "scheduled") return (
-                          <span className="inline-flex items-center gap-1 rounded-full bg-slate-100 dark:bg-slate-800 px-2 py-0.5 text-[11px] font-medium text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 group-hover:bg-white/10 group-hover:text-slate-300 group-hover:border-white/15 transition-colors duration-300">
-                            Scheduled
-                          </span>
-                        );
-                        return null;
-                      })()}
-                    </div>
-                    <div className="mt-1.5 flex flex-wrap items-center gap-2 text-xs font-semibold text-slate-500 dark:text-slate-400 group-hover:text-slate-400 transition-colors duration-300">
-                      <span>{valueOrUnavailable(venue?.venue)}</span>
-                      <span>•</span>
-                      <span className="inline-flex items-center gap-1 text-[#6A2DF1] dark:text-purple-400 group-hover:text-purple-400 font-bold transition-colors duration-300">
-                        <Users className="h-3.5 w-3.5" />
-                        {valueOrUnavailable(race.runners)} Runners
+                  {/* Top Header Block for mobile / Inline columns for desktop */}
+                  <div className="flex items-center gap-3 min-w-0 xl:contents">
+                    {/* Race Index Badge */}
+                    <div className="flex flex-col items-center justify-center min-w-[64px] sm:min-w-[88px] px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-2xl bg-purple-600 text-white shadow-md shadow-purple-600/30 border border-purple-500/40 shrink-0 group-hover:shadow-[0_0_18px_rgba(147,51,234,0.6)] group-hover:border-purple-400 transition-all duration-300">
+                      <span className="text-[9px] sm:text-[10px] font-black tracking-widest uppercase text-purple-100/90 leading-none">
+                        RACE
+                      </span>
+                      <span className="text-xl sm:text-3xl font-black leading-tight tracking-tight text-white">
+                        {String(race.race_number ?? 0).padStart(2, "0")}
                       </span>
                     </div>
+
+                    {/* Race Title & Status Indicators */}
+                    <div className="min-w-0 flex-1">
+                      <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
+                        <h2 className="truncate text-[15px] sm:text-[19px] font-black leading-tight text-slate-950 dark:text-white group-hover:text-white transition-colors duration-300">
+                          {valueOrUnavailable(race.title)}
+                        </h2>
+                        {(() => {
+                          const status = getRaceDisplayStatus(race, now);
+                          if (status === "today") return (
+                            <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/10 dark:bg-emerald-500/10 px-2 sm:px-2.5 py-0.5 text-[10px] sm:text-[11px] font-bold text-emerald-700 dark:text-emerald-400 border border-emerald-500/30 shadow-xs group-hover:bg-emerald-500/20 group-hover:text-emerald-300 group-hover:border-emerald-500/40 transition-colors duration-300">
+                              <span className="h-1.5 w-1.5 sm:h-2 sm:w-2 rounded-full bg-emerald-400 shadow-[0_0_5px_rgba(52,211,153,0.6)]" />
+                              Today's Race
+                            </span>
+                          );
+                          if (status === "upcoming") return (
+                            <span className="inline-flex items-center gap-1 rounded-full bg-purple-50 dark:bg-purple-950/40 px-2 sm:px-2.5 py-0.5 text-[10px] sm:text-[11px] font-bold text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800 group-hover:bg-purple-950/60 group-hover:text-purple-300 group-hover:border-purple-500/40 transition-colors duration-300">
+                              <Clock className="h-3 w-3 text-purple-600 dark:text-purple-400 group-hover:text-purple-300" />
+                              Upcoming
+                            </span>
+                          );
+                          if (status === "scheduled") return (
+                            <span className="inline-flex items-center gap-1 rounded-full bg-slate-100 dark:bg-slate-800 px-2 py-0.5 text-[10px] sm:text-[11px] font-medium text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 group-hover:bg-white/10 group-hover:text-slate-300 group-hover:border-white/15 transition-colors duration-300">
+                              Scheduled
+                            </span>
+                          );
+                          return null;
+                        })()}
+                      </div>
+                      <div className="mt-1 flex flex-wrap items-center gap-2 text-xs font-semibold text-slate-500 dark:text-slate-400 group-hover:text-slate-400 transition-colors duration-300">
+                        <span>{valueOrUnavailable(venue?.venue)}</span>
+                        <span>•</span>
+                        <span className="inline-flex items-center gap-1 text-[#6A2DF1] dark:text-purple-400 group-hover:text-purple-400 font-bold transition-colors duration-300">
+                          <Users className="h-3.5 w-3.5" />
+                          {valueOrUnavailable(race.runners)} Runners
+                        </span>
+                      </div>
+                    </div>
                   </div>
 
-                  {/* Metadata Tiles */}
-                  <InfoColumn label="Post Time" value={formatTime(race.race_time)} />
-                  <InfoColumn label="Distance" value={valueOrUnavailable(race.distance)} />
-                  <InfoColumn label="Surface" value={valueOrUnavailable(race.surface)} />
-                  <InfoColumn label="Field Size" value={`${valueOrUnavailable(race.runners)} runners`} />
+                  {/* Metadata Tiles (2x2 grid on mobile, inline on desktop xl) */}
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1 xl:contents">
+                    <InfoColumn label="Post Time" value={formatTime(race.race_time)} />
+                    <InfoColumn label="Distance" value={valueOrUnavailable(race.distance)} />
+                    <InfoColumn label="Surface" value={valueOrUnavailable(race.surface)} />
+                    <InfoColumn label="Field Size" value={`${valueOrUnavailable(race.runners)} runners`} />
+                  </div>
 
                   {/* CTA Action Button */}
                   <button
                     type="button"
-                    className="inline-flex items-center justify-center gap-1.5 whitespace-nowrap rounded-xl bg-purple-50 dark:bg-purple-950/50 border border-purple-200 dark:border-purple-800/80 px-4 py-2.5 text-xs font-bold text-[#6A2DF1] dark:text-purple-300 transition-all duration-300 group-hover:bg-purple-600 group-hover:text-white group-hover:border-purple-500 group-hover:shadow-[0_4px_14px_0_rgba(147,51,234,0.39)] active:scale-[0.98] cursor-pointer"
+                    className="w-full xl:w-auto inline-flex items-center justify-center gap-1.5 whitespace-nowrap rounded-xl bg-purple-50 dark:bg-purple-950/50 border border-purple-200 dark:border-purple-800/80 px-4 py-2.5 text-xs font-bold text-[#6A2DF1] dark:text-purple-300 transition-all duration-300 group-hover:bg-purple-600 group-hover:text-white group-hover:border-purple-500 group-hover:shadow-[0_4px_14px_0_rgba(147,51,234,0.39)] active:scale-[0.98] cursor-pointer mt-1 xl:mt-0"
                     onClick={(e) => {
                       e.stopPropagation();
                       setCurrentVenue(venue ?? null);

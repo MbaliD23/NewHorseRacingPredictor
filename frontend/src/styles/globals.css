@@ -2030,13 +2030,13 @@ input {
   }
 
   .factor-wheel {
-    width: min(100%, 430px);
+    width: min(92vw, 420px);
   }
 
   .factor-segment {
-    width: 96px;
-    min-height: 78px;
-    font-size: 0.78rem;
+    width: 90px;
+    min-height: 72px;
+    font-size: 0.75rem;
   }
 
   .factor-segment-core {
@@ -2065,6 +2065,41 @@ input {
   .wheel-center {
     inset: 37%;
   }
+
+@media (max-width: 520px) {
+  .factor-wheel {
+    width: min(90vw, 340px);
+  }
+
+  .factor-segment {
+    width: 78px;
+    min-height: 64px;
+    font-size: 0.68rem;
+  }
+
+  .factor-segment svg {
+    height: 1.25rem !important;
+    width: 1.25rem !important;
+  }
+
+  .factor-segment span {
+    font-size: 0.65rem !important;
+    max-width: 65px !important;
+  }
+
+  .factor-description-card {
+    position: fixed !important;
+    bottom: 24px !important;
+    left: 16px !important;
+    right: 16px !important;
+    top: auto !important;
+    transform: none !important;
+    width: auto !important;
+    max-width: none !important;
+    z-index: 100 !important;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8) !important;
+  }
+}
 
   .analysis-page .page-actions {
     align-items: stretch;
@@ -2464,3 +2499,65 @@ input {
     animation: none !important;
   }
 }
+
+/* =========================================================
+   LIGHT MODE – PAGE CANVAS OVERRIDES
+   Applied when html.light (or html:not(.dark)) is active.
+   These ensure the dark purple atmosphere is fully neutralized
+   and every page wrapper renders a clean slate-50 background.
+   ========================================================= */
+
+html:not(.dark) .app-shell {
+  background: #f8fafc !important;
+}
+
+html:not(.dark) .app-shell main,
+html:not(.dark) .app-shell main > div:last-child {
+  background-color: #f8fafc !important;
+}
+
+html:not(.dark) .page-section,
+html:not(.dark) .screen-shell {
+  background-color: #f8fafc;
+}
+
+html:not(.dark) body {
+  background: #f8fafc;
+}
+
+html:not(.dark) .page-heading h1,
+html:not(.dark) .section-title,
+html:not(.dark) .hero-title {
+  color: #0f172a !important;
+  text-shadow: none !important;
+}
+
+html:not(.dark) .page-heading p {
+  color: #64748b !important;
+}
+
+/* =========================================================
+   ANALYTICS DARK LOCK
+   Hard-lock Radar and Bar analytics pages to the dark theme
+   even when the rest of the app is in light mode.
+   ========================================================= */
+
+.analytics-dark-lock {
+  background: #121324 !important;
+  color: #f8fafc !important;
+}
+
+html:not(.dark) .app-shell:has(.analytics-dark-lock) {
+  background: #121324 !important;
+}
+
+html:not(.dark) .app-shell:has(.analytics-dark-lock) main,
+html:not(.dark) .app-shell:has(.analytics-dark-lock) main > div:last-child {
+  background-color: #121324 !important;
+}
+
+.analytics-dark-lock * {
+  --tw-text-opacity: 1;
+}
+
+

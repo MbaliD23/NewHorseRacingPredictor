@@ -138,8 +138,8 @@ export function AnalysisFactorsPage() {
   return (
     <section className="page-section screen-shell analysis-page light-theme min-h-[calc(100vh-96px)]">
       <div className="relative w-full max-w-6xl mx-auto flex flex-col items-center justify-center text-center px-4 mb-4 sm:mb-6">
-        <div className="w-full flex items-center justify-center relative">
-          <div className="sm:absolute sm:left-0 sm:top-1/2 sm:-translate-y-1/2">
+        <div className="w-full flex flex-col sm:flex-row items-center justify-center relative gap-2 sm:gap-0">
+          <div className="self-start sm:self-auto sm:absolute sm:left-0 sm:top-1/2 sm:-translate-y-1/2">
             <BackButton
               to={currentHorse?.id ? `/horses/${currentHorse.id}` : raceId ? `/races/${raceId}` : currentRace?.id ? `/races/${currentRace.id}` : "/"}
               fallbackTo={currentHorse?.id ? `/horses/${currentHorse.id}` : raceId ? `/races/${raceId}` : "/"}
@@ -147,10 +147,10 @@ export function AnalysisFactorsPage() {
             />
           </div>
           <div className="flex flex-col items-center justify-center text-center">
-            <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white tracking-tight">
+            <h1 className="text-2xl sm:text-4xl font-extrabold text-slate-900 dark:text-white tracking-tight">
               Choose Your <span className="text-purple-600 dark:text-purple-400">Analysis Factors</span>
             </h1>
-            <p className="mt-1 sm:mt-2 text-sm sm:text-base text-slate-500 dark:text-slate-400 font-medium">
+            <p className="mt-1 sm:mt-2 text-xs sm:text-base text-slate-500 dark:text-slate-400 font-medium">
               Select up to 3 factors to weight the prediction algorithm
             </p>
           </div>
@@ -218,7 +218,7 @@ export function AnalysisFactorsPage() {
                     >
                       {/* Standardized Info Icon in Top-Right */}
                       <span
-                        className="absolute top-1 right-2 flex h-4 w-4 items-center justify-center rounded-full border border-purple-400/50 text-purple-300 hover:text-white hover:border-purple-300 bg-slate-900/60 transition-colors z-10"
+                        className="absolute top-1 right-2 flex h-4 w-4 items-center justify-center rounded-full border border-purple-300 dark:border-purple-400/50 text-purple-600 dark:text-purple-300 hover:text-purple-800 dark:hover:text-white hover:border-purple-500 dark:hover:border-purple-300 bg-white/90 dark:bg-slate-900/60 transition-colors z-10"
                         onClick={(e) => {
                           e.stopPropagation();
                           setActiveInfo(activeInfo === factor.code ? null : factor.code);
@@ -261,7 +261,7 @@ export function AnalysisFactorsPage() {
             </div>
           </div>
 
-          <div className="factor-right-col">
+          <div className="factor-right-col hidden lg:flex">
             <img src={horseImg} alt="3D Horse" className="analysis-horse-image" />
           </div>
         </div>

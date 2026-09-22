@@ -773,23 +773,23 @@ export function HorseAnalysisView({
     <div className="w-full text-gray-800 dark:text-slate-200 p-1 sm:p-1.5 transition-all duration-300 ease-in-out">
       <div className="space-y-4 sm:space-y-5 rounded-3xl border border-purple-100/80 dark:border-slate-800/80 bg-white dark:bg-[#121324] p-[clamp(0.875rem,1.8vw,1.5rem)] shadow-[0_10px_40px_rgba(139,92,246,0.06)] dark:shadow-none transition-all duration-300 ease-in-out">
         {/* Header Control Bar */}
-        <div className="flex items-center justify-between gap-3 pb-3 border-b border-purple-100/70 dark:border-slate-800/70">
+        <div className="flex flex-wrap items-center justify-between gap-2.5 pb-3 border-b border-purple-100/70 dark:border-slate-800/70">
           <BackButton
             to={horse?.race_id ? `/races/${horse.race_id}` : currentRace?.id ? `/races/${currentRace.id}` : "/"}
             fallbackTo={horse?.race_id ? `/races/${horse.race_id}` : currentRace?.id ? `/races/${currentRace.id}` : "/"}
             label="Back to Horses"
           />
 
-          {/* Right Action Controls: Horse Display & Head to Head Comparison */}
-          <div className="flex items-center gap-2 sm:gap-2.5 shrink-0 flex-wrap">
+          {/* Right Action Controls: Horse Display, Head to Head Comparison, Go to Prediction */}
+          <div className="flex items-center justify-end gap-2 shrink-0 flex-wrap w-full sm:w-auto">
             <button
               type="button"
               onClick={handleWatchVideo}
-              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-purple-600/20 hover:bg-purple-600 text-purple-300 hover:text-white border border-purple-500/40 transition-all font-semibold text-xs sm:text-sm shadow-md cursor-pointer active:scale-95"
+              className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 px-3 sm:px-4 py-2 rounded-xl bg-purple-600 hover:bg-purple-700 text-white border border-purple-500 dark:bg-purple-600/20 dark:hover:bg-purple-600 dark:text-purple-300 dark:hover:text-white dark:border-purple-500/40 transition-all font-bold text-xs sm:text-sm shadow-sm cursor-pointer active:scale-95"
               title="Horse display"
               aria-label="Horse display"
             >
-              <PlayCircle className="h-4 w-4 shrink-0 text-purple-300 group-hover:text-white" />
+              <PlayCircle className="h-4 w-4 shrink-0 text-white dark:text-purple-300" />
               <span>Horse display</span>
             </button>
 
@@ -797,25 +797,25 @@ export function HorseAnalysisView({
               <button
                 type="button"
                 onClick={() => onViewModeChange(viewMode === "single" ? "split" : "single")}
-                className={`flex items-center gap-2 rounded-xl px-4 py-2 text-xs sm:text-sm font-bold backdrop-blur-sm transition-all duration-200 cursor-pointer shadow-xs active:scale-95 ${viewMode === "split"
+                className={`flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 rounded-xl px-3 sm:px-4 py-2 text-xs sm:text-sm font-bold backdrop-blur-sm transition-all duration-200 cursor-pointer shadow-xs active:scale-95 ${viewMode === "split"
                   ? "bg-purple-600 text-white shadow-lg shadow-purple-500/30 border border-purple-400"
-                  : "bg-purple-950/50 border border-purple-800/40 hover:bg-purple-800/50 text-white shadow-xs"
+                  : "bg-purple-600 hover:bg-purple-700 dark:bg-purple-950/50 dark:hover:bg-purple-800/50 text-white border border-purple-500 dark:border-purple-800/40 shadow-xs"
                   }`}
                 title={viewMode === "split" ? "Close Radar Chart (Return to Full Width)" : "Open Head to Head Radar Chart (50/50 Split)"}
                 aria-label="Toggle Head to Head Radar View"
                 aria-pressed={viewMode === "split"}
               >
-                <Zap className={`h-4 w-4 shrink-0 ${viewMode === "split" ? "text-white" : "text-purple-300 group-hover:text-white"}`} />
-                <span>Head to Head Comparison</span>
+                <Zap className="h-4 w-4 shrink-0 text-white" />
+                <span>Head to Head</span>
               </button>
             )}
           </div>
         </div>
 
         {/* Horse Identity Banner: Row 2 (Number Badge + Name with Nav Arrows + Metadata) */}
-        <div className="flex items-center gap-3.5 min-w-0 w-full pt-0.5">
+        <div className="flex items-start sm:items-center gap-2.5 sm:gap-3.5 min-w-0 w-full pt-0.5">
           <span
-            className="flex h-11 w-11 sm:h-12 sm:w-12 shrink-0 aspect-square items-center justify-center rounded-xl text-lg sm:text-xl font-bold text-white transition-all duration-300"
+            className="flex h-10 w-10 sm:h-12 sm:w-12 shrink-0 aspect-square items-center justify-center rounded-xl text-base sm:text-xl font-bold text-white transition-all duration-300 mt-0.5 sm:mt-0"
             style={{
               backgroundColor: assignedColor,
               boxShadow: `0 0 14px ${assignedColor}55`,
@@ -825,8 +825,8 @@ export function HorseAnalysisView({
             {saddleNo}
           </span>
           <div className="min-w-0 flex-1">
-            <div className="flex items-center gap-3 flex-wrap">
-              <h1 className="text-[clamp(1.2rem,2.2vw,1.75rem)] font-black uppercase tracking-tight text-gray-900 dark:text-white break-words leading-tight">
+            <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
+              <h1 className="text-[clamp(1.15rem,2.2vw,1.75rem)] font-black uppercase tracking-tight text-gray-900 dark:text-white break-words leading-tight">
                 {horseName}
               </h1>
 

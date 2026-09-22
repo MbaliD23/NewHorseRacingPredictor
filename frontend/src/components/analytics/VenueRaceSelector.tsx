@@ -125,7 +125,7 @@ export function VenueRaceSelector({
           }}
         >
           <MapPin size={13} style={{ color: selectedVenue ? "#60A5FA" : "#94A3B8", flexShrink: 0 }} />
-          <span>{venueLabel}</span>
+          <span style={{ overflow: "hidden", textOverflow: "ellipsis", maxWidth: "min(38vw, 180px)" }}>{venueLabel}</span>
           <ChevronDown
             size={13}
             style={{
@@ -255,7 +255,7 @@ export function VenueRaceSelector({
             }}
           >
             <Trophy size={13} style={{ color: selectedRace ? "#A78BFA" : "#94A3B8", flexShrink: 0 }} />
-            <span style={{ overflow: "hidden", textOverflow: "ellipsis" }}>{raceLabel}</span>
+            <span style={{ overflow: "hidden", textOverflow: "ellipsis", maxWidth: "min(46vw, 220px)" }}>{raceLabel}</span>
             <ChevronDown
               size={13}
               style={{

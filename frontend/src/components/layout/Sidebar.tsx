@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useRef } from "react";
+import { useState, useEffect, useMemo, useRef, useCallback } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -84,9 +84,23 @@ export function Sidebar() {
     resetFlow,
     isSidebarOpen,
     toggleSidebar,
+    setSidebarOpen,
   } = usePredictionStore();
 
   const expanded = isSidebarOpen;
+
+  const closeIfMobile = useCallback(() => {
+    if (typeof window !== "undefined" && window.innerWidth < 768) {
+      setSidebarOpen(false);
+    }
+  }, [setSidebarOpen]);
+
+  // Default to closed drawer on mobile screens (< 768px) so content isn't obstructed
+  useEffect(() => {
+    if (typeof window !== "undefined" && window.innerWidth < 768) {
+      setSidebarOpen(false);
+    }
+  }, [setSidebarOpen]);
 
   // Backend queries
   const { data: allVenues = [] } = useRaces();
@@ -236,6 +250,7 @@ export function Sidebar() {
   const handleSelectVenue = (venue: Venue) => {
     setCurrentVenue(venue);
     setExpandedSection("races");
+    closeIfMobile();
     navigate(`/venues/${venue.id}`);
   };
 
@@ -247,11 +262,13 @@ export function Sidebar() {
       if (venueMatchingRace) setCurrentVenue(venueMatchingRace);
     }
     setExpandedSection("horses");
+    closeIfMobile();
     navigate(`/races/${race.id}`);
   };
 
   const handleSelectHorse = (horse: Horse) => {
     setCurrentHorse(horse);
+    closeIfMobile();
     navigate(`/horses/${horse.id}`);
   };
 
@@ -261,6 +278,7 @@ export function Sidebar() {
     setCurrentRace(null);
     setCurrentHorse(null);
     setExpandedSection("events");
+    closeIfMobile();
     navigate("/");
   };
 
@@ -270,6 +288,7 @@ export function Sidebar() {
       return;
     }
     setExpandedSection("predictor");
+    closeIfMobile();
     if (activeRaceId) {
       navigate(`/analysis/${activeRaceId}`);
     } else if (activeVenue?.races?.[0]) {
@@ -286,13 +305,26 @@ export function Sidebar() {
     ].join(" ");
 
   return (
-    <aside
-      className={[
-        "flex h-full flex-col bg-white dark:bg-[#0E0F1A] border-r border-slate-200 dark:border-slate-800/80 text-slate-800 dark:text-slate-200",
-        "transition-all duration-300 ease-in-out shrink-0 overflow-hidden z-50 select-none shadow-sm",
-        expanded ? "w-72" : "w-16",
-      ].join(" ")}
-    >
+    <>
+      {/* Mobile Drawer Backdrop Overlay */}
+      {expanded && (
+        <div
+          className="fixed inset-0 bg-black/60 backdrop-blur-xs z-40 md:hidden transition-opacity duration-300"
+          onClick={closeIfMobile}
+          aria-hidden="true"
+        />
+      )}
+
+      <aside
+        className={[
+          "flex h-full flex-col bg-white dark:bg-[#0E0F1A] border-r border-slate-200 dark:border-slate-800/80 text-slate-800 dark:text-slate-200",
+          "transition-all duration-300 ease-in-out shrink-0 overflow-hidden z-50 select-none shadow-sm",
+          "max-md:fixed max-md:inset-y-0 max-md:left-0 max-md:z-50 max-md:shadow-2xl",
+          expanded
+            ? "w-72 max-md:translate-x-0"
+            : "max-md:-translate-x-full md:w-16",
+        ].join(" ")}
+      >
       {/* ── Top Header: Brand + Collapse/Expand Toggle ─────────── */}
       <div className="relative flex items-center justify-center w-full px-4 py-4 text-center mx-auto border-b border-slate-100 dark:border-slate-800/80 shrink-0">
         {expanded ? (
@@ -795,7 +827,10 @@ export function Sidebar() {
 
             <RailTooltip text="Head to Head Analysis">
               <button
-                onClick={() => navigate("/radar-analytics")}
+                onClick={() => {
+                  closeIfMobile();
+                  navigate("/radar-analytics");
+                }}
                 className={railBtn(location.pathname === "/radar-analytics")}
               >
                 <Activity className="h-5 w-5 text-[#8B5CF6]" />
@@ -804,7 +839,10 @@ export function Sidebar() {
 
             <RailTooltip text="5-Horse Comparison">
               <button
-                onClick={() => navigate("/bar-analytics")}
+                onClick={() => {
+                  closeIfMobile();
+                  navigate("/bar-analytics");
+                }}
                 className={railBtn(location.pathname === "/bar-analytics")}
               >
                 <BarChart2 className="h-5 w-5 text-[#8B5CF6]" />
@@ -870,5 +908,6 @@ export function Sidebar() {
         )}
       </div>
     </aside>
+  </>
   );
 }
